@@ -1,0 +1,109 @@
+{
+  "common": {
+    "appName": "KobKlein",
+    "tagline": "Pagos sin banco. Impulsado por ti.",
+    "loading": "Cargando...",
+    "error": "Ocurrió un error",
+    "success": "¡Éxito!",
+    "cancel": "Cancelar",
+    "continue": "Continuar",
+    "confirm": "Confirmar",
+    "save": "Guardar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "close": "Cerrar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "submit": "Enviar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "export": "Exportar",
+    "refresh": "Actualizar"
+  },
+  "navigation": {
+    "home": "Inicio",
+    "about": "Acerca de",
+    "app": "App",
+    "merchant": "Comerciante",
+    "join": "Únete",
+    "contact": "Contacto",
+    "login": "Iniciar Sesión",
+    "getStarted": "Empezar",
+    "dashboard": "Panel",
+    "transactions": "Transacciones",
+    "settings": "Configuración",
+    "support": "Soporte",
+    "logout": "Cerrar Sesión"
+  },
+  "welcome": {
+    "title": "Pagos sin banco. Impulsado por ti.",
+    "subtitle": "Un sistema de billetera digital seguro y sin efectivo diseñado para haitianos y sus familias en todo el mundo.",
+    "getApp": "Obtener la App",
+    "becomeDistributor": "Convertirse en Distribuidor",
+    "availableOn": "Disponible solo en iOS y Android",
+    "learnMore": "Saber Más"
+  },
+  "features": {
+    "sendReceive": {
+      "title": "Enviar y Recibir al Instante",
+      "description": "Solo con un número de teléfono o tarjeta."
+    },
+    "merchantReady": {
+      "title": "Listo para Comerciantes",
+      "description": "Acepta NFC o QR en tu tienda."
+    },
+    "diasporaPowered": {
+      "title": "Impulsado por la Diáspora",
+      "description": "Recarga una billetera desde cualquier lugar del mundo."
+    }
+  },
+  "currency": {
+    "htg": "HTG",
+    "usd": "USD",
+    "gourdes": "Gourdes",
+    "balance": "Saldo",
+    "amount": "Cantidad",
+    "fee": "Tarifa",
+    "total": "Total",
+    "exchangeRate": "Tipo de Cambio"
+  },
+  "auth": {
+    "signIn": "Iniciar Sesión",
+    "signUp": "Registrarse",
+    "email": "Email",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar Contraseña",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "phone": "Número de Teléfono",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "resetPassword": "Restablecer Contraseña",
+    "createAccount": "Crear Cuenta",
+    "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+    "dontHaveAccount": "¿No tienes una cuenta?",
+    "signInWith": "Iniciar sesión con",
+    "orContinueWith": "O continuar con"
+  },
+  "dashboard": {
+    "welcome": "Bienvenido de nuevo",
+    "quickActions": "Acciones Rápidas",
+    "recentTransactions": "Transacciones Recientes",
+    "addMoney": "Agregar Dinero",
+    "sendMoney": "Enviar Dinero",
+    "payMerchant": "Pagar Comerciante",
+    "withdraw": "Retirar",
+    "viewAll": "Ver Todo"
+  },
+  "footer": {
+    "tagline": "Hecho con ❤️ en Haití",
+    "links": {
+      "about": "Acerca de",
+      "partners": "Socios",
+      "contact": "Contacto",
+      "support": "Soporte",
+      "privacy": "Política de Privacidad",
+      "terms": "Términos de Servicio"
+    },
+    "copyright": "© 2025 TECHKLEIN. Todos los derechos reservados."
+  }
+}

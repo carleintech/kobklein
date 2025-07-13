@@ -1,0 +1,109 @@
+{
+  "common": {
+    "appName": "KobKlein",
+    "tagline": "Peye san bank. Nou menm k ap dirije l.",
+    "loading": "Y ap chaje...",
+    "error": "Gen yon erè ki rive",
+    "success": "Siksè!",
+    "cancel": "Anile",
+    "continue": "Kontinye",
+    "confirm": "Konfime",
+    "save": "Konsève",
+    "edit": "Modifye",
+    "delete": "Efase",
+    "close": "Fèmen",
+    "back": "Tounen",
+    "next": "Pwochen",
+    "submit": "Soumèt",
+    "search": "Chèche",
+    "filter": "Filtre",
+    "export": "Ekspòte",
+    "refresh": "Aktyalize"
+  },
+  "navigation": {
+    "home": "Lakay",
+    "about": "Konsènan",
+    "app": "App",
+    "merchant": "Komèsan",
+    "join": "Antre",
+    "contact": "Kontak",
+    "login": "Konekte",
+    "getStarted": "Kòmanse",
+    "dashboard": "Panèl",
+    "transactions": "Transaksyon yo",
+    "settings": "Paramèt yo",
+    "support": "Sipò",
+    "logout": "Dekonekte"
+  },
+  "welcome": {
+    "title": "Peye san bank. Nou menm k ap dirije l.",
+    "subtitle": "Yon sistèm pochèt dijital ki sikè ak san lajan lèt ki fèt pou Ayisyen yo ak fanmi yo nan tout kote nan mond lan.",
+    "getApp": "Pran App la",
+    "becomeDistributor": "Vin Yon Distribitè",
+    "availableOn": "Disponib sou iOS ak Android sèlman",
+    "learnMore": "Aprann Plis"
+  },
+  "features": {
+    "sendReceive": {
+      "title": "Voye ak Resevwa Rapidman",
+      "description": "Ak jis yon nimewo telefòn oswa yon kat."
+    },
+    "merchantReady": {
+      "title": "Pare pou Komèsan yo",
+      "description": "Aksepte NFC oswa QR nan magazen ou an."
+    },
+    "diasporaPowered": {
+      "title": "Diaspò a k ap Bay Fòs",
+      "description": "Rechaje yon pochèt soti nan nenpòt kote nan mond lan."
+    }
+  },
+  "currency": {
+    "htg": "HTG",
+    "usd": "USD",
+    "gourdes": "Goud",
+    "balance": "Balans",
+    "amount": "Kantite",
+    "fee": "Frè",
+    "total": "Total",
+    "exchangeRate": "Vo Echanj"
+  },
+  "auth": {
+    "signIn": "Konekte",
+    "signUp": "Enskri",
+    "email": "Email",
+    "password": "Modpas",
+    "confirmPassword": "Konfime Modpas",
+    "firstName": "Prenon",
+    "lastName": "Non Fanmi",
+    "phone": "Nimewo Telefòn",
+    "forgotPassword": "Bliye Modpas?",
+    "resetPassword": "Remetò Modpas",
+    "createAccount": "Kreye Kont",
+    "alreadyHaveAccount": "Ou gen yon kont deja?",
+    "dontHaveAccount": "Ou pa gen yon kont?",
+    "signInWith": "Konekte ak",
+    "orContinueWith": "Oswa kontinye ak"
+  },
+  "dashboard": {
+    "welcome": "Byenvini ankò",
+    "quickActions": "Aksyon Rapid yo",
+    "recentTransactions": "Transaksyon Resan yo",
+    "addMoney": "Ajoute Lajan",
+    "sendMoney": "Voye Lajan",
+    "payMerchant": "Peye Komèsan",
+    "withdraw": "Retire",
+    "viewAll": "Gade Tout"
+  },
+  "footer": {
+    "tagline": "Bati ak ❤️ nan Ayiti",
+    "links": {
+      "about": "Konsènan",
+      "partners": "Patnè yo",
+      "contact": "Kontak",
+      "support": "Sipò",
+      "privacy": "Politik Konfidansyalite",
+      "terms": "Kondisyon Sèvis"
+    },
+    "copyright": "© 2025 TECHKLEIN. Tout dwa rezève."
+  }
+}
