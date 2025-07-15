@@ -1,6 +1,5 @@
-// File: kobklein/web/src/app/admin/settings/page.tsx
+"use client";
 
-import { Metadata } from "next";
 import { 
   Home, 
   Users, 
@@ -35,11 +34,6 @@ import { KobKleinCard } from "@/components/ui/kobklein-card";
 import { Badge } from "@/components/ui/badge";
 import { ProtectedRoute } from "@/components/auth/protected-route";
 import { useState } from "react";
-
-export const metadata: Metadata = {
-  title: "System Settings | KobKlein Admin",
-  description: "Configure KobKlein system settings and preferences",
-};
 
 // Mock system settings data
 const mockSystemSettings = {
