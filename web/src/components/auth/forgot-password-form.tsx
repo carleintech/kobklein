@@ -1,82 +1,87 @@
 // File: kobklein/web/src/components/auth/forgot-password-form.tsx
-
 "use client";
 
+import * as React from "react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Mail, ArrowLeft, CheckCircle } from "lucide-react";
+import { Mail, Loader2, CheckCircle2, AlertTriangle, ArrowLeft } from "lucide-react";
 
-import { Button } from "@/components/ui/enhanced-button";
-import { KobKleinCard } from "@/components/ui/kobklein-card";
-import { FormField, KobKleinInput } from "@/components/ui/form-field";
-import { ErrorMessage } from "@/components/ui/error-message";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { KobKleinCard } from "@/components/ui/card";
 import { forgotPasswordSchema, type ForgotPasswordFormData } from "@/lib/validators";
-import { sendPasswordResetEmail } from "@/lib/auth";
+import { sendPasswordReset } from "@/lib/auth";
 import { ROUTES } from "@/lib/constants";
 
 export function ForgotPasswordForm() {
   const [isLoading, setIsLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
 
-  const form = useForm<ForgotPasswordFormData>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+  } = useForm<ForgotPasswordFormData>({
     resolver: zodResolver(forgotPasswordSchema),
-    defaultValues: {
-      email: "",
-    },
   });
+
+  const email = watch("email");
 
   const onSubmit = async (data: ForgotPasswordFormData) => {
     try {
       setIsLoading(true);
-      setError(null);
+      setError("");
 
-      const result = await sendPasswordResetEmail(data.email);
-
+      const result = await sendPasswordReset(data);
+      
       if (result.success) {
-        setIsSuccess(true);
-      } else {
-        setError(result.error || 'Failed to send reset email');
+        setSuccess(true);
       }
-    } catch (error: any) {
-      setError(error.message || 'An unexpected error occurred');
+    } catch (error) {
+      console.error("Password reset error:", error);
+      setError(error instanceof Error ? error.message : "Failed to send reset email");
     } finally {
       setIsLoading(false);
     }
   };
 
-  if (isSuccess) {
+  if (success) {
     return (
-      <KobKleinCard className="w-full max-w-md mx-auto">
-        <div className="p-6 space-y-6 text-center">
-          <div className="flex justify-center">
-            <CheckCircle className="h-16 w-16 text-green-500" />
+      <KobKleinCard className="w-full max-w-md mx-auto p-6">
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 mx-auto bg-green-100 rounded-full flex items-center justify-center">
+            <CheckCircle2 className="w-8 h-8 text-green-600" />
           </div>
-          
-          <div className="space-y-2">
-            <h1 className="text-2xl font-bold">Check Your Email</h1>
-            <p className="text-muted-foreground">
-              We've sent a password reset link to your email address.
+          <div>
+            <h2 className="text-xl font-bold text-kobklein-primary">Check Your Email</h2>
+            <p className="text-muted-foreground mt-2">
+              We've sent a password reset link to{" "}
+              <span className="font-medium">{email}</span>
             </p>
           </div>
-
-          <div className="space-y-3">
+          <div className="bg-blue-50 p-3 rounded-lg">
+            <p className="text-sm text-blue-700">
+              Click the link in the email to reset your password. The link will expire in 1 hour.
+            </p>
+          </div>
+          <div className="flex gap-3">
             <Button
-              variant="kobklein"
-              size="lg"
-              className="w-full"
-              onClick={() => setIsSuccess(false)}
+              variant="outline"
+              onClick={() => setSuccess(false)}
+              className="flex-1"
             >
               Send Another Email
             </Button>
-            
-            <a
-              href={ROUTES.public.login}
-              className="block text-center text-sm text-kobklein-accent hover:underline"
+            <Button
+              onClick={() => window.location.href = ROUTES.public.login}
+              className="flex-1"
             >
-              Back to Sign In
-            </a>
+              Back to Login
+            </Button>
           </div>
         </div>
       </KobKleinCard>
@@ -84,50 +89,56 @@ export function ForgotPasswordForm() {
   }
 
   return (
-    <KobKleinCard className="w-full max-w-md mx-auto">
-      <div className="p-6 space-y-6">
+    <KobKleinCard className="w-full max-w-md mx-auto p-6">
+      <div className="space-y-6">
         {/* Header */}
-        <div className="text-center space-y-2">
-          <h1 className="text-2xl font-bold">Reset Password</h1>
-          <p className="text-muted-foreground">
-            Enter your email address and we'll send you a link to reset your password.
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-kobklein-primary">Reset Password</h1>
+          <p className="text-muted-foreground mt-2">
+            Enter your email address and we'll send you a reset link
           </p>
         </div>
 
         {/* Error Message */}
         {error && (
-          <ErrorMessage
-            variant="destructive"
-            description={error}
-            dismissible
-            onDismiss={() => setError(null)}
-          />
+          <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3">
+            <div className="flex items-center gap-2 text-destructive">
+              <AlertTriangle className="w-4 h-4" />
+              <p className="text-sm font-medium">{error}</p>
+            </div>
+          </div>
         )}
 
-        {/* Form */}
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <FormField
-            label="Email Address"
-            error={form.formState.errors.email?.message}
-            required
-          >
-            <KobKleinInput
-              type="email"
-              placeholder="Enter your email"
-              leftIcon={<Mail className="h-4 w-4" />}
-              {...form.register("email")}
-            />
-          </FormField>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {/* Email Field */}
+          <div className="space-y-2">
+            <Label htmlFor="email">Email Address</Label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Input
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                className="pl-10"
+                {...register("email")}
+                disabled={isLoading}
+              />
+            </div>
+            {errors.email && (
+              <p className="text-sm text-destructive">{errors.email.message}</p>
+            )}
+          </div>
 
-          <Button
-            type="submit"
-            variant="kobklein"
-            size="lg"
-            className="w-full"
-            loading={isLoading}
-            loadingText="Sending..."
-          >
-            Send Reset Link
+          {/* Submit Button */}
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Sending Reset Link...
+              </>
+            ) : (
+              "Send Reset Link"
+            )}
           </Button>
         </form>
 
@@ -137,8 +148,8 @@ export function ForgotPasswordForm() {
             href={ROUTES.public.login}
             className="inline-flex items-center text-sm text-kobklein-accent hover:underline"
           >
-            <ArrowLeft className="h-4 w-4 mr-1" />
-            Back to Sign In
+            <ArrowLeft className="w-4 h-4 mr-1" />
+            Back to Login
           </a>
         </div>
       </div>

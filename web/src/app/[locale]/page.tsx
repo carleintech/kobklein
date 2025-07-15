@@ -1,5 +1,11 @@
-import { WelcomePage } from '@/components/welcome/welcome-page';
+import { EnhancedWelcomePage } from '@/components/welcome/enhanced-welcome-page';
 
-export default function HomePage() {
-  return <WelcomePage />;
+interface HomePageProps {
+  params: {
+    locale: string;
+  };
+}
+
+export default function HomePage({ params }: HomePageProps) {
+  return <EnhancedWelcomePage locale={params.locale} />;
 }

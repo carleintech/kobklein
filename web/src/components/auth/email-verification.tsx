@@ -1,190 +1,192 @@
 // File: kobklein/web/src/components/auth/email-verification.tsx
-
 "use client";
 
+import * as React from "react";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { CheckCircle, XCircle, Mail, RefreshCw } from "lucide-react";
+import { CheckCircle2, XCircle, Mail, Loader2 } from "lucide-react";
 
-import { Button } from "@/components/ui/enhanced-button";
-import { KobKleinCard } from "@/components/ui/kobklein-card";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
-import { verifyEmail, resendVerificationEmail } from "@/lib/auth";
+import { Button } from "@/components/ui/button";
+import { KobKleinCard } from "@/components/ui/card";
+import { verifyEmail, sendVerificationEmail } from "@/lib/auth";
 import { ROUTES } from "@/lib/constants";
 
 export function EmailVerification() {
-  const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'expired'>('loading');
+  const [status, setStatus] = useState<"verifying" | "success" | "error" | "resend">("verifying");
+  const [error, setError] = useState("");
   const [isResending, setIsResending] = useState(false);
-  const [resendSuccess, setResendSuccess] = useState(false);
-  const searchParams = useSearchParams();
   
-  const token = searchParams.get('token');
-  const email = searchParams.get('email');
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token");
+  const email = searchParams.get("email");
 
   useEffect(() => {
     if (token) {
       handleVerification(token);
     } else {
-      setStatus('error');
+      setStatus("resend");
     }
   }, [token]);
 
-  const handleVerification = async (verificationToken: string) => {
+  const handleVerification = async (token: string) => {
     try {
-      const result = await verifyEmail(verificationToken);
+      const result = await verifyEmail(token);
       
       if (result.success) {
-        setStatus('success');
+        setStatus("success");
       } else {
-        if (result.error?.includes('expired')) {
-          setStatus('expired');
-        } else {
-          setStatus('error');
-        }
+        setError("Invalid or expired verification token");
+        setStatus("error");
       }
     } catch (error) {
-      setStatus('error');
+      console.error("Email verification error:", error);
+      setError(error instanceof Error ? error.message : "Verification failed");
+      setStatus("error");
     }
   };
 
   const handleResendVerification = async () => {
-    if (!email) return;
-    
+    if (!email) {
+      setError("Email address is required");
+      return;
+    }
+
     try {
       setIsResending(true);
-      const result = await resendVerificationEmail(email);
+      const result = await sendVerificationEmail(email);
       
       if (result.success) {
-        setResendSuccess(true);
+        setStatus("resend");
+        setError("");
       }
     } catch (error) {
-      console.error('Resend verification error:', error);
+      console.error("Resend verification error:", error);
+      setError(error instanceof Error ? error.message : "Failed to resend verification email");
     } finally {
       setIsResending(false);
     }
   };
 
-  const renderContent = () => {
-    switch (status) {
-      case 'loading':
-        return (
-          <div className="text-center space-y-4">
-            <LoadingSpinner size="lg" />
-            <div className="space-y-2">
-              <h1 className="text-2xl font-bold">Verifying Email</h1>
-              <p className="text-muted-foreground">
+  return (
+    <KobKleinCard className="w-full max-w-md mx-auto p-6">
+      <div className="text-center space-y-6">
+        {/* Verifying State */}
+        {status === "verifying" && (
+          <>
+            <div className="w-16 h-16 mx-auto">
+              <Loader2 className="w-16 h-16 text-kobklein-secondary animate-spin" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-kobklein-primary">Verifying Email</h2>
+              <p className="text-muted-foreground mt-2">
                 Please wait while we verify your email address...
               </p>
             </div>
-          </div>
-        );
+          </>
+        )}
 
-      case 'success':
-        return (
-          <div className="text-center space-y-6">
-            <CheckCircle className="h-16 w-16 text-green-500 mx-auto" />
-            <div className="space-y-2">
-              <h1 className="text-2xl font-bold text-green-600">Email Verified!</h1>
-              <p className="text-muted-foreground">
-                Your email has been successfully verified. You can now access all features.
+        {/* Success State */}
+        {status === "success" && (
+          <>
+            <div className="w-16 h-16 mx-auto bg-green-100 rounded-full flex items-center justify-center">
+              <CheckCircle2 className="w-8 h-8 text-green-600" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-kobklein-primary">Email Verified!</h2>
+              <p className="text-muted-foreground mt-2">
+                Your email has been successfully verified. You can now sign in to your account.
               </p>
             </div>
             <Button
-              variant="kobklein"
-              size="lg"
-              className="w-full"
               onClick={() => window.location.href = ROUTES.public.login}
+              className="w-full"
             >
-              Continue to Sign In
+              Continue to Login
             </Button>
-          </div>
-        );
+          </>
+        )}
 
-      case 'expired':
-        return (
-          <div className="text-center space-y-6">
-            <XCircle className="h-16 w-16 text-amber-500 mx-auto" />
-            <div className="space-y-2">
-              <h1 className="text-2xl font-bold text-amber-600">Link Expired</h1>
-              <p className="text-muted-foreground">
-                This verification link has expired. Please request a new one.
-              </p>
+        {/* Error State */}
+        {status === "error" && (
+          <>
+            <div className="w-16 h-16 mx-auto bg-red-100 rounded-full flex items-center justify-center">
+              <XCircle className="w-8 h-8 text-red-600" />
             </div>
-            {email && (
-              <div className="space-y-3">
-                {resendSuccess ? (
-                  <div className="text-green-600 text-sm">
-                    ✓ New verification email sent!
-                  </div>
-                ) : (
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="w-full"
-                    onClick={handleResendVerification}
-                    loading={isResending}
-                    loadingText="Sending..."
-                  >
-                    <RefreshCw className="h-4 w-4 mr-2" />
-                    Send New Verification Email
-                  </Button>
-                )}
-                <a
-                  href={ROUTES.public.login}
-                  className="block text-center text-sm text-kobklein-accent hover:underline"
-                >
-                  Back to Sign In
-                </a>
-              </div>
-            )}
-          </div>
-        );
-
-      case 'error':
-      default:
-        return (
-          <div className="text-center space-y-6">
-            <XCircle className="h-16 w-16 text-red-500 mx-auto" />
-            <div className="space-y-2">
-              <h1 className="text-2xl font-bold text-red-600">Verification Failed</h1>
-              <p className="text-muted-foreground">
-                There was an error verifying your email. The link may be invalid or expired.
-              </p>
+            <div>
+              <h2 className="text-xl font-bold text-kobklein-primary">Verification Failed</h2>
+              <p className="text-muted-foreground mt-2">{error}</p>
             </div>
-            <div className="space-y-3">
-              {email && !resendSuccess ? (
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="w-full"
-                  onClick={handleResendVerification}
-                  loading={isResending}
-                  loadingText="Sending..."
-                >
-                  <Mail className="h-4 w-4 mr-2" />
-                  Send New Verification Email
-                </Button>
-              ) : resendSuccess ? (
-                <div className="text-green-600 text-sm">
-                  ✓ New verification email sent to {email}!
-                </div>
-              ) : null}
-              <a
-                href={ROUTES.public.login}
-                className="block text-center text-sm text-kobklein-accent hover:underline"
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={handleResendVerification}
+                disabled={isResending || !email}
+                className="flex-1"
               >
-                Back to Sign In
-              </a>
+                {isResending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  "Resend Email"
+                )}
+              </Button>
+              <Button
+                onClick={() => window.location.href = ROUTES.public.login}
+                className="flex-1"
+              >
+                Back to Login
+              </Button>
             </div>
-          </div>
-        );
-    }
-  };
+          </>
+        )}
 
-  return (
-    <KobKleinCard className="w-full max-w-md mx-auto">
-      <div className="p-6">
-        {renderContent()}
+        {/* Resend State */}
+        {status === "resend" && (
+          <>
+            <div className="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center">
+              <Mail className="w-8 h-8 text-blue-600" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-kobklein-primary">Verify Your Email</h2>
+              <p className="text-muted-foreground mt-2">
+                We've sent a verification link to your email address. Click the link to verify your account.
+              </p>
+              {email && (
+                <p className="text-sm font-medium mt-2">{email}</p>
+              )}
+            </div>
+            <div className="bg-amber-50 p-3 rounded-lg">
+              <p className="text-sm text-amber-700">
+                Didn't receive the email? Check your spam folder or click the button below to resend.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={handleResendVerification}
+                disabled={isResending || !email}
+                className="flex-1"
+              >
+                {isResending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  "Resend Email"
+                )}
+              </Button>
+              <Button
+                onClick={() => window.location.href = ROUTES.public.login}
+                className="flex-1"
+              >
+                Back to Login
+              </Button>
+            </div>
+          </>
+        )}
       </div>
     </KobKleinCard>
   );

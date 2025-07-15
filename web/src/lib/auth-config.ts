@@ -1,141 +1,161 @@
-// Authentication configuration for KobKlein
+// File: kobklein/web/src/lib/auth-config.ts
+import { NextAuthOptions } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
+import { comparePassword, getUserByEmail, getDashboardRoute } from "./auth";
 
-import type { NextAuthOptions } from 'next-auth';
-import { FirestoreAdapter } from '@next-auth/firebase-adapter';
-import { cert } from 'firebase-admin/app';
-import CredentialsProvider from 'next-auth/providers/credentials';
-import GoogleProvider from 'next-auth/providers/google';
-import { db } from './firebase';
-import { loginSchema } from './validators';
-import { comparePasswords, getUserByEmail, createUser } from './auth-utils';
-import type { User, UserRole } from '@/types';
-
-export const authConfig: NextAuthOptions = {
-  adapter: FirestoreAdapter({
-    credential: cert({
-      projectId: process.env.FIREBASE_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-    }),
-  }),
-
+export const authOptions: NextAuthOptions = {
   providers: [
+    // Email/Password Provider
     CredentialsProvider({
-      id: 'credentials',
-      name: 'credentials',
+      id: "credentials",
+      name: "credentials",
       credentials: {
-        email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' },
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error("Email and password are required");
+        }
+
         try {
-          if (!credentials?.email || !credentials?.password) {
-            return null;
-          }
-
-          // Validate input
-          const result = loginSchema.safeParse(credentials);
-          if (!result.success) {
-            return null;
-          }
-
           // Get user from database
           const user = await getUserByEmail(credentials.email);
+          
           if (!user) {
-            return null;
+            throw new Error("No user found with this email");
+          }
+
+          // Check if email is verified
+          if (!user.isVerified) {
+            throw new Error("Please verify your email before logging in");
           }
 
           // Check password
-          const isValidPassword = await comparePasswords(
+          const isPasswordValid = await comparePassword(
             credentials.password,
-            user.password
+            user.passwordHash
           );
 
-          if (!isValidPassword) {
-            return null;
+          if (!isPasswordValid) {
+            throw new Error("Invalid password");
           }
 
-          // Return user object (without password)
+          // Return user object
           return {
             id: user.id,
             email: user.email,
             name: `${user.firstName} ${user.lastName}`,
             role: user.role,
             isVerified: user.isVerified,
-            isActive: user.isActive,
+            profile: {
+              phone: user.phone,
+              location: user.location,
+              businessName: user.businessName,
+              region: user.region,
+              permissions: user.permissions || [],
+            },
           };
         } catch (error) {
-          console.error('Auth error:', error);
-          return null;
+          console.error("Authorization error:", error);
+          throw new Error(error instanceof Error ? error.message : "Authentication failed");
         }
       },
     }),
 
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    }),
+    // Google OAuth Provider (optional - only if you have credentials)
+    ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+      ? [
+          GoogleProvider({
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+            authorization: {
+              params: {
+                prompt: "consent",
+                access_type: "offline",
+                response_type: "code",
+              },
+            },
+          }),
+        ]
+      : []),
   ],
-
-  pages: {
-    signIn: '/auth/login',
-    signUp: '/auth/register',
-    error: '/auth/error',
-  },
-
-  session: {
-    strategy: 'jwt',
-    maxAge: 30 * 24 * 60 * 60, // 30 days
-  },
 
   callbacks: {
     async jwt({ token, user, account }) {
       // Initial sign in
-      if (account && user) {
-        return {
-          ...token,
-          role: user.role,
-          isVerified: user.isVerified,
-          isActive: user.isActive,
-        };
+      if (user) {
+        token.id = user.id;
+        token.role = user.role;
+        token.isVerified = user.isVerified;
+        token.profile = user.profile;
+      }
+
+      // Handle Google OAuth
+      if (account?.provider === "google" && user) {
+        try {
+          // Check if user exists in our database
+          let existingUser = await getUserByEmail(user.email!);
+
+          if (!existingUser) {
+            // For now, we'll assign them as a client
+            token.role = "client";
+            token.isVerified = true;
+            token.profile = {
+              phone: "",
+              location: "Haiti",
+              permissions: [],
+            };
+          } else {
+            token.id = existingUser.id;
+            token.role = existingUser.role;
+            token.isVerified = existingUser.isVerified;
+            token.profile = existingUser.profile;
+          }
+        } catch (error) {
+          console.error("Google OAuth callback error:", error);
+        }
       }
 
       return token;
     },
 
     async session({ session, token }) {
-      return {
-        ...session,
-        user: {
-          ...session.user,
-          id: token.sub,
-          role: token.role as UserRole,
-          isVerified: token.isVerified as boolean,
-          isActive: token.isActive as boolean,
-        },
-      };
+      if (token) {
+        session.user.id = token.id as string;
+        session.user.role = token.role as any;
+        session.user.isVerified = token.isVerified as boolean;
+        session.user.profile = token.profile as any;
+      }
+      return session;
     },
 
     async redirect({ url, baseUrl }) {
-      // Allows relative callback URLs
-      if (url.startsWith('/')) return `${baseUrl}${url}`;
-      
-      // Allows callback URLs on the same origin
-      if (new URL(url).origin === baseUrl) return url;
-      
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      else if (new URL(url).origin === baseUrl) return url;
       return baseUrl;
     },
   },
 
-  events: {
-    async signIn({ user, account, profile }) {
-      console.log('User signed in:', { user: user.email, account: account?.provider });
-    },
-    
-    async signOut({ session }) {
-      console.log('User signed out:', session?.user?.email);
-    },
+  pages: {
+    signIn: "/auth/login",
+    error: "/auth/error",
+    verifyRequest: "/auth/verify-email",
+    newUser: "/auth/welcome",
   },
 
-  debug: process.env.NODE_ENV === 'development',
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+    updateAge: 24 * 60 * 60, // 24 hours
+  },
+
+  jwt: {
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+
+  secret: process.env.NEXTAUTH_SECRET,
+
+  debug: false, // Disable debug to reduce console warnings
 };

@@ -1,424 +1,259 @@
+// File: kobklein/web/src/lib/utils.ts
+
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
-import type { Locale, UserRole } from '@/types';
-import { CURRENCIES, VALIDATION_RULES } from './constants';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-// ===== CURRENCY UTILITIES =====
+// ===== CURRENCY FORMATTING =====
 export function formatCurrency(
-  amount: number,
+  amount: number, 
   currency: 'HTG' | 'USD' = 'HTG',
-  locale: string = 'en-HT',
+  locale?: string,
   showSymbol: boolean = true
 ): string {
-  try {
-    const currencyConfig = CURRENCIES[currency];
-    
-    if (currency === 'HTG') {
-      // Custom HTG formatting
-      const formatted = new Intl.NumberFormat(locale, {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }).format(amount);
-      
-      return showSymbol ? `${formatted} G` : formatted;
-    }
-    
-    // Standard currency formatting
-    const formatter = new Intl.NumberFormat(locale, {
-      style: 'currency',
-      currency: currency,
-      minimumFractionDigits: currencyConfig.decimals,
-      maximumFractionDigits: currencyConfig.decimals,
-    });
-    
-    return formatter.format(amount);
-  } catch (error) {
-    console.error('Currency formatting error:', error);
-    return `${amount} ${currency}`;
-  }
-}
+  const symbols = {
+    HTG: 'G',
+    USD: '$'
+  };
 
-export function convertUSDToHTG(usdAmount: number): number {
-  return Math.round(usdAmount * CURRENCIES.HTG.exchangeRate);
-}
+  const formattedAmount = new Intl.NumberFormat(locale || 'en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(Math.abs(amount));
 
-export function convertHTGToUSD(htgAmount: number): number {
-  return Math.round((htgAmount / CURRENCIES.HTG.exchangeRate) * 100) / 100;
-}
-
-export function parseCurrencyInput(input: string): number {
-  // Remove all non-numeric characters except decimal points
-  const cleaned = input.replace(/[^\d.]/g, '');
-  const parsed = parseFloat(cleaned);
-  return isNaN(parsed) ? 0 : parsed;
-}
-
-// ===== PHONE NUMBER UTILITIES =====
-export function formatPhoneNumber(phone: string, country: string = 'HT'): string {
-  // Remove all non-digits
-  const digits = phone.replace(/\D/g, '');
-  
-  switch (country) {
-    case 'HT': // Haiti
-      if (digits.length === 8) {
-        return `+509 ${digits.slice(0, 4)}-${digits.slice(4)}`;
-      }
-      if (digits.length === 11 && digits.startsWith('509')) {
-        return `+${digits.slice(0, 3)} ${digits.slice(3, 7)}-${digits.slice(7)}`;
-      }
-      break;
-      
-    case 'US': // United States
-      if (digits.length === 10) {
-        return `+1 (${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
-      }
-      if (digits.length === 11 && digits.startsWith('1')) {
-        return `+${digits.slice(0, 1)} (${digits.slice(1, 4)}) ${digits.slice(4, 7)}-${digits.slice(7)}`;
-      }
-      break;
-      
-    default:
-      return phone; // Return as-is for other countries
+  if (showSymbol) {
+    return `${symbols[currency]} ${formattedAmount}`;
   }
   
-  return phone; // Return original if not recognized format
+  return formattedAmount;
 }
 
-export function validatePhoneNumber(phone: string, country: string = 'HT'): boolean {
-  const rules = VALIDATION_RULES.phone;
-  
-  switch (country) {
-    case 'HT':
-      return rules.haiti.test(phone);
-    case 'US':
-      return rules.us.test(phone);
-    default:
-      return rules.international.test(phone);
-  }
-}
-
-// ===== DATE AND TIME UTILITIES =====
+// ===== DATE FORMATTING =====
 export function formatDate(
-  date: Date | string,
-  locale: string = 'en-US',
-  options: Intl.DateTimeFormatOptions = {}
-): string {
+  date: string | Date,
+  options?: {
+    includeTime?: boolean;
+    format?: 'short' | 'medium' | 'long';
+  }
+) {
+  const { includeTime = false, format = 'medium' } = options || {};
+  
   const dateObj = typeof date === 'string' ? new Date(date) : date;
   
-  const defaultOptions: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    ...options,
+  if (isNaN(dateObj.getTime())) {
+    return 'Invalid date';
+  }
+
+  const now = new Date();
+  const diffInSeconds = Math.floor((now.getTime() - dateObj.getTime()) / 1000);
+  
+  // Show relative time for recent dates
+  if (diffInSeconds < 60) {
+    return 'Just now';
+  } else if (diffInSeconds < 3600) {
+    const minutes = Math.floor(diffInSeconds / 60);
+    return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+  } else if (diffInSeconds < 86400) {
+    const hours = Math.floor(diffInSeconds / 3600);
+    return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+  } else if (diffInSeconds < 604800) {
+    const days = Math.floor(diffInSeconds / 86400);
+    return `${days} day${days > 1 ? 's' : ''} ago`;
+  }
+
+  // Format options for older dates
+  const formatOptions: Intl.DateTimeFormatOptions = {};
+  
+  if (format === 'short') {
+    formatOptions.month = 'short';
+    formatOptions.day = 'numeric';
+  } else if (format === 'medium') {
+    formatOptions.month = 'short';
+    formatOptions.day = 'numeric';
+    formatOptions.year = 'numeric';
+  } else {
+    formatOptions.weekday = 'short';
+    formatOptions.month = 'long';
+    formatOptions.day = 'numeric';
+    formatOptions.year = 'numeric';
+  }
+
+  if (includeTime) {
+    formatOptions.hour = '2-digit';
+    formatOptions.minute = '2-digit';
+  }
+
+  return dateObj.toLocaleDateString('en-US', formatOptions);
+}
+
+// ===== PHONE NUMBER FORMATTING =====
+export function formatPhoneNumber(phoneNumber: string, countryCode = '+509') {
+  // Remove all non-digit characters
+  const cleaned = phoneNumber.replace(/\D/g, '');
+  
+  if (cleaned.length === 8) {
+    // Haitian phone number format: XXXX XXXX
+    return `${countryCode} ${cleaned.slice(0, 4)} ${cleaned.slice(4)}`;
+  }
+  
+  if (cleaned.length === 11 && cleaned.startsWith('509')) {
+    // Remove country code if present
+    const local = cleaned.slice(3);
+    return `${countryCode} ${local.slice(0, 4)} ${local.slice(4)}`;
+  }
+  
+  return phoneNumber; // Return as-is if format is unclear
+}
+
+// ===== TRANSACTION HELPERS =====
+export function getTransactionStatusColor(status: 'completed' | 'pending' | 'failed') {
+  const colors = {
+    completed: 'text-green-600',
+    pending: 'text-yellow-600',
+    failed: 'text-red-600',
   };
   
-  return new Intl.DateTimeFormat(locale, defaultOptions).format(dateObj);
+  return colors[status] || 'text-gray-600';
 }
 
-export function formatDateTime(
-  date: Date | string,
-  locale: string = 'en-US'
-): string {
-  return formatDate(date, locale, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
-
-export function getTimeAgo(date: Date | string, locale: string = 'en'): string {
-  const now = new Date();
-  const then = typeof date === 'string' ? new Date(date) : date;
-  const diffInSeconds = Math.floor((now.getTime() - then.getTime()) / 1000);
+export function getTransactionStatusBg(status: 'completed' | 'pending' | 'failed') {
+  const backgrounds = {
+    completed: 'bg-green-100',
+    pending: 'bg-yellow-100', 
+    failed: 'bg-red-100',
+  };
   
-  if (diffInSeconds < 60) return 'Just now';
-  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
-  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
-  if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} days ago`;
-  
-  return formatDate(then, locale);
+  return backgrounds[status] || 'bg-gray-100';
 }
 
-// ===== VALIDATION UTILITIES =====
+// ===== VALIDATION HELPERS =====
 export function validateEmail(email: string): boolean {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 }
 
-export function validatePassword(password: string): {
-  isValid: boolean;
-  errors: string[];
-} {
-  const rules = VALIDATION_RULES.password;
-  const errors: string[] = [];
+export function validateHaitianPhone(phone: string): boolean {
+  // Haitian phone numbers: 8 digits starting with 2, 3, 4, or 5
+  const cleaned = phone.replace(/\D/g, '');
+  const haitianRegex = /^[2-5]\d{7}$/;
   
-  if (password.length < rules.minLength) {
-    errors.push(`Password must be at least ${rules.minLength} characters long`);
+  if (cleaned.length === 8) {
+    return haitianRegex.test(cleaned);
   }
   
-  if (password.length > rules.maxLength) {
-    errors.push(`Password must be no more than ${rules.maxLength} characters long`);
+  if (cleaned.length === 11 && cleaned.startsWith('509')) {
+    return haitianRegex.test(cleaned.slice(3));
   }
   
-  if (rules.requireUppercase && !/[A-Z]/.test(password)) {
-    errors.push('Password must contain at least one uppercase letter');
-  }
-  
-  if (rules.requireLowercase && !/[a-z]/.test(password)) {
-    errors.push('Password must contain at least one lowercase letter');
-  }
-  
-  if (rules.requireNumbers && !/\d/.test(password)) {
-    errors.push('Password must contain at least one number');
-  }
-  
-  if (rules.requireSpecialChars && !/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-    errors.push('Password must contain at least one special character');
-  }
-  
-  return {
-    isValid: errors.length === 0,
-    errors,
-  };
+  return false;
 }
 
-export function validateAmount(amount: number, userRole: UserRole): {
-  isValid: boolean;
-  error?: string;
-} {
-  const limits = VALIDATION_RULES.amounts;
-  
-  if (amount < limits.min) {
-    return {
-      isValid: false,
-      error: `Minimum amount is ${formatCurrency(limits.min)}`,
-    };
-  }
-  
-  if (amount > limits.max) {
-    return {
-      isValid: false,
-      error: `Maximum amount is ${formatCurrency(limits.max)}`,
-    };
-  }
-  
-  return { isValid: true };
+export function validateCardNumber(cardNumber: string): boolean {
+  // Basic card number validation (remove spaces and check length)
+  const cleaned = cardNumber.replace(/\s/g, '');
+  return /^\d{16}$/.test(cleaned);
 }
 
-// ===== STRING UTILITIES =====
-export function generateId(prefix: string = '', length: number = 8): string {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let result = '';
-  
-  for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  
-  return prefix ? `${prefix}_${result}` : result;
-}
-
+// ===== TEXT HELPERS =====
 export function truncateText(text: string, maxLength: number = 50): string {
   if (text.length <= maxLength) return text;
   return text.slice(0, maxLength) + '...';
 }
 
 export function capitalizeFirst(str: string): string {
+  if (!str) return '';
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
 
-export function slugify(text: string): string {
-  return text
-    .toString()
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, '-')
-    .replace(/[^\w\-]+/g, '')
-    .replace(/\-\-+/g, '-')
-    .replace(/^-+/, '')
-    .replace(/-+$/, '');
+// ===== AMOUNT HELPERS =====
+export function parseAmount(amountString: string): number {
+  // Remove currency symbols and commas, then parse
+  const cleaned = amountString.replace(/[G$,\s]/g, '');
+  const parsed = parseFloat(cleaned);
+  return isNaN(parsed) ? 0 : parsed;
 }
 
-// ===== ARRAY UTILITIES =====
-export function chunk<T>(array: T[], size: number): T[][] {
-  return Array.from({ length: Math.ceil(array.length / size) }, (_, i) =>
-    array.slice(i * size, i * size + size)
-  );
-}
-
-export function shuffle<T>(array: T[]): T[] {
-  const shuffled = [...array];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+export function formatBalance(balance: number, showCurrency = true): string {
+  if (showCurrency) {
+    return formatCurrency(balance, 'HTG');
   }
-  return shuffled;
-}
-
-export function unique<T>(array: T[]): T[] {
-  return Array.from(new Set(array));
-}
-
-// ===== URL AND ROUTING UTILITIES =====
-export function buildUrl(base: string, params: Record<string, any> = {}): string {
-  const url = new URL(base, window.location.origin);
-  
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null) {
-      url.searchParams.set(key, String(value));
-    }
+  return balance.toLocaleString('en-US', { 
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2 
   });
-  
-  return url.toString();
 }
 
-export function getQueryParam(key: string): string | null {
-  if (typeof window === 'undefined') return null;
-  const params = new URLSearchParams(window.location.search);
-  return params.get(key);
-}
-
-// ===== LOCAL STORAGE UTILITIES =====
-export function setLocalStorage<T>(key: string, value: T): void {
-  if (typeof window === 'undefined') return;
-  
+// ===== CLIPBOARD HELPERS =====
+export async function copyToClipboard(text: string): Promise<boolean> {
   try {
-    localStorage.setItem(key, JSON.stringify(value));
+    await navigator.clipboard.writeText(text);
+    return true;
   } catch (error) {
-    console.error('Error setting localStorage:', error);
+    console.error('Failed to copy to clipboard:', error);
+    return false;
   }
 }
 
-export function getLocalStorage<T>(key: string, defaultValue: T): T {
-  if (typeof window === 'undefined') return defaultValue;
+// ===== ROLE HELPERS =====
+export function getRoleDisplayName(role: string): string {
+  const roleNames = {
+    client: 'Client',
+    merchant: 'Merchant',
+    distributor: 'Distributor',
+    diaspora: 'Diaspora',
+    admin: 'Administrator',
+    super_admin: 'Super Administrator',
+  };
   
-  try {
-    const item = localStorage.getItem(key);
-    return item ? JSON.parse(item) : defaultValue;
-  } catch (error) {
-    console.error('Error getting localStorage:', error);
-    return defaultValue;
-  }
+  return roleNames[role as keyof typeof roleNames] || role;
 }
 
-export function removeLocalStorage(key: string): void {
-  if (typeof window === 'undefined') return;
+export function getRoleColor(role: string): string {
+  const colors = {
+    client: 'bg-blue-500',
+    merchant: 'bg-green-500',
+    distributor: 'bg-purple-500',
+    diaspora: 'bg-orange-500',
+    admin: 'bg-red-500',
+    super_admin: 'bg-gray-900',
+  };
   
-  try {
-    localStorage.removeItem(key);
-  } catch (error) {
-    console.error('Error removing localStorage:', error);
-  }
+  return colors[role as keyof typeof colors] || 'bg-gray-500';
 }
 
-// ===== DEVICE AND BROWSER UTILITIES =====
-export function isMobile(): boolean {
-  if (typeof window === 'undefined') return false;
-  return window.innerWidth <= 768;
-}
-
-export function isTablet(): boolean {
-  if (typeof window === 'undefined') return false;
-  return window.innerWidth > 768 && window.innerWidth <= 1024;
-}
-
-export function isDesktop(): boolean {
-  if (typeof window === 'undefined') return false;
-  return window.innerWidth > 1024;
-}
-
-export function supportsNFC(): boolean {
-  return 'NDEFReader' in window;
-}
-
-export function supportsBiometrics(): boolean {
-  return 'credentials' in navigator && 'create' in navigator.credentials;
-}
-
-// ===== ERROR HANDLING UTILITIES =====
-export function handleApiError(error: any): string {
-  if (error?.response?.data?.message) {
-    return error.response.data.message;
-  }
+// ===== TIME HELPERS =====
+export function getTimeOfDay(): 'morning' | 'afternoon' | 'evening' {
+  const hour = new Date().getHours();
   
-  if (error?.message) {
+  if (hour < 12) return 'morning';
+  if (hour < 18) return 'afternoon';
+  return 'evening';
+}
+
+export function getGreeting(name?: string): string {
+  const timeOfDay = getTimeOfDay();
+  const greetings = {
+    morning: 'Good morning',
+    afternoon: 'Good afternoon', 
+    evening: 'Good evening',
+  };
+  
+  const greeting = greetings[timeOfDay];
+  return name ? `${greeting}, ${name}!` : `${greeting}!`;
+}
+
+// ===== ERROR HELPERS =====
+export function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
     return error.message;
   }
   
-  return 'An unexpected error occurred';
-}
-
-export function logError(error: any, context: string = ''): void {
-  console.error(`KobKlein Error ${context ? `[${context}]` : ''}:`, error);
-  
-  // In production, send to error tracking service
-  if (process.env.NODE_ENV === 'production') {
-    // Send to Sentry, LogRocket, etc.
-  }
-}
-
-// ===== PERFORMANCE UTILITIES =====
-export function debounce<T extends (...args: any[]) => any>(
-  func: T,
-  wait: number
-): (...args: Parameters<T>) => void {
-  let timeout: NodeJS.Timeout;
-  
-  return (...args: Parameters<T>) => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), wait);
-  };
-}
-
-export function throttle<T extends (...args: any[]) => any>(
-  func: T,
-  limit: number
-): (...args: Parameters<T>) => void {
-  let inThrottle: boolean;
-  
-  return (...args: Parameters<T>) => {
-    if (!inThrottle) {
-      func(...args);
-      inThrottle = true;
-      setTimeout(() => (inThrottle = false), limit);
-    }
-  };
-}
-
-// ===== ROLE AND PERMISSION UTILITIES =====
-export function hasPermission(userRole: UserRole, permission: string): boolean {
-  const rolePermissions = USER_ROLES[userRole]?.permissions || [];
-  return rolePermissions.includes('*') || rolePermissions.includes(permission);
-}
-
-export function canAccessRoute(userRole: UserRole, route: string): boolean {
-  // Define route access rules
-  const routeAccess: Record<string, UserRole[]> = {
-    '/client': ['client'],
-    '/merchant': ['merchant'],
-    '/distributor': ['distributor'],
-    '/diaspora': ['diaspora'],
-    '/admin': ['admin', 'super_admin'],
-  };
-  
-  for (const [basePath, allowedRoles] of Object.entries(routeAccess)) {
-    if (route.startsWith(basePath)) {
-      return allowedRoles.includes(userRole);
-    }
+  if (typeof error === 'string') {
+    return error;
   }
   
-  return true; // Public routes
-}
-
-export function getRoleColor(role: UserRole): string {
-  return USER_ROLES[role]?.color || 'gray';
-}
-
-export function getRoleName(role: UserRole): string {
-  return USER_ROLES[role]?.name || role;
+  return 'An unknown error occurred';
 }

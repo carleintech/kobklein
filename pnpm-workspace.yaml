@@ -1,5 +1,8 @@
 packages:
-  - 'web'
-  - 'mobile'
-  - 'backend'
-  - 'libs/*'
+  - web
+  - mobile
+  - backend
+  - libs/*
+
+onlyBuiltDependencies:
+  - '@vercel/speed-insights'

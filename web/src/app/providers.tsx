@@ -1,27 +1,24 @@
 // File: kobklein/web/src/app/providers.tsx
-
 "use client";
 
 import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "next-themes";
-import { ToastProvider } from "@/components/ui/toast";
 
 interface ProvidersProps {
   children: React.ReactNode;
+  session?: any;
 }
 
-export function Providers({ children }: ProvidersProps) {
+export function Providers({ children, session }: ProvidersProps) {
   return (
-    <SessionProvider>
+    <SessionProvider session={session}>
       <ThemeProvider
         attribute="class"
-        defaultTheme="dark"
+        defaultTheme="system"
         enableSystem
         disableTransitionOnChange
       >
-        <ToastProvider>
-          {children}
-        </ToastProvider>
+        {children}
       </ThemeProvider>
     </SessionProvider>
   );

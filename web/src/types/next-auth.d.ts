@@ -2,31 +2,53 @@
 
 import NextAuth, { DefaultSession } from "next-auth";
 import { UserRole } from "@/lib/types";
+import { JWT } from "next-auth/jwt";
 
 declare module "next-auth" {
   interface Session {
     user: {
       id: string;
-      role: UserRole;
-      emailVerified: boolean;
-      phone?: string;
-      location?: string;
-    } & DefaultSession["user"];
+      email: string;
+      name: string;
+      role: "client" | "merchant" | "distributor" | "diaspora" | "admin" | "super_admin" | "regional_manager" | "support_agent";
+      isVerified: boolean;
+      profile?: {
+        phone?: string;
+        location?: string;
+        businessName?: string;
+        region?: string;
+        permissions?: string[];
+      };
+    };
   }
 
   interface User {
-    role: UserRole;
-    emailVerified: boolean;
-    phone?: string;
-    location?: string;
+    id: string;
+    email: string;
+    name: string;
+    role: "client" | "merchant" | "distributor" | "diaspora" | "admin" | "super_admin" | "regional_manager" | "support_agent";
+    isVerified: boolean;
+    profile?: {
+      phone?: string;
+      location?: string;
+      businessName?: string;
+      region?: string;
+      permissions?: string[];
+    };
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
-    role: UserRole;
-    emailVerified: boolean;
-    phone?: string;
-    location?: string;
+    id: string;
+    role: "client" | "merchant" | "distributor" | "diaspora" | "admin" | "super_admin" | "regional_manager" | "support_agent";
+    isVerified: boolean;
+    profile?: {
+      phone?: string;
+      location?: string;
+      businessName?: string;
+      region?: string;
+      permissions?: string[];
+    };
   }
 }

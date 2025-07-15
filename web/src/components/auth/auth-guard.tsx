@@ -1,84 +1,85 @@
-/ File: kobklein/web/src/components/auth/auth-guard.tsx
-
+// File: kobklein/web/src/components/auth/auth-guard.tsx
 "use client";
 
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
-import type { UserRole } from "@/lib/types";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { LoadingSpinner } from "@/components/ui/loading";
 
 interface AuthGuardProps {
   children: React.ReactNode;
-  allowedRoles?: UserRole[];
-  requireEmailVerification?: boolean;
-  redirectOnUnauthorized?: boolean;
+  requiredRoles?: string | string[];
+  requiredPermissions?: string | string[];
+  fallback?: React.ReactNode;
+  redirectTo?: string;
 }
 
 export function AuthGuard({
   children,
-  allowedRoles,
-  requireEmailVerification = false,
-  redirectOnUnauthorized = true,
+  requiredRoles,
+  requiredPermissions,
+  fallback,
+  redirectTo = "/auth/login",
 }: AuthGuardProps) {
-  const { 
-    isAuthenticated, 
-    isLoading, 
-    hasRole, 
-    user, 
-    redirectToLogin, 
-    redirectToDashboard 
-  } = useAuth();
+  const auth = useAuth();
 
   useEffect(() => {
-    if (isLoading) return;
+    // Redirect if not authenticated
+    if (auth.isUnauthenticated) {
+      auth.redirectToLogin();
+      return;
+    }
 
-    // Redirect to login if not authenticated
-    if (!isAuthenticated) {
-      if (redirectOnUnauthorized) {
-        redirectToLogin(window.location.pathname);
+    // Check role requirements
+    if (requiredRoles && !auth.checkRole(requiredRoles)) {
+      auth.redirectToDashboard(); // Redirect to appropriate dashboard
+      return;
+    }
+
+    // Check permission requirements
+    if (requiredPermissions) {
+      const permissions = Array.isArray(requiredPermissions) 
+        ? requiredPermissions 
+        : [requiredPermissions];
+      
+      const hasAllPermissions = permissions.every(permission => 
+        auth.checkPermission(permission)
+      );
+
+      if (!hasAllPermissions) {
+        auth.redirectToDashboard();
+        return;
       }
-      return;
     }
+  }, [auth, requiredRoles, requiredPermissions]);
 
-    // Check email verification
-    if (requireEmailVerification && !user?.emailVerified) {
-      // Could redirect to email verification page
-      return;
-    }
-
-    // Check role permissions
-    if (allowedRoles && !hasRole(allowedRoles)) {
-      if (redirectOnUnauthorized) {
-        redirectToDashboard();
-      }
-      return;
-    }
-  }, [
-    isLoading,
-    isAuthenticated,
-    user?.emailVerified,
-    hasRole,
-    allowedRoles,
-    requireEmailVerification,
-    redirectOnUnauthorized,
-    redirectToLogin,
-    redirectToDashboard,
-  ]);
-
-  // Show loading while checking auth
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
+  // Show loading while checking authentication
+  if (auth.isLoading) {
+    return fallback || <LoadingSpinner />;
   }
 
-  // Don't render if not authenticated/authorized and redirect is enabled
-  if (redirectOnUnauthorized) {
-    if (!isAuthenticated) return null;
-    if (requireEmailVerification && !user?.emailVerified) return null;
-    if (allowedRoles && !hasRole(allowedRoles)) return null;
+  // Show fallback if not authenticated
+  if (auth.isUnauthenticated) {
+    return fallback || <LoadingSpinner />;
+  }
+
+  // Check role requirements
+  if (requiredRoles && !auth.checkRole(requiredRoles)) {
+    return fallback || <LoadingSpinner />;
+  }
+
+  // Check permission requirements
+  if (requiredPermissions) {
+    const permissions = Array.isArray(requiredPermissions) 
+      ? requiredPermissions 
+      : [requiredPermissions];
+    
+    const hasAllPermissions = permissions.every(permission => 
+      auth.checkPermission(permission)
+    );
+
+    if (!hasAllPermissions) {
+      return fallback || <LoadingSpinner />;
+    }
   }
 
   return <>{children}</>;

@@ -1,5 +1,4 @@
 // File: kobklein/web/src/app/auth/login/page.tsx
-
 import { Metadata } from "next";
 import { LoginForm } from "@/components/auth/login-form";
 
@@ -8,18 +7,11 @@ export const metadata: Metadata = {
   description: "Sign in to your KobKlein account",
 };
 
-interface LoginPageProps {
-  searchParams: {
-    callbackUrl?: string;
-    error?: string;
-  };
-}
-
-export default function LoginPage({ searchParams }: LoginPageProps) {
+export default function LoginPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-kobklein-dark via-kobklein-primary to-kobklein-dark p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-kobklein-primary via-kobklein-primary/90 to-kobklein-secondary px-4">
       <div className="w-full max-w-md">
-        <LoginForm callbackUrl={searchParams.callbackUrl} />
+        <LoginForm />
       </div>
     </div>
   );

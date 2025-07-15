@@ -4,182 +4,220 @@ import { z } from 'zod';
 import { VALIDATION_RULES } from './constants';
 import { validatePhoneNumber } from './utils';
 
-// ===== BASE VALIDATORS =====
-export const emailSchema = z
+// ===== BASE VALIDATION SCHEMAS =====
+
+// Email validation
+const emailSchema = z
   .string()
-  .email('Please enter a valid email address')
-  .min(1, 'Email is required');
+  .email("Please enter a valid email address")
+  .min(1, "Email is required");
 
-export const passwordSchema = z
+// Password validation
+const passwordSchema = z
   .string()
-  .min(VALIDATION_RULES.password.minLength, `Password must be at least ${VALIDATION_RULES.password.minLength} characters`)
-  .max(VALIDATION_RULES.password.maxLength, `Password must be no more than ${VALIDATION_RULES.password.maxLength} characters`)
-  .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-  .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-  .regex(/\d/, 'Password must contain at least one number');
+  .min(8, "Password must be at least 8 characters")
+  .regex(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+    "Password must contain at least one lowercase letter, one uppercase letter, and one number"
+  );
 
-export const phoneSchema = z
+// Phone validation (Haitian format)
+const phoneSchema = z
   .string()
-  .min(1, 'Phone number is required')
-  .refine((phone) => validatePhoneNumber(phone), 'Please enter a valid phone number');
+  .regex(
+    /^(\+509|509)?[2-9]\d{7}$/,
+    "Please enter a valid Haitian phone number (e.g., +509 1234 5678)"
+  );
 
-export const amountSchema = z
-  .number()
-  .min(VALIDATION_RULES.amounts.min, `Minimum amount is ${VALIDATION_RULES.amounts.min} HTG`)
-  .max(VALIDATION_RULES.amounts.max, `Maximum amount is ${VALIDATION_RULES.amounts.max} HTG`);
+// Name validation
+const nameSchema = z
+  .string()
+  .min(2, "Name must be at least 2 characters")
+  .max(50, "Name must be less than 50 characters")
+  .regex(/^[a-zA-ZÀ-ÿ\s'-]+$/, "Name can only contain letters, spaces, hyphens, and apostrophes");
 
-// ===== AUTH SCHEMAS =====
+// ===== AUTHENTICATION SCHEMAS =====
+
+// Login Schema
 export const loginSchema = z.object({
   email: emailSchema,
-  password: z.string().min(1, 'Password is required'),
+  password: z.string().min(1, "Password is required"),
+  rememberMe: z.boolean().default(false),
 });
 
+// Registration Schema
 export const registerSchema = z.object({
-  firstName: z.string().min(2, 'First name must be at least 2 characters'),
-  lastName: z.string().min(2, 'Last name must be at least 2 characters'),
+  // Personal Information
+  firstName: nameSchema,
+  lastName: nameSchema,
   email: emailSchema,
   phone: phoneSchema,
   password: passwordSchema,
-  confirmPassword: z.string().min(1, 'Please confirm your password'),
-  role: z.enum(['client', 'merchant', 'distributor', 'diaspora']),
-  country: z.string().min(2, 'Please select your country'),
-  language: z.enum(['en', 'fr', 'ht', 'es']),
-  agreeToTerms: z.boolean().refine((val) => val === true, 'You must agree to the terms'),
+  confirmPassword: z.string(),
+  
+  // Role Selection
+  role: z.enum(["client", "merchant", "distributor", "diaspora"], {
+    required_error: "Please select your role",
+  }),
+  
+  // Role-specific fields
+  businessName: z.string().optional(),
+  businessType: z.string().optional(),
+  location: z.string().min(1, "Location is required"),
+  region: z.string().optional(),
+  
+  // Diaspora-specific
+  currentCountry: z.string().optional(),
+  
+  // Legal agreements
+  acceptTerms: z.boolean().refine(val => val === true, {
+    message: "You must accept the terms and conditions",
+  }),
+  acceptPrivacy: z.boolean().refine(val => val === true, {
+    message: "You must accept the privacy policy",
+  }),
+  
+  // Marketing consent (optional)
+  acceptMarketing: z.boolean().default(false),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
+}).refine((data) => {
+  // Merchant requires business name
+  if (data.role === "merchant" && !data.businessName) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Business name is required for merchants",
+  path: ["businessName"],
+}).refine((data) => {
+  // Diaspora requires current country
+  if (data.role === "diaspora" && !data.currentCountry) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Current country is required for diaspora users",
+  path: ["currentCountry"],
 });
 
+// Password Reset Schema
 export const forgotPasswordSchema = z.object({
   email: emailSchema,
 });
 
+// Reset Password Schema
 export const resetPasswordSchema = z.object({
-  token: z.string().min(1, 'Reset token is required'),
+  token: z.string().min(1, "Reset token is required"),
   password: passwordSchema,
-  confirmPassword: z.string().min(1, 'Please confirm your password'),
+  confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
 });
 
-// ===== TRANSACTION SCHEMAS =====
-export const sendMoneySchema = z.object({
-  recipientPhone: phoneSchema,
-  amount: amountSchema,
-  note: z.string().max(200, 'Note must be less than 200 characters').optional(),
-  pin: z.string().min(4, 'PIN must be at least 4 digits').max(6, 'PIN must be no more than 6 digits'),
+// Email Verification Schema
+export const verifyEmailSchema = z.object({
+  token: z.string().min(1, "Verification token is required"),
 });
 
-export const refillSchema = z.object({
-  amount: amountSchema,
-  recipientPhone: phoneSchema.optional(),
-  note: z.string().max(200, 'Note must be less than 200 characters').optional(),
-});
-
-export const withdrawSchema = z.object({
-  amount: amountSchema,
-  distributorId: z.string().min(1, 'Please select a distributor'),
-  pin: z.string().min(4, 'PIN must be at least 4 digits'),
-});
-
-// ===== PROFILE SCHEMAS =====
-export const profileUpdateSchema = z.object({
-  firstName: z.string().min(2, 'First name must be at least 2 characters'),
-  lastName: z.string().min(2, 'Last name must be at least 2 characters'),
-  phone: phoneSchema,
-  language: z.enum(['en', 'fr', 'ht', 'es']),
-  country: z.string().min(2, 'Please select your country'),
-});
-
+// Change Password Schema
 export const changePasswordSchema = z.object({
-  currentPassword: z.string().min(1, 'Current password is required'),
+  currentPassword: z.string().min(1, "Current password is required"),
   newPassword: passwordSchema,
-  confirmPassword: z.string().min(1, 'Please confirm your new password'),
+  confirmPassword: z.string(),
 }).refine((data) => data.newPassword === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
 });
 
-export const changePinSchema = z.object({
-  currentPin: z.string().min(4, 'Current PIN is required'),
-  newPin: z.string().min(4, 'PIN must be at least 4 digits').max(6, 'PIN must be no more than 6 digits'),
-  confirmPin: z.string().min(4, 'Please confirm your new PIN'),
-}).refine((data) => data.newPin === data.confirmPin, {
-  message: "PINs don't match",
-  path: ["confirmPin"],
-});
-
-// ===== MERCHANT SCHEMAS =====
-export const merchantRegistrationSchema = z.object({
-  businessName: z.string().min(2, 'Business name must be at least 2 characters'),
-  businessType: z.string().min(1, 'Please select business type'),
-  businessAddress: z.string().min(10, 'Please provide complete business address'),
-  businessPhone: phoneSchema,
-  merchantCategory: z.string().min(1, 'Please select merchant category'),
-});
-
-export const merchantPayoutSchema = z.object({
-  amount: amountSchema,
-  distributorId: z.string().min(1, 'Please select a distributor'),
-  pin: z.string().min(4, 'PIN is required'),
-});
-
-// ===== DISTRIBUTOR SCHEMAS =====
-export const distributorOnboardingSchema = z.object({
-  zone: z.string().min(1, 'Please select your zone'),
-  distributorLevel: z.enum(['basic', 'premium', 'gold']),
-  initialInventory: z.number().min(10, 'Minimum inventory is 10 cards'),
-});
-
-export const cardActivationSchema = z.object({
-  cardUID: z.string().min(8, 'Invalid card UID'),
-  clientPhone: phoneSchema,
-  clientFirstName: z.string().min(2, 'First name is required'),
-  clientLastName: z.string().min(2, 'Last name is required'),
-  initialAmount: z.number().min(0, 'Initial amount cannot be negative').optional(),
-});
-
-// ===== DIASPORA SCHEMAS =====
-export const beneficiarySchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
+// Profile Update Schema
+export const updateProfileSchema = z.object({
+  firstName: nameSchema,
+  lastName: nameSchema,
   phone: phoneSchema,
-  relationship: z.string().min(1, 'Please specify relationship'),
-  walletId: z.string().min(1, 'Wallet ID is required').optional(),
+  location: z.string().min(1, "Location is required"),
+  businessName: z.string().optional(),
+  businessType: z.string().optional(),
 });
 
-export const autoRefillSchema = z.object({
-  isEnabled: z.boolean(),
-  amount: amountSchema,
-  frequency: z.enum(['weekly', 'monthly']),
-  dayOfWeek: z.number().min(0).max(6).optional(),
-  dayOfMonth: z.number().min(1).max(31).optional(),
-  beneficiaryId: z.string().min(1, 'Please select a beneficiary'),
-});
-
-// ===== ADMIN SCHEMAS =====
-export const adminUserUpdateSchema = z.object({
-  userId: z.string().min(1, 'User ID is required'),
-  isActive: z.boolean(),
-  role: z.enum(['client', 'merchant', 'distributor', 'diaspora', 'admin']),
-  isVerified: z.boolean(),
-});
-
-export const systemConfigSchema = z.object({
-  exchangeRate: z.number().positive('Exchange rate must be positive'),
-  transactionFees: z.object({
-    diasporaRefill: z.number().min(0, 'Fee cannot be negative'),
-    merchantPayout: z.number().min(0, 'Fee cannot be negative'),
-  }),
-  systemMaintenance: z.boolean(),
-});
-
-// ===== EXPORT TYPES =====
+// ===== TYPE EXPORTS =====
 export type LoginFormData = z.infer<typeof loginSchema>;
 export type RegisterFormData = z.infer<typeof registerSchema>;
-export type SendMoneyFormData = z.infer<typeof sendMoneySchema>;
-export type RefillFormData = z.infer<typeof refillSchema>;
-export type ProfileUpdateFormData = z.infer<typeof profileUpdateSchema>;
-export type MerchantRegistrationFormData = z.infer<typeof merchantRegistrationSchema>;
-export type BeneficiaryFormData = z.infer<typeof beneficiarySchema>;
-export type AutoRefillFormData = z.infer<typeof autoRefillSchema>;
+export type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
+export type VerifyEmailFormData = z.infer<typeof verifyEmailSchema>;
+export type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;
+export type UpdateProfileFormData = z.infer<typeof updateProfileSchema>;
+
+// ===== ROLE DEFINITIONS =====
+export const USER_ROLES = {
+  client: {
+    label: "Client",
+    description: "Individual user for personal transactions",
+    permissions: ["wallet:read", "transaction:create", "profile:update"],
+  },
+  merchant: {
+    label: "Merchant",
+    description: "Business owner accepting payments",
+    permissions: ["wallet:read", "transaction:create", "transaction:receive", "profile:update", "business:manage"],
+  },
+  distributor: {
+    label: "Distributor",
+    description: "Community agent managing card distribution",
+    permissions: ["wallet:read", "transaction:create", "user:onboard", "refill:process", "commission:view"],
+  },
+  diaspora: {
+    label: "Diaspora",
+    description: "Send money to family in Haiti",
+    permissions: ["wallet:read", "remittance:send", "beneficiary:manage", "profile:update"],
+  },
+  admin: {
+    label: "Administrator",
+    description: "Platform administrator",
+    permissions: ["*"],
+  },
+} as const;
+
+// Country list for diaspora users
+export const COUNTRIES = [
+  { code: "US", name: "United States" },
+  { code: "CA", name: "Canada" },
+  { code: "FR", name: "France" },
+  { code: "DO", name: "Dominican Republic" },
+  { code: "BR", name: "Brazil" },
+  { code: "CL", name: "Chile" },
+  { code: "MX", name: "Mexico" },
+  { code: "GB", name: "United Kingdom" },
+  { code: "DE", name: "Germany" },
+  { code: "IT", name: "Italy" },
+] as const;
+
+// Business types for merchants
+export const BUSINESS_TYPES = [
+  "Restaurant/Food Service",
+  "Retail Store",
+  "Pharmacy",
+  "Gas Station",
+  "Market/Grocery",
+  "Beauty Salon",
+  "Mechanic/Auto Repair",
+  "Electronics/Phone Repair",
+  "Clothing Store",
+  "Other",
+] as const;
+
+// Haitian regions for location
+export const HAITIAN_REGIONS = [
+  "Ouest (Port-au-Prince)",
+  "Sud-Est (Jacmel)",
+  "Nord (Cap-Haïtien)",
+  "Nord-Est (Fort-Liberté)",
+  "Nord-Ouest (Port-de-Paix)",
+  "Artibonite (Gonaïves)",
+  "Centre (Hinche)",
+  "Sud (Les Cayes)",
+  "Grand'Anse (Jérémie)",
+  "Nippes (Miragoâne)",
+] as const;
