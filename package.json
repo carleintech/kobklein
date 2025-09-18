@@ -1,0 +1,29 @@
+{
+    "name": "kobklein",
+    "version": "1.0.0",
+    "description": "KobKlein - Cashless, Borderless Digital Payment Ecosystem for Haiti",
+    "private": true,
+    "scripts": {
+        "dev": "pnpm --filter web dev",
+        "build": "pnpm --filter web build",
+        "start": "pnpm --filter web start",
+        "lint": "pnpm --filter web lint",
+        "clean": "pnpm -r clean && rm -rf node_modules",
+        "install:all": "pnpm install"
+    },
+    "keywords": [
+        "fintech",
+        "haiti",
+        "payments",
+        "nfc",
+        "diaspora"
+    ],
+    "author": "TECHKLEIN | Erickharlein Pierre",
+    "license": "PROPRIETARY",
+    "workspaces": [
+        "web",
+        "mobile",
+        "backend",
+        "libs/*"
+    ]
+}
