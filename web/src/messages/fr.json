@@ -1,0 +1,109 @@
+{
+    "common": {
+        "appName": "KobKlein",
+        "tagline": "Paiements sans banque. Alimenté par vous.",
+        "loading": "Chargement...",
+        "error": "Une erreur s'est produite",
+        "success": "Succès !",
+        "cancel": "Annuler",
+        "continue": "Continuer",
+        "confirm": "Confirmer",
+        "save": "Sauvegarder",
+        "edit": "Modifier",
+        "delete": "Supprimer",
+        "close": "Fermer",
+        "back": "Retour",
+        "next": "Suivant",
+        "submit": "Soumettre",
+        "search": "Rechercher",
+        "filter": "Filtrer",
+        "export": "Exporter",
+        "refresh": "Actualiser"
+    },
+    "navigation": {
+        "home": "Accueil",
+        "about": "À propos",
+        "app": "App",
+        "merchant": "Commerçant",
+        "join": "Rejoindre",
+        "contact": "Contact",
+        "login": "Connexion",
+        "getStarted": "Commencer",
+        "dashboard": "Tableau de bord",
+        "transactions": "Transactions",
+        "settings": "Paramètres",
+        "support": "Support",
+        "logout": "Déconnexion"
+    },
+    "welcome": {
+        "title": "Paiements sans banque. Alimenté par vous.",
+        "subtitle": "Un système de portefeuille numérique sécurisé et sans espèces conçu pour les Haïtiens et leurs familles dans le monde entier.",
+        "getApp": "Obtenir l'App",
+        "becomeDistributor": "Devenir Distributeur",
+        "availableOn": "Disponible sur iOS et Android uniquement",
+        "learnMore": "En savoir plus"
+    },
+    "features": {
+        "sendReceive": {
+            "title": "Envoyer et Recevoir Instantanément",
+            "description": "Avec juste un numéro de téléphone ou une carte."
+        },
+        "merchantReady": {
+            "title": "Prêt pour les Commerçants",
+            "description": "Acceptez NFC ou QR dans votre magasin."
+        },
+        "diasporaPowered": {
+            "title": "Alimenté par la Diaspora",
+            "description": "Rechargez un portefeuille depuis n'importe où dans le monde."
+        }
+    },
+    "currency": {
+        "htg": "HTG",
+        "usd": "USD",
+        "gourdes": "Gourdes",
+        "balance": "Solde",
+        "amount": "Montant",
+        "fee": "Frais",
+        "total": "Total",
+        "exchangeRate": "Taux de change"
+    },
+    "auth": {
+        "signIn": "Se connecter",
+        "signUp": "S'inscrire",
+        "email": "Email",
+        "password": "Mot de passe",
+        "confirmPassword": "Confirmer le mot de passe",
+        "firstName": "Prénom",
+        "lastName": "Nom de famille",
+        "phone": "Numéro de téléphone",
+        "forgotPassword": "Mot de passe oublié ?",
+        "resetPassword": "Réinitialiser le mot de passe",
+        "createAccount": "Créer un compte",
+        "alreadyHaveAccount": "Vous avez déjà un compte ?",
+        "dontHaveAccount": "Vous n'avez pas de compte ?",
+        "signInWith": "Se connecter avec",
+        "orContinueWith": "Ou continuer avec"
+    },
+    "dashboard": {
+        "welcome": "Content de vous revoir",
+        "quickActions": "Actions rapides",
+        "recentTransactions": "Transactions récentes",
+        "addMoney": "Ajouter de l'argent",
+        "sendMoney": "Envoyer de l'argent",
+        "payMerchant": "Payer un commerçant",
+        "withdraw": "Retirer",
+        "viewAll": "Voir tout"
+    },
+    "footer": {
+        "tagline": "Conçu avec ❤️ en Haïti",
+        "links": {
+            "about": "À propos",
+            "partners": "Partenaires",
+            "contact": "Contact",
+            "support": "Support",
+            "privacy": "Politique de confidentialité",
+            "terms": "Conditions d'utilisation"
+        },
+        "copyright": "© 2025 TECHKLEIN. Tous droits réservés."
+    }
+}

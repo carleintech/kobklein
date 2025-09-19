@@ -17,14 +17,22 @@ const config: Config = {
     },
     extend: {
       colors: {
-        // KobKlein Brand Colors
+        // KobKlein Modern Fintech Brand Colors
         kobklein: {
-          primary: "#0F1E3D", // Dark Navy Blue
-          accent: "#29A9E0", // Sky Blue
+          primary: "#1E4DFF", // Modern vibrant blue
+          "primary-light": "#4169FF", // Lighter blue
+          secondary: "#0B1E4A", // Deep navy blue
+          accent: "#00BFFF", // Light accent blue
+          "accent-light": "#33CCFF", // Lighter accent
           gold: "#FFD700", // Gold for HTG
           success: "#10B981", // Green for success states
           warning: "#F59E0B", // Amber for warnings
           error: "#EF4444", // Red for errors
+          text: {
+            primary: "#FFFFFF", // White text
+            secondary: "#A7C8FF", // Light blue muted text
+            muted: "#8AA3D9", // Even more muted blue
+          },
         },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

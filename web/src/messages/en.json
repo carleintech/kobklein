@@ -1,0 +1,109 @@
+{
+    "common": {
+        "appName": "KobKlein",
+        "tagline": "Bank-Free Payments. Powered by You.",
+        "loading": "Loading...",
+        "error": "An error occurred",
+        "success": "Success!",
+        "cancel": "Cancel",
+        "continue": "Continue",
+        "confirm": "Confirm",
+        "save": "Save",
+        "edit": "Edit",
+        "delete": "Delete",
+        "close": "Close",
+        "back": "Back",
+        "next": "Next",
+        "submit": "Submit",
+        "search": "Search",
+        "filter": "Filter",
+        "export": "Export",
+        "refresh": "Refresh"
+    },
+    "navigation": {
+        "home": "Home",
+        "about": "About",
+        "app": "App",
+        "merchant": "Merchant",
+        "join": "Join",
+        "contact": "Contact",
+        "login": "Login",
+        "getStarted": "Get Started",
+        "dashboard": "Dashboard",
+        "transactions": "Transactions",
+        "settings": "Settings",
+        "support": "Support",
+        "logout": "Logout"
+    },
+    "welcome": {
+        "title": "Bank-Free Payments. Powered by You.",
+        "subtitle": "A secure and cashless digital wallet system designed for Haitians and their families worldwide.",
+        "getApp": "Get the App",
+        "becomeDistributor": "Become a Distributor",
+        "availableOn": "Available on iOS and Android only",
+        "learnMore": "Learn More"
+    },
+    "features": {
+        "sendReceive": {
+            "title": "Send & Receive Instantly",
+            "description": "With just a phone number or card."
+        },
+        "merchantReady": {
+            "title": "Merchant Ready",
+            "description": "Accept NFC or QR in your store."
+        },
+        "diasporaPowered": {
+            "title": "Diaspora Powered",
+            "description": "Reload a wallet from anywhere in the world."
+        }
+    },
+    "currency": {
+        "htg": "HTG",
+        "usd": "USD",
+        "gourdes": "Gourdes",
+        "balance": "Balance",
+        "amount": "Amount",
+        "fee": "Fee",
+        "total": "Total",
+        "exchangeRate": "Exchange Rate"
+    },
+    "auth": {
+        "signIn": "Sign In",
+        "signUp": "Sign Up",
+        "email": "Email",
+        "password": "Password",
+        "confirmPassword": "Confirm Password",
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "phone": "Phone Number",
+        "forgotPassword": "Forgot Password?",
+        "resetPassword": "Reset Password",
+        "createAccount": "Create Account",
+        "alreadyHaveAccount": "Already have an account?",
+        "dontHaveAccount": "Don't have an account?",
+        "signInWith": "Sign in with",
+        "orContinueWith": "Or continue with"
+    },
+    "dashboard": {
+        "welcome": "Welcome back",
+        "quickActions": "Quick Actions",
+        "recentTransactions": "Recent Transactions",
+        "addMoney": "Add Money",
+        "sendMoney": "Send Money",
+        "payMerchant": "Pay Merchant",
+        "withdraw": "Withdraw",
+        "viewAll": "View All"
+    },
+    "footer": {
+        "tagline": "Built with ❤️ in Haiti",
+        "links": {
+            "about": "About",
+            "partners": "Partners",
+            "contact": "Contact",
+            "support": "Support",
+            "privacy": "Privacy Policy",
+            "terms": "Terms of Service"
+        },
+        "copyright": "© 2025 TECHKLEIN. All rights reserved."
+    }
+}

@@ -1,0 +1,109 @@
+{
+    "common": {
+        "appName": "KobKlein",
+        "tagline": "Peman san bank. Ak fòs nou yo.",
+        "loading": "Ap chaje...",
+        "error": "Gen yon erè",
+        "success": "Reyèl !",
+        "cancel": "Anile",
+        "continue": "Kontinye",
+        "confirm": "Konfime",
+        "save": "Anrejistre",
+        "edit": "Chanje",
+        "delete": "Efase",
+        "close": "Fèmen",
+        "back": "Tounen",
+        "next": "Apre",
+        "submit": "Voye",
+        "search": "Chèche",
+        "filter": "Filtre",
+        "export": "Ekspo",
+        "refresh": "Aktyalize"
+    },
+    "navigation": {
+        "home": "Lakay",
+        "about": "Sou nou",
+        "app": "App",
+        "merchant": "Komèsan",
+        "join": "Rantre",
+        "contact": "Kontak",
+        "login": "Konekte",
+        "getStarted": "Kòmanse",
+        "dashboard": "Panèl kontròl",
+        "transactions": "Tranzaksyon yo",
+        "settings": "Paramèt yo",
+        "support": "Sipò",
+        "logout": "Dekonekte"
+    },
+    "welcome": {
+        "title": "Peman san bank. Ak fòs nou yo.",
+        "subtitle": "Yon sistèm pochèt dijital ki solid ak sekirite pou Ayisyen yo ak fanmi yo nan mond lan.",
+        "getApp": "Jwenn App lan",
+        "becomeDistributor": "Vin Distribitè",
+        "availableOn": "Sèlman sou iOS ak Android",
+        "learnMore": "Aprann pi plis"
+    },
+    "features": {
+        "sendReceive": {
+            "title": "Voye ak Resevwa Rapidman",
+            "description": "Ak jis yon nimewo telefòn oswa yon kat."
+        },
+        "merchantReady": {
+            "title": "Pare pou Komèsan yo",
+            "description": "Aksepte NFC oswa QR nan boutik ou a."
+        },
+        "diasporaPowered": {
+            "title": "Ak Fòs Dyaspora a",
+            "description": "Rechaje yon pochèt soti nenpòt kote nan mond lan."
+        }
+    },
+    "currency": {
+        "htg": "HTG",
+        "usd": "USD",
+        "gourdes": "Goud",
+        "balance": "Balans",
+        "amount": "Kantite",
+        "fee": "Frè",
+        "total": "Total",
+        "exchangeRate": "To chanje"
+    },
+    "auth": {
+        "signIn": "Konekte",
+        "signUp": "Enskrire",
+        "email": "Imel",
+        "password": "Mo de pas",
+        "confirmPassword": "Konfime mo de pas la",
+        "firstName": "Premye non",
+        "lastName": "Depo non",
+        "phone": "Nimewo telefòn",
+        "forgotPassword": "Bliye mo de pas?",
+        "resetPassword": "Rès mo de pas la",
+        "createAccount": "Kreye kont",
+        "alreadyHaveAccount": "Ou gen kont deja?",
+        "dontHaveAccount": "Ou pa gen kont?",
+        "signInWith": "Konekte ak",
+        "orContinueWith": "Oswa kontinye ak"
+    },
+    "dashboard": {
+        "welcome": "Kontan wè ou ankò",
+        "quickActions": "Aksyon rapid yo",
+        "recentTransactions": "Dènye tranzaksyon yo",
+        "addMoney": "Ajoute lajan",
+        "sendMoney": "Voye lajan",
+        "payMerchant": "Peye komèsan",
+        "withdraw": "Retire",
+        "viewAll": "Gade tout"
+    },
+    "footer": {
+        "tagline": "Fèt ak ❤️ nan Ayiti",
+        "links": {
+            "about": "Sou nou",
+            "partners": "Patnè yo",
+            "contact": "Kontak",
+            "support": "Sipò",
+            "privacy": "Politik konfidansyalite",
+            "terms": "Kondisyon yo"
+        },
+        "copyright": "© 2025 TECHKLEIN. Tout dwa yo rezève."
+    }
+}
