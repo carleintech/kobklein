@@ -128,8 +128,6 @@ export default function ModernSignUpForm() {
         lastName: data.lastName,
         phone: data.phoneNumber,
         role: data.role,
-        businessName: data.businessName,
-        language: data.language,
       });
       router.push(`/${locale}/dashboard`);
     } catch (error: any) {
