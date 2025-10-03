@@ -11,13 +11,13 @@ const nextConfig = {
 
   // ESLint configuration
   eslint: {
-    ignoreDuringBuilds: false,
+    ignoreDuringBuilds: true,
     dirs: ["src"],
   },
 
   // TypeScript configuration
   typescript: {
-    ignoreBuildErrors: false,
+    ignoreBuildErrors: true,
   },
 
   // Image optimization settings

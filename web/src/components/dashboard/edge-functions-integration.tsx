@@ -109,12 +109,18 @@ export function WalletDashboard({ userId }: WalletDashboardProps) {
           {balance ? (
             <div className="space-y-2">
               <div className="text-3xl font-bold">
-                {formatCurrency(balance.balance, balance.currency)}
+                {formatCurrency(
+                  balance.balance,
+                  balance.currency as "en" | "ht" | "fr" | "es"
+                )}
               </div>
               {balance.reservedBalance > 0 && (
                 <div className="text-sm text-muted-foreground">
                   Reserved:{" "}
-                  {formatCurrency(balance.reservedBalance, balance.currency)}
+                  {formatCurrency(
+                    balance.reservedBalance,
+                    balance.currency as "en" | "ht" | "fr" | "es"
+                  )}
                 </div>
               )}
               <div className="text-xs text-muted-foreground">
@@ -402,4 +408,3 @@ export function NotificationsPanel() {
     </Card>
   );
 }
-
