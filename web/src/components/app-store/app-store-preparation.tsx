@@ -541,7 +541,7 @@ export default function AppStorePreparation({
                       <Checkbox
                         id={`feature-${index}`}
                         checked={true}
-                        readOnly
+                        disabled
                       />
                       <Label htmlFor={`feature-${index}`} className="text-sm">
                         {feature}
@@ -908,4 +908,3 @@ export default function AppStorePreparation({
     </div>
   );
 }
-
