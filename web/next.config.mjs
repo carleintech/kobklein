@@ -9,6 +9,17 @@ const nextConfig = {
     optimizePackageImports: ["lucide-react", "@radix-ui/react-icons"],
   },
 
+  // ESLint configuration
+  eslint: {
+    ignoreDuringBuilds: false,
+    dirs: ["src"],
+  },
+
+  // TypeScript configuration
+  typescript: {
+    ignoreBuildErrors: false,
+  },
+
   // Image optimization settings
   images: {
     domains: ["kobklein.com", "assets.kobklein.com"],
@@ -32,6 +43,16 @@ const nextConfig = {
           {
             key: "Referrer-Policy",
             value: "strict-origin-when-cross-origin",
+          },
+        ],
+      },
+      // Allow video files to be served
+      {
+        source: "/videos/:path*",
+        headers: [
+          {
+            key: "Content-Type",
+            value: "video/mp4",
           },
         ],
       },
