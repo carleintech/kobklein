@@ -126,7 +126,7 @@ export default function ModernSignUpForm() {
         password: data.password,
         firstName: data.firstName,
         lastName: data.lastName,
-        phoneNumber: data.phoneNumber,
+        phone: data.phoneNumber,
         role: data.role,
         businessName: data.businessName,
         language: data.language,
