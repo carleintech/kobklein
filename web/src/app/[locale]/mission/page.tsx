@@ -7,20 +7,20 @@ import { WelcomeNavigation } from "../../../components/welcome/welcome-navigatio
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 30 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } },
+  show: { opacity: 1, y: 0 },
 };
 
 const containerVariants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
-    transition: { staggerChildren: 0.3, ease: "easeOut" },
+    transition: { staggerChildren: 0.3 },
   },
 };
 
 const itemVariants = {
   hidden: { opacity: 0, y: 30 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+  show: { opacity: 1, y: 0 },
 };
 
 export default function MissionPage() {
