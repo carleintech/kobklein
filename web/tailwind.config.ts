@@ -17,21 +17,25 @@ const config: Config = {
     },
     extend: {
       colors: {
-        // KobKlein Modern Fintech Brand Colors
+        // KobKlein Neon Theme Colors (Matching Reference Image)
+        neonPurple: "#9B4DFF",
+        neonBlue: "#00E0FF",
+        deepBlack: "#0A0A0F",
+        midnightPurple: "#120024",
+        darkPurple: "#1A0033",
         kobklein: {
-          primary: "#1E4DFF", // Modern vibrant blue
-          "primary-light": "#4169FF", // Lighter blue
-          secondary: "#0B1E4A", // Deep navy blue
-          accent: "#00BFFF", // Light accent blue
-          "accent-light": "#33CCFF", // Lighter accent
-          gold: "#FFD700", // Gold for HTG
+          primary: "#9B4DFF", // Neon purple
+          accent: "#00E0FF", // Neon blue
+          background: "#0A0A0F", // Deep black
+          gold: "#FFD700", // Gold for premium features
           success: "#10B981", // Green for success states
           warning: "#F59E0B", // Amber for warnings
           error: "#EF4444", // Red for errors
           text: {
             primary: "#FFFFFF", // White text
-            secondary: "#A7C8FF", // Light blue muted text
-            muted: "#8AA3D9", // Even more muted blue
+            secondary: "#E4E4E7", // Light gray text
+            muted: "#A1A1AA", // Muted gray
+            accent: "#00E0FF", // Neon blue accent text
           },
         },
         border: "hsl(var(--border))",
@@ -101,6 +105,16 @@ const config: Config = {
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
         display: ["Sora", "Inter", "system-ui", "sans-serif"],
+      },
+      backgroundImage: {
+        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
+        "gradient-conic":
+          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+        "kobklein-primary":
+          "linear-gradient(135deg, #6A0DAD 0%, #2F6BFF 50%, #00E0FF 100%)",
+        "kobklein-secondary":
+          "linear-gradient(135deg, #9A4DFF 0%, #00FFFF 100%)",
+        "kobklein-accent": "linear-gradient(135deg, #2F6BFF 0%, #00E0FF 100%)",
       },
     },
   },

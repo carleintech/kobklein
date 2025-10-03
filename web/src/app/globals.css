@@ -8,18 +8,44 @@
     --font-sora: "Sora", sans-serif;
     --font-mono: "JetBrains Mono", monospace;
 
-    /* Modern Fintech Theme Colors */
-    --kobklein-primary: #1e4dff;
-    --kobklein-primary-light: #4169ff;
-    --kobklein-secondary: #0b1e4a;
-    --kobklein-accent: #00bfff;
-    --kobklein-accent-light: #33ccff;
+    /* KobKlein Neon Purple/Blue Theme Colors (Matching Reference Image) */
+    --neon-purple: #9b4dff;
+    --neon-blue: #00e0ff;
+    --deep-black: #0a0a0f;
+    --midnight-purple: #120024;
+    --dark-purple: #1a0033;
+    --glass-white: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.2);
     --kobklein-gold: #ffd700;
+
+    /* Neon Gradient Stops (Matching Reference Image) */
+    --gradient-primary: linear-gradient(
+      135deg,
+      var(--deep-black) 0%,
+      var(--midnight-purple) 50%,
+      var(--dark-purple) 100%
+    );
+    --gradient-neon: linear-gradient(
+      135deg,
+      var(--neon-purple) 0%,
+      var(--neon-blue) 100%
+    );
+    --gradient-card: linear-gradient(
+      135deg,
+      var(--glass-white),
+      rgba(155, 77, 255, 0.1)
+    );
+    --gradient-dark: linear-gradient(
+      135deg,
+      var(--deep-black) 0%,
+      var(--midnight-purple) 100%
+    );
 
     /* Text Colors */
     --text-primary: #ffffff;
-    --text-secondary: #a7c8ff;
-    --text-muted: #8aa3d9;
+    --text-secondary: #e4e4e7;
+    --text-muted: #a1a1aa;
+    --text-accent: #a78bfa;
 
     /* KobKlein Z-Index Scale */
     --z-particles: 1;
@@ -29,17 +55,33 @@
     --z-modal: 100;
     --z-tooltip: 200;
 
-    /* Gradients */
-    --hero-gradient: linear-gradient(135deg, #0b1e4a 0%, #1e4dff 100%);
-    --button-gradient: linear-gradient(135deg, #1e4dff 0%, #00bfff 100%);
+    /* Neon Hero & Component Gradients */
+    --hero-gradient: linear-gradient(
+      to bottom right,
+      var(--deep-black) 0%,
+      var(--midnight-purple) 40%,
+      var(--dark-purple) 100%
+    );
+    --button-gradient: linear-gradient(
+      135deg,
+      var(--neon-purple) 0%,
+      var(--neon-blue) 100%
+    );
+    --card-gradient: var(--gradient-card);
 
-    --background: 222.2 84% 4.9%;
+    /* PWA Safe Areas */
+    --safe-area-inset-top: env(safe-area-inset-top);
+    --safe-area-inset-right: env(safe-area-inset-right);
+    --safe-area-inset-bottom: env(safe-area-inset-bottom);
+    --safe-area-inset-left: env(safe-area-inset-left);
+
+    --background: 10 10% 4%; /* Deep black matching neon theme */
     --foreground: 210 40% 98%;
 
-    --card: 222.2 84% 4.9%;
+    --card: 10 10% 4%; /* Deep black for cards */
     --card-foreground: 210 40% 98%;
 
-    --popover: 222.2 84% 4.9%;
+    --popover: 10 10% 4%; /* Deep black for popovers */
     --popover-foreground: 210 40% 98%;
 
     --primary: 210 40% 98%;
@@ -63,20 +105,20 @@
 
     --radius: 0.5rem;
 
-    /* KobKlein Brand Colors */
-    --kobklein-primary: #0f1e3d;
-    --kobklein-accent: #29a9e0;
-    --kobklein-gold: #ffd700;
+    /* KobKlein Neon Brand Colors */
+    --kobklein-primary: var(--neon-purple);
+    --kobklein-accent: var(--neon-blue);
+    --kobklein-background: var(--deep-black);
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    --background: 10 10% 4%; /* Deep black for dark mode */
     --foreground: 210 40% 98%;
 
-    --card: 222.2 84% 4.9%;
+    --card: 10 10% 4%; /* Deep black for cards in dark mode */
     --card-foreground: 210 40% 98%;
 
-    --popover: 222.2 84% 4.9%;
+    --popover: 10 10% 4%; /* Deep black for popovers in dark mode */
     --popover-foreground: 210 40% 98%;
 
     --primary: 210 40% 98%;
@@ -124,23 +166,27 @@
 }
 
 @layer components {
-  /* KobKlein Modern Fintech Gradient Background */
+  /* KobKlein Purple & Black Fintech Gradient Background */
   .kobklein-gradient {
-    background: linear-gradient(
-      135deg,
-      rgba(11, 30, 74, 0.8) 0%,
-      rgba(21, 53, 112, 0.7) 25%,
-      rgba(30, 77, 255, 0.6) 50%,
-      rgba(66, 133, 255, 0.7) 75%,
-      rgba(11, 30, 74, 0.8) 100%
-    );
+    background: var(--hero-gradient);
     background-size: 400% 400%;
-    animation: gradientShift 15s ease infinite;
+    animation: gradientShift 20s ease infinite;
   }
 
-  /* KobKlein Button */
+  /* KobKlein Neon Theme Button */
   .kobklein-button {
-    @apply bg-kobklein-accent hover:bg-kobklein-accent/90 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1;
+    @apply bg-white text-black font-semibold py-4 px-8 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:bg-gray-100;
+  }
+
+  .kobklein-button-neon {
+    background: var(--button-gradient);
+    @apply text-white font-semibold py-4 px-8 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl;
+    box-shadow: 0 0 20px rgba(155, 77, 255, 0.3);
+  }
+
+  .kobklein-button-neon:hover {
+    box-shadow: 0 0 30px rgba(155, 77, 255, 0.5),
+      0 0 20px rgba(0, 224, 255, 0.3);
   }
 
   /* Glass Morphism */
@@ -162,40 +208,185 @@
   .text-subheading {
     @apply text-lg sm:text-xl lg:text-2xl;
   }
+
+  /* KobKlein Neon Theme Components */
+  .kobklein-card {
+    background: var(--glass-white);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 32px rgba(155, 77, 255, 0.15);
+  }
+
+  /* Stunning Navbar Glass Effect */
+  .neon-glass {
+    background: linear-gradient(
+      135deg,
+      rgba(10, 10, 15, 0.85) 0%,
+      rgba(18, 0, 36, 0.9) 50%,
+      rgba(26, 0, 51, 0.85) 100%
+    );
+    backdrop-filter: blur(25px);
+    border: 1px solid rgba(155, 77, 255, 0.25);
+    box-shadow: 0 8px 32px rgba(155, 77, 255, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  .neon-glow-purple {
+    box-shadow: 0 0 40px rgba(155, 77, 255, 0.3),
+      0 4px 20px rgba(155, 77, 255, 0.2);
+  }
+
+  .neon-glow-blue {
+    box-shadow: 0 0 40px rgba(0, 224, 255, 0.3);
+  }
+
+  /* Navbar Logo Glow */
+  .navbar-logo-glow {
+    text-shadow: 0 0 10px rgba(155, 77, 255, 0.5),
+      0 0 20px rgba(155, 77, 255, 0.3), 0 0 30px rgba(155, 77, 255, 0.1);
+  }
+
+  /* Navbar Text Hover Glow */
+  .group-hover\:text-shadow:hover {
+    text-shadow: 0 0 5px rgba(0, 224, 255, 0.8), 0 0 10px rgba(0, 224, 255, 0.4);
+  }
+
+  /* Mobile Menu Glass */
+  .mobile-menu-glass {
+    background: linear-gradient(
+      135deg,
+      rgba(10, 10, 15, 0.95) 0%,
+      rgba(18, 0, 36, 0.95) 50%,
+      rgba(26, 0, 51, 0.95) 100%
+    );
+    backdrop-filter: blur(30px);
+    border: 1px solid rgba(155, 77, 255, 0.3);
+  }
+
+  .floating-card {
+    background: var(--glass-white);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 32px rgba(155, 77, 255, 0.15),
+      0 0 20px rgba(0, 224, 255, 0.1);
+  }
+
+  /* Premium Frosted Glass Panels */
+  .frosted-glass-panel {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(155, 77, 255, 0.05) 25%,
+      rgba(0, 224, 255, 0.03) 50%,
+      rgba(255, 255, 255, 0.06) 100%
+    );
+    backdrop-filter: blur(30px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 12px 40px rgba(155, 77, 255, 0.2),
+      inset 0 1px 2px rgba(255, 255, 255, 0.2), 0 0 60px rgba(0, 224, 255, 0.1);
+    position: relative;
+  }
+
+  .frosted-glass-panel::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
+      transparent
+    );
+  }
+
+  /* 3D Glowing Orb Effects */
+  .glowing-orb-purple {
+    background: radial-gradient(
+      circle at 30% 30%,
+      rgba(155, 77, 255, 0.6) 0%,
+      rgba(155, 77, 255, 0.3) 30%,
+      rgba(155, 77, 255, 0.1) 60%,
+      transparent 100%
+    );
+    box-shadow: 0 0 40px rgba(155, 77, 255, 0.4),
+      0 0 80px rgba(155, 77, 255, 0.2), inset 0 0 40px rgba(155, 77, 255, 0.1);
+  }
+
+  .glowing-orb-blue {
+    background: radial-gradient(
+      circle at 30% 30%,
+      rgba(0, 224, 255, 0.5) 0%,
+      rgba(0, 224, 255, 0.25) 30%,
+      rgba(0, 224, 255, 0.08) 60%,
+      transparent 100%
+    );
+    box-shadow: 0 0 40px rgba(0, 224, 255, 0.4), 0 0 80px rgba(0, 224, 255, 0.2),
+      inset 0 0 40px rgba(0, 224, 255, 0.1);
+  }
+
+  /* Advanced Glass Panel Variants */
+  .glass-panel-primary {
+    background: linear-gradient(
+      145deg,
+      rgba(155, 77, 255, 0.12) 0%,
+      rgba(155, 77, 255, 0.08) 50%,
+      rgba(0, 224, 255, 0.05) 100%
+    );
+    backdrop-filter: blur(25px);
+    border: 1px solid rgba(155, 77, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(155, 77, 255, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  }
+
+  .glass-panel-secondary {
+    background: linear-gradient(
+      145deg,
+      rgba(0, 224, 255, 0.1) 0%,
+      rgba(0, 224, 255, 0.06) 50%,
+      rgba(155, 77, 255, 0.04) 100%
+    );
+    backdrop-filter: blur(25px);
+    border: 1px solid rgba(0, 224, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 224, 255, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  }
 }
 
 @layer utilities {
-  /* KobKlein Color Utilities */
-  .text-kobklein-primary {
-    color: var(--kobklein-primary);
+  /* KobKlein Purple & Black Fintech Color Utilities */
+  .text-kobklein-purple {
+    color: var(--kobklein-purple);
   }
 
-  .text-kobklein-accent {
-    color: var(--kobklein-accent);
+  .text-kobklein-electric {
+    color: var(--kobklein-electric-violet);
   }
 
   .text-kobklein-gold {
     color: var(--kobklein-gold);
   }
 
-  .bg-kobklein-primary {
-    background-color: var(--kobklein-primary);
+  .bg-kobklein-purple {
+    background-color: var(--kobklein-purple);
   }
 
-  .bg-kobklein-accent {
-    background-color: var(--kobklein-accent);
+  .bg-kobklein-black {
+    background-color: var(--kobklein-deep-black);
   }
 
-  .bg-kobklein-gold {
-    background-color: var(--kobklein-gold);
+  .bg-kobklein-dark {
+    background-color: var(--kobklein-dark-slate);
   }
 
-  .border-kobklein-primary {
-    border-color: var(--kobklein-primary);
+  .border-kobklein-purple {
+    border-color: var(--kobklein-purple);
   }
 
-  .border-kobklein-accent {
-    border-color: var(--kobklein-accent);
+  .border-kobklein-electric {
+    border-color: var(--kobklein-electric-violet);
   }
 
   .border-kobklein-gold {
@@ -253,6 +444,28 @@
   }
   50% {
     background-position: 100% 50%;
+  }
+}
+
+@keyframes neonPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(155, 77, 255, 0.3),
+      0 0 40px rgba(155, 77, 255, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(155, 77, 255, 0.5),
+      0 0 60px rgba(155, 77, 255, 0.2);
+  }
+}
+
+@keyframes cardFloat {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(-10deg);
+  }
+  50% {
+    transform: translateY(-15px) rotate(-10deg);
   }
 }
 
@@ -320,4 +533,324 @@
     width: 100% !important;
     height: 100% !important;
   }
+
+  /* PWA and Mobile Optimizations */
+  html {
+    /* Disable zoom on double tap for PWA */
+    touch-action: manipulation;
+  }
+
+  body {
+    /* Prevent overscroll bounce on mobile */
+    overscroll-behavior: none;
+    /* Prevent rubber band effect */
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* PWA safe area support */
+  .pt-safe-top {
+    padding-top: var(--safe-area-inset-top);
+  }
+
+  .pb-safe-bottom {
+    padding-bottom: var(--safe-area-inset-bottom);
+  }
+
+  .pl-safe-left {
+    padding-left: var(--safe-area-inset-left);
+  }
+
+  .pr-safe-right {
+    padding-right: var(--safe-area-inset-right);
+  }
+
+  /* Touch optimizations */
+  button,
+  input,
+  textarea,
+  select {
+    /* Increase touch targets */
+    min-height: 44px;
+    /* Smooth tap highlight */
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+  }
+
+  /* Remove iOS input shadows */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="tel"],
+  textarea {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+  }
+
+  /* Prevent zoom on focus for iOS */
+  @media screen and (max-width: 768px) {
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    input[type="tel"],
+    textarea,
+    select {
+      font-size: 16px !important;
+    }
+  }
+
+  /* PWA specific styles */
+  @media (display-mode: standalone) {
+    body {
+      /* Hide address bar in standalone mode */
+      --safe-area-inset-top: 20px;
+    }
+  }
+
+  /* Connection status indicators */
+  .offline-indicator {
+    background: linear-gradient(45deg, #f56565, #e53e3e);
+    color: white;
+    padding: 0.5rem 1rem;
+    text-align: center;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .slow-connection {
+    background: linear-gradient(45deg, #ed8936, #dd6b20);
+    color: white;
+    padding: 0.5rem 1rem;
+    text-align: center;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  /* Touch feedback animations */
+  .touch-feedback {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .touch-feedback::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.3;
+    transform: translate(-50%, -50%);
+    transition: all 0.3s ease;
+  }
+
+  .touch-feedback:active::before {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Smooth scrolling for mobile */
+  .smooth-scroll {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Hide scrollbars on mobile */
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Loading animations for PWA */
+  @keyframes shimmer {
+    0% {
+      background-position: -468px 0;
+    }
+    100% {
+      background-position: 468px 0;
+    }
+  }
+
+  .shimmer {
+    animation: shimmer 1.2s ease-in-out infinite;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 468px 100%;
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .card {
+      border-width: 2px;
+    }
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+
+    .shimmer {
+      animation: none;
+      background: #f0f0f0;
+    }
+  }
+}
+
+@layer components {
+  /* Mobile-first components */
+  .mobile-container {
+    @apply max-w-md mx-auto px-4;
+  }
+
+  .mobile-grid {
+    @apply grid grid-cols-2 gap-4;
+  }
+
+  .mobile-stack {
+    @apply flex flex-col space-y-4;
+  }
+
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+
+  .glass-effect {
+    @apply bg-white/10 backdrop-blur-md border border-white/20;
+  }
+
+  .pwa-card {
+    @apply bg-card border border-border rounded-lg p-4 shadow-sm;
+  }
+
+  .pwa-button {
+    @apply touch-target rounded-lg font-medium transition-all duration-200;
+  }
+
+  .pwa-input {
+    @apply touch-target w-full rounded-lg border border-input bg-background px-3 py-2;
+  }
+}
+
+/* Custom NextTopLoader styles for KobKlein Neon theme */
+#nprogress {
+  pointer-events: none;
+}
+
+#nprogress .bar {
+  background: linear-gradient(90deg, #9b4dff 0%, #00e0ff 100%);
+  position: fixed;
+  z-index: 1031;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  box-shadow: 0 0 10px #9b4dff, 0 0 5px #00e0ff;
+}
+
+#nprogress .peg {
+  display: block;
+  position: absolute;
+  right: 0px;
+  width: 100px;
+  height: 100%;
+  background: linear-gradient(90deg, #9b4dff 0%, #00e0ff 100%);
+  box-shadow: 0 0 10px #9b4dff, 0 0 5px #00e0ff;
+  opacity: 1;
+  transform: rotate(3deg) translate(0px, -4px);
+}
+
+#nprogress .spinner {
+  display: none;
+}
+
+/* Smooth route transitions */
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.page-transition-exit {
+  opacity: 1;
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transition: opacity 300ms;
+}
+
+/* KobKlein Modern Theme Utilities */
+@layer utilities {
+  .kobklein-gradient {
+    background: var(--gradient-primary);
+  }
+
+  .kobklein-gradient-secondary {
+    background: var(--gradient-secondary);
+  }
+
+  .kobklein-gradient-accent {
+    background: var(--gradient-accent);
+  }
+
+  .kobklein-text-gradient {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .kobklein-glow {
+    box-shadow: 0 0 20px rgba(154, 77, 255, 0.3),
+      0 0 40px rgba(0, 224, 255, 0.2);
+  }
+
+  .kobklein-glassmorphism {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .kobklein-card {
+    background: linear-gradient(
+      135deg,
+      rgba(106, 13, 173, 0.1) 0%,
+      rgba(47, 107, 255, 0.1) 50%,
+      rgba(0, 224, 255, 0.1) 100%
+    );
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 224, 255, 0.2);
+  }
+}
+
+/* Grid pattern for hero section */
+.bg-grid-pattern {
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgba(148, 163, 184, 0.3) 1px,
+    transparent 0
+  );
+  background-size: 40px 40px;
+}
+
+/* Radial gradient utility */
+.bg-gradient-radial {
+  background: radial-gradient(circle, var(--tw-gradient-stops));
 }

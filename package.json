@@ -23,7 +23,9 @@
     "workspaces": [
         "web",
         "mobile",
-        "backend",
-        "libs/*"
-    ]
+        "backend"
+    ],
+    "dependencies": {
+        "tailwindcss-animate": "^1.0.7"
+    }
 }

@@ -153,3 +153,4 @@ function getFlagEmoji(locale: Locale): string {
   };
   return flags[locale] || "🌐";
 }
+

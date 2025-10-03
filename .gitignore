@@ -97,3 +97,7 @@ temp/
 .env.kobklein
 deployment-keys/
 sensitive-data/
+
+
+#Ignore vscode AI rules
+.github\instructions\codacy.instructions.md

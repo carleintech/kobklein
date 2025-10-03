@@ -1,9 +1,8 @@
-import { fontClasses } from "@/lib/fonts";
+import ClientProviders from "@/components/providers/ClientProviders";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { locales } from "../../i18n";
-import "../globals.css";
 
 interface RootLayoutProps {
   children: React.ReactNode;
@@ -23,19 +22,9 @@ export default async function RootLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} className={fontClasses}>
-      <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#0F1E3D" />
-        <link rel="icon" href="/favicon.ico" />
-      </head>
-      <body className="min-h-screen bg-background font-sans antialiased">
-        <NextIntlClientProvider messages={messages}>
-          {children}
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <NextIntlClientProvider messages={messages}>
+      <ClientProviders>{children}</ClientProviders>
+    </NextIntlClientProvider>
   );
 }
 
@@ -60,6 +49,7 @@ export function generateMetadata({
   };
 
   return {
+    metadataBase: new URL("https://kobklein.com"),
     title: titles[locale as keyof typeof titles] || titles.en,
     description:
       descriptions[locale as keyof typeof descriptions] || descriptions.en,
@@ -99,6 +89,16 @@ export function generateMetadata({
     },
   };
 }
+
+// Generate viewport configuration for all locales
+export const viewport = {
+  themeColor: "#0d1b2a",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+};
 
 // Generate static params for all locales
 export function generateStaticParams() {
