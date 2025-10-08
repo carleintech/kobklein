@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Pre-push hook for comprehensive checks
+echo "🚀 Running pre-push checks..."
+
+# Change to web directory
+cd web
+
+# Build check
+echo "🏗️  Building project..."
+pnpm build || exit 1
+
+# Security audit
+echo "🔒 Running security audit..."
+pnpm audit --audit-level moderate || exit 1
+
+echo "✅ Pre-push checks passed! Ready to push."

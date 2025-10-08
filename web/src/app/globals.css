@@ -8,15 +8,121 @@
     --font-sora: "Sora", sans-serif;
     --font-mono: "JetBrains Mono", monospace;
 
-    /* KobKlein Neon Purple/Blue Theme Colors (Matching Reference Image) */
-    --neon-purple: #9b4dff;
-    --neon-blue: #00e0ff;
+    /* 💙 PROFESSIONAL KOBKLEIN THEME - Blue Primary, Guava Accent */
+    --primary-blue: #0f2a6b;
+    --secondary-blue: #07122b;
+    --light-blue: #0b1736;
+    --accent-blue: #29a9e0;
     --deep-black: #0a0a0f;
-    --midnight-purple: #120024;
-    --dark-purple: #1a0033;
     --glass-white: rgba(255, 255, 255, 0.1);
     --glass-border: rgba(255, 255, 255, 0.2);
-    --kobklein-gold: #ffd700;
+
+    /* Professional Blue Palette */
+    --blue-50: #eff6ff;
+    --blue-100: #dbeafe;
+    --blue-200: #bfdbfe;
+    --blue-300: #93c5fd;
+    --blue-400: #60a5fa;
+    --blue-500: #3b82f6;
+    --blue-600: #2563eb;
+    --blue-700: #1d4ed8;
+    --blue-800: #1e40af;
+    --blue-900: #1e3a8a;
+
+    /* Strategic Guava Accent System (Limited usage) */
+    --guava-primary: #ff6b6b;
+    --guava-secondary: #ff8e8e;
+    --guava-light: #ffb8b8;
+    --guava-dark: #e85555;
+    --guava-50: #fff5f5;
+    --guava-100: #fed7d7;
+    --guava-200: #feb2b2;
+    --guava-300: #fc8181;
+    --guava-400: #f56565;
+    --guava-500: #e53e3e;
+    --guava-600: #c53030;
+    --guava-700: #9b2c2c;
+    --guava-800: #742a2a;
+    --guava-900: #4a1a1a;
+
+    /* Professional Purple Supporting Colors */
+    --purple-primary: #8b5cf6;
+    --purple-secondary: #a78bfa;
+    --purple-dark: #7c3aed;
+
+    /* 💙 PROFESSIONAL GRADIENT SYSTEM - Blue Primary */
+    --gradient-primary: linear-gradient(
+      135deg,
+      var(--primary-blue) 0%,
+      var(--accent-blue) 50%,
+      var(--light-blue) 100%
+    );
+    --gradient-secondary: linear-gradient(
+      135deg,
+      var(--secondary-blue) 0%,
+      var(--primary-blue) 100%
+    );
+    --gradient-accent: linear-gradient(
+      135deg,
+      var(--accent-blue) 0%,
+      var(--primary-blue) 100%
+    );
+
+    /* Professional Blue Gradients */
+    --gradient-blue-deep: linear-gradient(
+      135deg,
+      var(--secondary-blue) 0%,
+      var(--primary-blue) 100%
+    );
+    --gradient-blue-bright: linear-gradient(
+      135deg,
+      var(--accent-blue) 0%,
+      #3b82f6 100%
+    );
+
+    /* Strategic Guava Accent Gradients (Limited usage) */
+    --gradient-guava-accent: linear-gradient(
+      135deg,
+      var(--guava-primary) 0%,
+      var(--guava-dark) 100%
+    );
+
+    /* Professional Purple Supporting Gradients */
+    --gradient-purple: linear-gradient(
+      135deg,
+      var(--purple-primary) 0%,
+      var(--purple-dark) 100%
+    );
+
+    /* Premium Professional Gradient */
+    --gradient-premium: linear-gradient(
+      135deg,
+      var(--primary-blue) 0%,
+      var(--accent-blue) 50%,
+      var(--purple-primary) 100%
+    );
+
+    /* Animated Professional Gradient */
+    --gradient-animated: linear-gradient(
+      -45deg,
+      var(--primary-blue),
+      var(--accent-blue),
+      var(--purple-primary),
+      var(--guava-primary)
+    );
+
+    /* Professional Shadow System */
+    --shadow-blue: 0 10px 25px rgba(15, 42, 107, 0.4);
+    --shadow-accent: 0 10px 25px rgba(41, 169, 224, 0.3);
+    --shadow-purple: 0 10px 25px rgba(139, 92, 246, 0.3);
+    --shadow-guava: 0 10px 25px rgba(255, 107, 107, 0.3);
+    --shadow-premium: 0 20px 40px rgba(15, 42, 107, 0.3);
+
+    /* Enhanced Fintech Color Palette */
+    --fintech-success: #36d399;
+    --fintech-warning: #fbbd23;
+    --fintech-error: #f87272;
+    --fintech-info: #3abff8;
 
     /* Neon Gradient Stops (Matching Reference Image) */
     --gradient-primary: linear-gradient(
@@ -39,6 +145,18 @@
       135deg,
       var(--deep-black) 0%,
       var(--midnight-purple) 100%
+    );
+    --gradient-guava: var(--guava-gradient);
+    --gradient-modern: linear-gradient(
+      135deg,
+      var(--neon-purple) 0%,
+      var(--guava) 50%,
+      var(--neon-blue) 100%
+    );
+    --gradient-glass: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.05) 100%
     );
 
     /* Text Colors */
@@ -171,6 +289,13 @@
     background: var(--hero-gradient);
     background-size: 400% 400%;
     animation: gradientShift 20s ease infinite;
+  }
+
+  /* Modern Guava Accent Gradient */
+  .guava-gradient {
+    background: var(--gradient-guava);
+    background-size: 200% 200%;
+    animation: gradientShift 15s ease infinite;
   }
 
   /* KobKlein Neon Theme Button */
@@ -353,12 +478,80 @@
     box-shadow: 0 8px 32px rgba(0, 224, 255, 0.2),
       inset 0 1px 0 rgba(255, 255, 255, 0.12);
   }
+
+  /* Modern Fintech UI Components */
+  .fintech-card {
+    @apply relative overflow-hidden rounded-2xl border border-white/20 bg-white/10 backdrop-blur-xl p-6 transition-all duration-300;
+  }
+
+  .fintech-card-hover {
+    @apply hover:border-white/30 hover:bg-white/15 hover:shadow-xl hover:-translate-y-1;
+  }
+
+  .fintech-button {
+    @apply relative overflow-hidden rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2;
+  }
+
+  .fintech-button-primary {
+    @apply bg-gradient-to-r from-kobklein-primary to-kobklein-accent text-white shadow-lg hover:shadow-xl hover:from-kobklein-accent hover:to-kobklein-primary;
+  }
+
+  .fintech-button-guava {
+    @apply bg-gradient-to-r text-white shadow-lg hover:shadow-xl;
+    background: linear-gradient(
+      to right,
+      var(--guava-light),
+      var(--guava-dark)
+    );
+  }
+
+  .fintech-button-glass {
+    @apply bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 hover:border-white/30;
+  }
+
+  .fintech-input {
+    @apply bg-white/10 backdrop-blur-md border border-white/20 rounded-xl px-4 py-3 text-white placeholder:text-white/50 focus:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/10;
+  }
+
+  .shimmer-effect {
+    @apply relative overflow-hidden;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.15) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+
+  .pulse-effect {
+    animation: pulse 2s infinite ease-in-out;
+  }
+
+  .rotate-in {
+    animation: rotateIn 0.5s forwards ease-out;
+  }
+
+  .bounce-effect {
+    animation: bounce 2s infinite;
+  }
+
+  .spin-effect {
+    animation: spin 2s linear infinite;
+  }
+
+  .guava-glow {
+    box-shadow: 0 0 20px rgba(255, 106, 136, 0.3),
+      0 0 40px rgba(255, 106, 136, 0.1);
+    animation: guavaPulse 2s infinite;
+  }
 }
 
 @layer utilities {
   /* KobKlein Purple & Black Fintech Color Utilities */
   .text-kobklein-purple {
-    color: var(--kobklein-purple);
+    color: var(--neon-purple);
   }
 
   .text-kobklein-electric {
@@ -369,20 +562,44 @@
     color: var(--kobklein-gold);
   }
 
+  .text-guava {
+    color: var(--guava);
+  }
+
+  .text-guava-light {
+    color: var(--guava-light);
+  }
+
+  .text-guava-dark {
+    color: var(--guava-dark);
+  }
+
   .bg-kobklein-purple {
-    background-color: var(--kobklein-purple);
+    background-color: var(--neon-purple);
   }
 
   .bg-kobklein-black {
-    background-color: var(--kobklein-deep-black);
+    background-color: var(--deep-black);
   }
 
   .bg-kobklein-dark {
-    background-color: var(--kobklein-dark-slate);
+    background-color: var(--dark-purple);
+  }
+
+  .bg-guava {
+    background-color: var(--guava);
+  }
+
+  .bg-guava-light {
+    background-color: var(--guava-light);
+  }
+
+  .bg-guava-dark {
+    background-color: var(--guava-dark);
   }
 
   .border-kobklein-purple {
-    border-color: var(--kobklein-purple);
+    border-color: var(--neon-purple);
   }
 
   .border-kobklein-electric {
@@ -391,6 +608,10 @@
 
   .border-kobklein-gold {
     border-color: var(--kobklein-gold);
+  }
+
+  .border-guava {
+    border-color: var(--guava);
   }
 
   /* Z-Index utilities */
@@ -434,6 +655,142 @@
   .glow {
     box-shadow: 0 0 20px rgba(41, 169, 224, 0.5);
   }
+
+  /* KobKlein Modern Theme Utilities */
+  .kobklein-gradient {
+    background: var(--gradient-primary);
+  }
+
+  .kobklein-gradient-secondary {
+    background: var(--gradient-secondary);
+  }
+
+  .kobklein-gradient-accent {
+    background: var(--gradient-accent);
+  }
+
+  .kobklein-gradient-guava {
+    background: var(--gradient-guava);
+  }
+
+  .kobklein-gradient-modern {
+    background: var(--gradient-modern);
+  }
+
+  .kobklein-text-gradient {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .guava-text-gradient {
+    background: var(--gradient-guava);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .modern-text-gradient {
+    background: var(--gradient-modern);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .kobklein-glow {
+    box-shadow: 0 0 20px rgba(154, 77, 255, 0.3),
+      0 0 40px rgba(0, 224, 255, 0.2);
+  }
+
+  .guava-glow {
+    box-shadow: 0 0 20px rgba(255, 106, 136, 0.3),
+      0 0 40px rgba(255, 154, 139, 0.2);
+  }
+
+  .modern-glow {
+    box-shadow: 0 0 20px rgba(154, 77, 255, 0.2),
+      0 0 40px rgba(255, 106, 136, 0.2), 0 0 60px rgba(0, 224, 255, 0.2);
+  }
+
+  .kobklein-glassmorphism {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .premium-glassmorphism {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(30px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  .kobklein-card {
+    background: linear-gradient(
+      135deg,
+      rgba(106, 13, 173, 0.1) 0%,
+      rgba(47, 107, 255, 0.1) 50%,
+      rgba(0, 224, 255, 0.1) 100%
+    );
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 224, 255, 0.2);
+  }
+
+  .guava-card {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 154, 139, 0.1) 0%,
+      rgba(255, 106, 136, 0.1) 50%,
+      rgba(229, 64, 94, 0.1) 100%
+    );
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 106, 136, 0.2);
+  }
+
+  .modern-card {
+    background: linear-gradient(
+      135deg,
+      rgba(155, 77, 255, 0.1) 0%,
+      rgba(255, 106, 136, 0.05) 50%,
+      rgba(0, 224, 255, 0.1) 100%
+    );
+    backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Microinteraction Utilities */
+  .hover-scale {
+    @apply transition-transform duration-300 hover:scale-105;
+  }
+
+  .hover-lift {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-lg;
+  }
+
+  .hover-glow-purple {
+    @apply transition-all duration-300;
+  }
+  .hover-glow-purple:hover {
+    box-shadow: 0 0 20px rgba(155, 77, 255, 0.4);
+  }
+
+  .hover-glow-guava {
+    @apply transition-all duration-300;
+  }
+  .hover-glow-guava:hover {
+    box-shadow: 0 0 20px rgba(255, 106, 136, 0.4);
+  }
+
+  .hover-border-glow {
+    @apply transition-all duration-300 border border-transparent;
+  }
+  .hover-border-glow:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+  }
 }
 
 /* Keyframe Animations */
@@ -456,6 +813,18 @@
   50% {
     box-shadow: 0 0 30px rgba(155, 77, 255, 0.5),
       0 0 60px rgba(155, 77, 255, 0.2);
+  }
+}
+
+@keyframes guavaPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(255, 106, 136, 0.3),
+      0 0 40px rgba(255, 106, 136, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(255, 106, 136, 0.5),
+      0 0 60px rgba(255, 106, 136, 0.2);
   }
 }
 
@@ -501,342 +870,56 @@
   }
 }
 
-/* Mobile Responsiveness */
-@media (max-width: 640px) {
-  .text-display {
-    @apply text-3xl;
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
   }
-
-  .text-heading {
-    @apply text-xl;
-  }
-
-  .text-subheading {
-    @apply text-base;
-  }
-
-  /* Particle Background Styles */
-  #tsparticles {
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    pointer-events: none;
-    z-index: 0 !important;
-  }
-
-  #tsparticles canvas {
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-  }
-
-  /* PWA and Mobile Optimizations */
-  html {
-    /* Disable zoom on double tap for PWA */
-    touch-action: manipulation;
-  }
-
-  body {
-    /* Prevent overscroll bounce on mobile */
-    overscroll-behavior: none;
-    /* Prevent rubber band effect */
-    -webkit-overflow-scrolling: touch;
-  }
-
-  /* PWA safe area support */
-  .pt-safe-top {
-    padding-top: var(--safe-area-inset-top);
-  }
-
-  .pb-safe-bottom {
-    padding-bottom: var(--safe-area-inset-bottom);
-  }
-
-  .pl-safe-left {
-    padding-left: var(--safe-area-inset-left);
-  }
-
-  .pr-safe-right {
-    padding-right: var(--safe-area-inset-right);
-  }
-
-  /* Touch optimizations */
-  button,
-  input,
-  textarea,
-  select {
-    /* Increase touch targets */
-    min-height: 44px;
-    /* Smooth tap highlight */
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
-  }
-
-  /* Remove iOS input shadows */
-  input[type="text"],
-  input[type="email"],
-  input[type="password"],
-  input[type="number"],
-  input[type="tel"],
-  textarea {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-  }
-
-  /* Prevent zoom on focus for iOS */
-  @media screen and (max-width: 768px) {
-    input[type="text"],
-    input[type="email"],
-    input[type="password"],
-    input[type="number"],
-    input[type="tel"],
-    textarea,
-    select {
-      font-size: 16px !important;
-    }
-  }
-
-  /* PWA specific styles */
-  @media (display-mode: standalone) {
-    body {
-      /* Hide address bar in standalone mode */
-      --safe-area-inset-top: 20px;
-    }
-  }
-
-  /* Connection status indicators */
-  .offline-indicator {
-    background: linear-gradient(45deg, #f56565, #e53e3e);
-    color: white;
-    padding: 0.5rem 1rem;
-    text-align: center;
-    font-size: 0.875rem;
-    font-weight: 500;
-  }
-
-  .slow-connection {
-    background: linear-gradient(45deg, #ed8936, #dd6b20);
-    color: white;
-    padding: 0.5rem 1rem;
-    text-align: center;
-    font-size: 0.875rem;
-    font-weight: 500;
-  }
-
-  /* Touch feedback animations */
-  .touch-feedback {
-    position: relative;
-    overflow: hidden;
-  }
-
-  .touch-feedback::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: currentColor;
-    opacity: 0.3;
-    transform: translate(-50%, -50%);
-    transition: all 0.3s ease;
-  }
-
-  .touch-feedback:active::before {
-    width: 100%;
-    height: 100%;
-  }
-
-  /* Smooth scrolling for mobile */
-  .smooth-scroll {
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  /* Hide scrollbars on mobile */
-  .hide-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
-  .hide-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* Loading animations for PWA */
-  @keyframes shimmer {
-    0% {
-      background-position: -468px 0;
-    }
-    100% {
-      background-position: 468px 0;
-    }
-  }
-
-  .shimmer {
-    animation: shimmer 1.2s ease-in-out infinite;
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 468px 100%;
-  }
-
-  /* High contrast mode support */
-  @media (prefers-contrast: high) {
-    .card {
-      border-width: 2px;
-    }
-  }
-
-  /* Reduced motion support */
-  @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-    }
-
-    .shimmer {
-      animation: none;
-      background: #f0f0f0;
-    }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
   }
 }
 
-@layer components {
-  /* Mobile-first components */
-  .mobile-container {
-    @apply max-w-md mx-auto px-4;
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
   }
-
-  .mobile-grid {
-    @apply grid grid-cols-2 gap-4;
-  }
-
-  .mobile-stack {
-    @apply flex flex-col space-y-4;
-  }
-
-  .touch-target {
-    @apply min-h-[44px] min-w-[44px];
-  }
-
-  .glass-effect {
-    @apply bg-white/10 backdrop-blur-md border border-white/20;
-  }
-
-  .pwa-card {
-    @apply bg-card border border-border rounded-lg p-4 shadow-sm;
-  }
-
-  .pwa-button {
-    @apply touch-target rounded-lg font-medium transition-all duration-200;
-  }
-
-  .pwa-input {
-    @apply touch-target w-full rounded-lg border border-input bg-background px-3 py-2;
+  100% {
+    background-position: 200% 0;
   }
 }
 
-/* Custom NextTopLoader styles for KobKlein Neon theme */
-#nprogress {
-  pointer-events: none;
-}
-
-#nprogress .bar {
-  background: linear-gradient(90deg, #9b4dff 0%, #00e0ff 100%);
-  position: fixed;
-  z-index: 1031;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 3px;
-  box-shadow: 0 0 10px #9b4dff, 0 0 5px #00e0ff;
-}
-
-#nprogress .peg {
-  display: block;
-  position: absolute;
-  right: 0px;
-  width: 100px;
-  height: 100%;
-  background: linear-gradient(90deg, #9b4dff 0%, #00e0ff 100%);
-  box-shadow: 0 0 10px #9b4dff, 0 0 5px #00e0ff;
-  opacity: 1;
-  transform: rotate(3deg) translate(0px, -4px);
-}
-
-#nprogress .spinner {
-  display: none;
-}
-
-/* Smooth route transitions */
-.page-transition-enter {
-  opacity: 0;
-  transform: translateY(20px);
-}
-
-.page-transition-enter-active {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 300ms, transform 300ms;
-}
-
-.page-transition-exit {
-  opacity: 1;
-}
-
-.page-transition-exit-active {
-  opacity: 0;
-  transition: opacity 300ms;
-}
-
-/* KobKlein Modern Theme Utilities */
-@layer utilities {
-  .kobklein-gradient {
-    background: var(--gradient-primary);
+@keyframes rotateIn {
+  from {
+    transform: rotate(-10deg) scale(0.9);
+    opacity: 0;
   }
-
-  .kobklein-gradient-secondary {
-    background: var(--gradient-secondary);
+  to {
+    transform: rotate(0) scale(1);
+    opacity: 1;
   }
+}
 
-  .kobklein-gradient-accent {
-    background: var(--gradient-accent);
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
   }
-
-  .kobklein-text-gradient {
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  50% {
+    transform: translateY(-10px);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
   }
+}
 
-  .kobklein-glow {
-    box-shadow: 0 0 20px rgba(154, 77, 255, 0.3),
-      0 0 40px rgba(0, 224, 255, 0.2);
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
   }
-
-  .kobklein-glassmorphism {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  .kobklein-card {
-    background: linear-gradient(
-      135deg,
-      rgba(106, 13, 173, 0.1) 0%,
-      rgba(47, 107, 255, 0.1) 50%,
-      rgba(0, 224, 255, 0.1) 100%
-    );
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(0, 224, 255, 0.2);
+  to {
+    transform: rotate(360deg);
   }
 }
 
@@ -853,4 +936,234 @@
 /* Radial gradient utility */
 .bg-gradient-radial {
   background: radial-gradient(circle, var(--tw-gradient-stops));
+}
+
+/* =======================================================
+   🍊 KOBKLEIN REVOLUTIONARY FINTECH ENHANCEMENTS
+   Breaking the purple fintech monotony with guava power
+   ======================================================= */
+
+/* Guava-powered microinteraction utilities */
+.guava-hover {
+  @apply transition-all duration-300 ease-out hover:scale-105 hover:shadow-guava-glow;
+}
+
+.guava-button {
+  @apply bg-gradient-to-r from-kobklein-guava-500 to-kobklein-guava-600 text-white font-semibold;
+  @apply rounded-xl px-6 py-3 shadow-lg hover:shadow-guava-glow transition-all duration-300;
+  @apply hover:from-kobklein-guava-400 hover:to-kobklein-guava-500 active:scale-95;
+}
+
+.guava-card {
+  @apply bg-white/10 backdrop-blur-xl border border-kobklein-guava-200/20 rounded-2xl;
+  @apply shadow-xl hover:shadow-guava-soft transition-all duration-500;
+  @apply hover:bg-white/15 hover:border-kobklein-guava-300/30;
+}
+
+/* Revolutionary data visualization components */
+.data-viz-glow {
+  animation: guava-pulse 2s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 20px rgba(255, 107, 107, 0.4));
+}
+
+.progress-bar-guava {
+  @apply bg-gradient-to-r from-guava-400 via-guava-500 to-guava-600;
+  @apply relative overflow-hidden rounded-full;
+}
+
+.progress-bar-guava::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  animation: shimmer-progress 2s infinite;
+}
+
+@keyframes shimmer-progress {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Advanced mobile-first touch targets */
+.touch-target {
+  @apply min-h-[44px] min-w-[44px] flex items-center justify-center;
+  @apply rounded-xl transition-all duration-200 active:scale-95;
+}
+
+.mobile-safe-area {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Premium floating action button */
+.fab-guava {
+  @apply fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-guava-500 to-guava-600;
+  @apply rounded-full shadow-lg hover:shadow-guava-glow flex items-center justify-center;
+  @apply text-white transition-all duration-300 hover:scale-110 active:scale-95;
+  @apply z-50;
+}
+
+/* Revolutionary glassmorphism with guava accents */
+.glass-guava {
+  @apply bg-white/5 backdrop-blur-2xl border border-guava-300/20;
+  @apply shadow-2xl relative overflow-hidden;
+}
+
+.glass-guava::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 107, 107, 0.6),
+    transparent
+  );
+}
+
+/* Animated statistics counters */
+.stat-counter {
+  @apply text-3xl font-bold bg-gradient-to-r from-guava-400 to-guava-600 bg-clip-text text-transparent;
+  animation: count-up 2s ease-out forwards;
+}
+
+@keyframes count-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Revolutionary notification toasts */
+.toast-guava-success {
+  @apply bg-gradient-to-r from-emerald-500 to-guava-500 text-white;
+  @apply rounded-xl p-4 shadow-lg backdrop-blur-sm border border-white/20;
+  animation: toast-slide-in 0.3s ease-out forwards;
+}
+
+.toast-guava-error {
+  @apply bg-gradient-to-r from-red-500 to-guava-600 text-white;
+  @apply rounded-xl p-4 shadow-lg backdrop-blur-sm border border-white/20;
+  animation: toast-slide-in 0.3s ease-out forwards;
+}
+
+@keyframes toast-slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Loading states with guava personality */
+.loading-guava {
+  @apply inline-block w-6 h-6 border-2 border-guava-200 border-t-guava-500 rounded-full;
+  animation: spin 1s linear infinite;
+}
+
+.loading-pulse-guava {
+  @apply bg-gradient-to-r from-guava-400 to-guava-600 rounded-lg;
+  animation: loading-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes loading-pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+/* Revolutionary form styling */
+.input-guava {
+  @apply w-full px-4 py-3 bg-white/5 border border-guava-300/30 rounded-xl;
+  @apply text-white placeholder-guava-300 focus:border-guava-400 focus:ring-2 focus:ring-guava-400/20;
+  @apply transition-all duration-300 backdrop-blur-sm;
+}
+
+.input-guava:focus {
+  @apply bg-white/10 shadow-guava-soft;
+}
+
+/* Advanced scroll indicators */
+.scroll-indicator {
+  @apply fixed top-0 left-0 w-full h-1 bg-gradient-to-r from-guava-400 to-guava-600 z-50;
+  @apply origin-left scale-x-0 transition-transform duration-300;
+}
+
+/* Premium modal overlays */
+.modal-overlay-guava {
+  @apply fixed inset-0 bg-black/60 backdrop-blur-sm z-40;
+  animation: fade-in 0.2s ease-out forwards;
+}
+
+.modal-content-guava {
+  @apply bg-white/10 backdrop-blur-2xl border border-guava-300/20 rounded-2xl;
+  @apply shadow-2xl max-w-lg w-full mx-4 relative;
+  animation: modal-slide-up 0.3s ease-out forwards;
+}
+
+@keyframes modal-slide-up {
+  from {
+    transform: translateY(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Revolutionary navigation highlighting */
+.nav-active-guava {
+  @apply relative;
+}
+
+.nav-active-guava::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--guava-400), var(--guava-600));
+  border-radius: 1px;
+  animation: nav-expand 0.3s ease-out forwards;
+}
+
+@keyframes nav-expand {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
 }

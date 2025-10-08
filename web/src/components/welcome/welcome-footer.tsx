@@ -1,16 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import {
-  Github,
-  Globe,
-  Heart,
-  Instagram,
-  Mail,
-  MapPin,
-  Phone,
-  Twitter,
-} from "lucide-react";
+import { Github, Globe, Heart, Instagram, Twitter } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 
@@ -63,26 +54,49 @@ export function WelcomeFooter() {
     { icon: Globe, href: "#", label: "Website" },
   ];
 
-  const contactInfo = [
-    { icon: Mail, text: "support@kobklein.com" },
-    { icon: Phone, text: "+509 2222-0000" },
-    { icon: MapPin, text: "Port-au-Prince, Haiti" },
-  ];
-
   return (
     <footer className="relative overflow-hidden">
-      {/* Background Image */}
+      {/* 💙 PROFESSIONAL BLUE FADE SECTION SEPARATOR */}
+      <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-kobklein-primary/0 via-kobklein-accent/20 to-transparent pointer-events-none z-30" />
+
+      {/* 🎴 FOOTER BACKGROUND IMAGE */}
       <div className="absolute inset-0">
         <Image
-          src="/images/footer/footerbg.jpg"
+          src="/images/footer/footerbg.png"
           alt="KobKlein Footer Background"
           fill
-          className="object-cover object-center"
+          className="object-cover object-center opacity-70"
           quality={100}
+          priority={true}
         />
-        {/* Overlay for better text readability */}
-        <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" />
-        <div className="absolute inset-0 bg-gradient-to-t from-kobklein-primary/40 via-transparent to-kobklein-primary/20" />
+        {/* Professional blue overlay for consistency */}
+        <div className="absolute inset-0 bg-gradient-to-b from-kobklein-primary/60 via-kobklein-secondary/40 to-kobklein-primary/80" />
+      </div>
+
+      {/* 💎 PROFESSIONAL FLOATING ELEMENTS */}
+      <div className="absolute inset-0 pointer-events-none">
+        {[...Array(6)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-8 h-8 bg-gradient-to-br from-kobklein-accent/20 to-kobklein-primary/20 rounded-2xl opacity-30 flex items-center justify-center"
+            style={{
+              left: `${10 + Math.random() * 80}%`,
+              top: `${10 + Math.random() * 80}%`,
+            }}
+            animate={{
+              y: [0, -20, 0],
+              rotate: [0, 180, 360],
+              opacity: [0.1, 0.3, 0.1],
+            }}
+            transition={{
+              duration: 10 + Math.random() * 5,
+              repeat: Infinity,
+              delay: Math.random() * 5,
+            }}
+          >
+            <div className="w-4 h-4 bg-kobklein-accent/40 rounded-full" />
+          </motion.div>
+        ))}
       </div>
 
       <div className="relative z-10">
@@ -97,66 +111,107 @@ export function WelcomeFooter() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
               >
-                {/* Logo */}
-                <div className="flex items-center gap-3 mb-6">
-                  <motion.div
-                    className="w-14 h-14 bg-gradient-to-br from-kobklein-neon-blue to-kobklein-neon-blue-2 rounded-2xl flex items-center justify-center shadow-neon-blue navbar-logo-glow overflow-hidden"
-                    whileHover={{ scale: 1.05, rotate: 5 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <Image
-                      src="/images/logos/kobklein-footer-logo.png"
-                      alt="KobKlein Logo"
-                      width={40}
-                      height={40}
-                      className="object-contain"
-                    />
-                  </motion.div>
-                  <div>
-                    <h3
-                      className="text-slate-900 font-black text-2xl font-display"
-                      style={{
-                        textShadow: "1px 1px 3px rgba(255, 255, 255, 0.9)",
-                      }}
+                {/* Beautiful K Logo Design */}
+                <motion.div
+                  className="mb-8"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 1, delay: 0.2 }}
+                >
+                  <div className="flex items-center gap-4">
+                    {/* Giant Beautiful K */}
+                    <motion.div
+                      className="relative"
+                      whileHover={{ scale: 1.05 }}
+                      transition={{ duration: 0.3 }}
                     >
-                      KobKlein
-                    </h3>
-                    <p
-                      className="text-slate-700 font-bold"
-                      style={{
-                        textShadow: "1px 1px 2px rgba(255, 255, 255, 0.8)",
-                      }}
-                    >
-                      Financial Freedom
-                    </p>
-                  </div>
-                </div>
+                      <div className="relative w-20 h-20 bg-gradient-to-br from-kobklein-accent via-kobklein-primary to-kobklein-secondary rounded-3xl flex items-center justify-center shadow-2xl border border-kobklein-accent/30">
+                        {/* Glow effect */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-kobklein-accent/20 to-kobklein-primary/20 rounded-3xl blur-xl"></div>
+                        {/* Beautiful K Letter */}
+                        <span className="relative text-5xl font-black text-white drop-shadow-2xl">
+                          K
+                        </span>
+                      </div>
+                      {/* Floating particles */}
+                      <motion.div
+                        className="absolute -top-2 -right-2 w-3 h-3 bg-kobklein-accent rounded-full opacity-80"
+                        animate={{
+                          scale: [1, 1.5, 1],
+                          opacity: [0.8, 1, 0.8],
+                        }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      />
+                    </motion.div>
 
-                <div className="bg-slate-900/85 backdrop-blur-md rounded-xl border border-white/20 shadow-xl mb-6">
-                  <p className="text-white font-medium text-lg leading-relaxed px-6 py-4">
+                    {/* Brand Text */}
+                    <div>
+                      <motion.h3
+                        className="text-5xl font-black text-transparent bg-gradient-to-r from-kobklein-accent via-white to-kobklein-secondary bg-clip-text mb-2"
+                        style={{
+                          filter: "drop-shadow(0 2px 8px rgba(41,169,224,0.5))",
+                        }}
+                      >
+                       KobKlein
+                      </motion.h3>
+                      <p className="text-kobklein-blue-200 font-bold text-lg">
+                        Financial Freedom
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+
+                <div className="bg-white/10 backdrop-blur-md rounded-xl border border-kobklein-accent/30 shadow-xl mb-8 p-6">
+                  <p className="text-white font-medium text-lg leading-relaxed">
                     Empowering Haiti with secure, instant digital payments and
                     financial inclusion for everyone.
                   </p>
                 </div>
 
-                {/* Contact Info */}
-                <div className="space-y-3">
-                  {contactInfo.map((contact, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, x: -20 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: index * 0.1, duration: 0.6 }}
-                      className="flex items-center gap-3 text-kobklein-blue-200 hover:text-white transition-colors cursor-pointer"
-                    >
-                      <div className="w-8 h-8 glass rounded-lg flex items-center justify-center">
-                        <contact.icon className="h-4 w-4" />
+                {/* QR Code with K Symbol */}
+                <motion.div
+                  className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-kobklein-accent/30 shadow-xl"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.8, delay: 0.4 }}
+                >
+                  <div className="text-center">
+                    <h4 className="text-white font-bold text-lg mb-4">
+                      Download KobKlein App
+                    </h4>
+
+                    {/* QR Code Container */}
+                    <div className="relative mx-auto w-32 h-32 mb-4">
+                      {/* QR Code Background */}
+                      <div className="absolute inset-0 bg-white rounded-xl p-4">
+                        {/* QR Pattern Simulation */}
+                        <div className="grid grid-cols-8 gap-0.5 h-full">
+                          {Array.from({ length: 64 }).map((_, i) => (
+                            <div
+                              key={i}
+                              className={`${
+                                Math.random() > 0.5 ? "bg-black" : "bg-white"
+                              } rounded-sm`}
+                            />
+                          ))}
+                        </div>
                       </div>
-                      <span className="text-sm">{contact.text}</span>
-                    </motion.div>
-                  ))}
-                </div>
+
+                      {/* K Symbol in Center */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-8 h-8 bg-kobklein-primary rounded-lg flex items-center justify-center shadow-lg">
+                          <span className="text-white font-black text-sm">
+                            K
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <p className="text-kobklein-blue-200 text-sm">
+                      Scan to download our mobile app
+                    </p>
+                  </div>
+                </motion.div>
               </motion.div>
             </div>
 
@@ -188,7 +243,7 @@ export function WelcomeFooter() {
                         >
                           <a
                             href={link.href}
-                            className="text-kobklein-blue-200 hover:text-kobklein-neon-blue transition-colors text-sm block py-1 hover:translate-x-1 transition-transform duration-200"
+                            className="text-kobklein-blue-200 hover:text-kobklein-accent transition-all duration-200 text-sm block py-1 hover:translate-x-1"
                           >
                             {link.label}
                           </a>
@@ -245,7 +300,7 @@ export function WelcomeFooter() {
                     transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
                     whileHover={{ y: -3, scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
-                    className="w-10 h-10 glass neon-glass border border-white/20 rounded-xl flex items-center justify-center text-kobklein-blue-200 hover:text-white hover:bg-white/20 transition-all duration-300 shadow-neon-purple"
+                    className="w-12 h-12 bg-white/10 backdrop-blur-md border border-kobklein-accent/30 rounded-xl flex items-center justify-center text-kobklein-blue-200 hover:text-kobklein-accent hover:bg-kobklein-accent/20 transition-all duration-300 shadow-lg"
                     aria-label={social.label}
                   >
                     <social.icon className="h-5 w-5" />
@@ -253,30 +308,87 @@ export function WelcomeFooter() {
                 ))}
               </motion.div>
 
-              {/* Certifications */}
+              {/* Enhanced Compliance Badges */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8, delay: 0.4 }}
-                className="flex items-center gap-4"
+                className="flex items-center gap-6"
               >
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-kobklein-green/20 rounded-lg flex items-center justify-center">
-                    <div className="w-3 h-3 bg-kobklein-green rounded-full"></div>
+                {/* PCI Compliant with Enhanced Green Light */}
+                <motion.div
+                  className="flex items-center gap-3 bg-white/10 backdrop-blur-md rounded-xl px-4 py-2 border border-green-400/30"
+                  whileHover={{ scale: 1.05 }}
+                >
+                  <div className="relative">
+                    <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center">
+                      <motion.div
+                        className="w-4 h-4 bg-green-400 rounded-full shadow-lg"
+                        animate={{
+                          boxShadow: [
+                            "0 0 5px #4ade80",
+                            "0 0 20px #4ade80",
+                            "0 0 5px #4ade80",
+                          ],
+                        }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      />
+                    </div>
+                    {/* Pulsing ring */}
+                    <motion.div
+                      className="absolute inset-0 border-2 border-green-400 rounded-full"
+                      animate={{ scale: [1, 1.3, 1], opacity: [0.8, 0.2, 0.8] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
                   </div>
-                  <span className="text-kobklein-green text-xs font-medium">
-                    PCI Compliant
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-kobklein-neon-blue/20 rounded-lg flex items-center justify-center">
-                    <div className="w-3 h-3 bg-kobklein-neon-blue rounded-full"></div>
+                  <div>
+                    <span className="text-green-400 text-sm font-bold block">
+                      PCI Compliant
+                    </span>
+                    <span className="text-green-300 text-xs">● ACTIVE</span>
                   </div>
-                  <span className="text-kobklein-neon-blue text-xs font-medium">
-                    ISO 27001
-                  </span>
-                </div>
+                </motion.div>
+
+                {/* ISO 27001 with Enhanced Blue Light */}
+                <motion.div
+                  className="flex items-center gap-3 bg-white/10 backdrop-blur-md rounded-xl px-4 py-2 border border-kobklein-accent/30"
+                  whileHover={{ scale: 1.05 }}
+                >
+                  <div className="relative">
+                    <div className="w-8 h-8 bg-kobklein-accent/20 rounded-full flex items-center justify-center">
+                      <motion.div
+                        className="w-4 h-4 bg-kobklein-accent rounded-full shadow-lg"
+                        animate={{
+                          boxShadow: [
+                            "0 0 5px #29a9e0",
+                            "0 0 20px #29a9e0",
+                            "0 0 5px #29a9e0",
+                          ],
+                        }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                          delay: 0.5,
+                        }}
+                      />
+                    </div>
+                    {/* Pulsing ring */}
+                    <motion.div
+                      className="absolute inset-0 border-2 border-kobklein-accent rounded-full"
+                      animate={{ scale: [1, 1.3, 1], opacity: [0.8, 0.2, 0.8] }}
+                      transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+                    />
+                  </div>
+                  <div>
+                    <span className="text-kobklein-accent text-sm font-bold block">
+                      ISO 27001
+                    </span>
+                    <span className="text-kobklein-blue-200 text-xs">
+                      ● CERTIFIED
+                    </span>
+                  </div>
+                </motion.div>
               </motion.div>
             </div>
           </div>

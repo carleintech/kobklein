@@ -1,0 +1,28 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Pre-commit hook for code quality checks
+echo "🔍 Running pre-commit checks..."
+
+# Change to web directory
+cd web
+
+# Type checking
+echo "📝 Type checking..."
+pnpm type-check || exit 1
+
+# Linting
+echo "🔧 Linting code..."
+pnpm lint || exit 1
+
+# Format check
+echo "💅 Checking code formatting..."
+pnpm format:check || exit 1
+
+# Run tests (if they exist)
+if [ -f "jest.config.js" ] || [ -f "jest.config.ts" ]; then
+  echo "🧪 Running tests..."
+  pnpm test --passWithNoTests || exit 1
+fi
+
+echo "✅ Pre-commit checks passed!"

@@ -8,6 +8,7 @@ import {
 } from "framer-motion";
 import { ArrowRight, CheckCircle, CreditCard, Star, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 const steps = [
@@ -23,9 +24,8 @@ const steps = [
       "Multiple card types",
       "Local distributor network",
     ],
-    previewImage: "/images/preview/get-card.png",
-    gradient:
-      "from-kobklein-neon-blue-2 via-kobklein-neon-blue to-kobklein-neon-blue-3",
+    previewImage: "/images/card/Card.png",
+    gradient: "from-kobklein-accent via-kobklein-primary to-kobklein-secondary",
     icon: CreditCard,
   },
   {
@@ -36,8 +36,8 @@ const steps = [
     description:
       "Download the KobKlein app, scan your card QR code, and securely link it to your phone number.",
     features: ["QR code scanning", "Phone verification", "Secure linking"],
-    previewImage: "/images/preview/download-register.png",
-    gradient: "from-kobklein-deep via-kobklein-midnight to-kobklein-ink",
+    previewImage: "/images/card/Download.png",
+    gradient: "from-kobklein-primary via-kobklein-secondary to-kobklein-accent",
     icon: Users,
   },
   {
@@ -48,8 +48,8 @@ const steps = [
     description:
       "Send, receive, refill, and spend money instantly. Earn 50% bonus on deposits. No bank account required!",
     features: ["Instant transfers", "50% deposit bonus", "No bank required"],
-    previewImage: "/images/preview/start-earning.png",
-    gradient: "from-kobklein-orange via-kobklein-orange to-kobklein-gold",
+    previewImage: "/images/card/Spending.png",
+    gradient: "from-kobklein-secondary via-kobklein-accent to-kobklein-primary",
     icon: Star,
   },
 ];
@@ -80,13 +80,17 @@ export function WelcomeHowItWorks() {
   return (
     <section
       ref={sectionRef}
-      className="relative py-24 overflow-hidden bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900"
+      className="relative py-24 overflow-hidden bg-gradient-to-b from-kobklein-primary via-kobklein-secondary to-kobklein-primary"
     >
-      {/* Ambient Glow Effects */}
+      {/* 💙 PROFESSIONAL BLUE FADE SECTION SEPARATOR */}
+      <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-kobklein-primary/0 via-kobklein-accent/20 to-transparent pointer-events-none z-20" />
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-kobklein-primary/0 via-kobklein-accent/20 to-transparent pointer-events-none z-20" />
+
+      {/* 💎 PROFESSIONAL BLUE AMBIENT GLOW EFFECTS */}
       <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-1/6 w-80 h-80 bg-gradient-radial from-kobklein-neon-purple/20 to-transparent rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/6 w-80 h-80 bg-gradient-radial from-kobklein-neon-blue/20 to-transparent rounded-full blur-3xl" />
-        <div className="absolute top-3/4 left-1/8 w-60 h-60 bg-gradient-radial from-kobklein-green/15 to-transparent rounded-full blur-2xl" />
+        <div className="absolute top-1/4 left-1/6 w-80 h-80 bg-gradient-radial from-kobklein-accent/15 to-transparent rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/6 w-80 h-80 bg-gradient-radial from-kobklein-primary/20 to-transparent rounded-full blur-3xl" />
+        <div className="absolute top-3/4 left-1/8 w-60 h-60 bg-gradient-radial from-kobklein-secondary/12 to-transparent rounded-full blur-2xl" />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4">
@@ -102,34 +106,45 @@ export function WelcomeHowItWorks() {
             initial={{ scale: 0.8 }}
             whileInView={{ scale: 1 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border-2 border-kobklein-green/30 rounded-full px-8 py-4 mb-8 shadow-xl"
+            className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border-2 border-kobklein-accent/40 rounded-full px-8 py-4 mb-8 shadow-xl"
           >
-            <CheckCircle className="h-5 w-5 text-kobklein-green" />
+            <CheckCircle className="h-5 w-5 text-kobklein-accent" />
             <span className="text-sm font-bold text-white">3 Simple Steps</span>
           </motion.div>
 
-          <h2 className="text-4xl lg:text-7xl font-black text-white mb-8 leading-[0.9]">
-            <span className="block">From Zero to</span>
-            <span className="text-transparent bg-gradient-to-r from-kobklein-neon-blue via-kobklein-neon-purple to-kobklein-gold bg-clip-text animate-pulse">
+          <h2
+            className="text-4xl lg:text-7xl font-black mb-8 leading-[0.9]"
+            style={{
+              textShadow:
+                "0 4px 20px rgba(0,0,0,0.8), 0 0 40px rgba(0,0,0,0.6)",
+            }}
+          >
+            <span className="block text-white drop-shadow-2xl">
+              From Zero to
+            </span>
+            <span
+              className="text-transparent bg-gradient-to-r from-kobklein-accent via-kobklein-secondary to-kobklein-primary bg-clip-text animate-pulse drop-shadow-2xl"
+              style={{ filter: "drop-shadow(0 2px 8px rgba(41,169,224,0.5))" }}
+            >
               Financial Freedom
             </span>
           </h2>
 
-          <div className="max-w-4xl mx-auto bg-white/5 backdrop-blur-xl rounded-2xl p-8 border border-white/20 shadow-2xl">
-            <p className="text-xl lg:text-2xl text-white font-semibold leading-relaxed mb-4">
+          <div className="max-w-4xl mx-auto bg-slate-900/90 backdrop-blur-xl rounded-2xl p-8 border border-kobklein-accent/30 shadow-2xl">
+            <p className="text-xl lg:text-2xl text-white font-semibold leading-relaxed mb-4 drop-shadow-lg">
               Get your KobKlein card and start earning in under 5 minutes
             </p>
-            <p className="text-lg text-white/80 font-medium">
-              <span className="text-kobklein-neon-blue font-bold">
+            <p className="text-lg text-white font-medium drop-shadow-lg">
+              <span className="text-kobklein-accent font-bold drop-shadow-sm">
                 No bank account needed
               </span>
               ,
-              <span className="text-kobklein-gold font-bold">
+              <span className="text-white font-bold drop-shadow-sm">
                 {" "}
                 no complicated paperwork
               </span>
               ,
-              <span className="text-kobklein-neon-purple font-bold">
+              <span className="text-kobklein-accent font-bold drop-shadow-sm">
                 {" "}
                 just instant access
               </span>{" "}
@@ -147,20 +162,20 @@ export function WelcomeHowItWorks() {
             transition={{ duration: 0.8 }}
             className="relative"
           >
-            <div className="relative bg-slate-900/95 backdrop-blur-xl rounded-3xl border-2 border-kobklein-neon-purple/50 shadow-2xl shadow-kobklein-neon-purple/20 overflow-hidden">
-              {/* Glowing border effect */}
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-kobklein-neon-purple/20 to-pink-500/20 blur-xl"></div>
+            <div className="relative bg-slate-900/95 backdrop-blur-xl rounded-3xl border-2 border-kobklein-accent/50 shadow-2xl shadow-kobklein-accent/20 overflow-hidden">
+              {/* Professional Blue Glowing border effect */}
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-kobklein-accent/20 to-kobklein-primary/20 blur-xl"></div>
 
               <div className="relative bg-slate-900/98 rounded-3xl">
                 {/* Monitor bezel/frame */}
-                <div className="p-6 border-b border-kobklein-neon-purple/30">
+                <div className="p-6 border-b border-kobklein-accent/30">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-3 h-3 rounded-full bg-red-500 shadow-lg"></div>
                       <div className="w-3 h-3 rounded-full bg-yellow-500 shadow-lg"></div>
                       <div className="w-3 h-3 rounded-full bg-green-500 shadow-lg"></div>
                     </div>
-                    <div className="text-kobklein-neon-purple text-sm font-medium">
+                    <div className="text-kobklein-accent text-sm font-medium">
                       Step {selectedStep.number} - {selectedStep.title}
                     </div>
                   </div>
@@ -262,7 +277,7 @@ export function WelcomeHowItWorks() {
                   <div
                     className={`relative rounded-2xl p-8 h-full flex flex-col justify-between bg-gradient-to-br from-slate-800 to-slate-900 border transition-all duration-300 ${
                       isSelected
-                        ? "border-kobklein-neon-blue/40 shadow-xl shadow-kobklein-neon-blue/20"
+                        ? "border-kobklein-accent/40 shadow-xl shadow-kobklein-accent/20"
                         : "border-white/10 hover:border-white/20"
                     }`}
                   >
@@ -271,7 +286,7 @@ export function WelcomeHowItWorks() {
                       <motion.div
                         initial={{ scale: 0, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
-                        className="absolute top-4 right-4 w-6 h-6 bg-gradient-to-r from-kobklein-neon-blue to-kobklein-neon-purple rounded-full flex items-center justify-center shadow-lg"
+                        className="absolute top-4 right-4 w-6 h-6 bg-gradient-to-r from-kobklein-accent to-kobklein-primary rounded-full flex items-center justify-center shadow-lg"
                       >
                         <CheckCircle className="h-4 w-4 text-white" />
                       </motion.div>
@@ -310,7 +325,7 @@ export function WelcomeHowItWorks() {
                             key={idx}
                             className="flex items-center gap-2 text-xs text-kobklein-blue-100"
                           >
-                            <CheckCircle className="w-3 h-3 text-kobklein-green flex-shrink-0" />
+                            <CheckCircle className="w-3 h-3 text-kobklein-accent flex-shrink-0" />
                             <span className="leading-relaxed">{feature}</span>
                           </div>
                         ))}
@@ -321,19 +336,20 @@ export function WelcomeHowItWorks() {
                     <div>
                       {/* CTA Button - Always visible but changes style when selected */}
                       <motion.div className="flex justify-end">
-                        <button
-                          className={`px-6 py-2 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center gap-2 ${
-                            isSelected
-                              ? "bg-gradient-to-r from-kobklein-neon-blue to-kobklein-neon-purple text-white shadow-lg"
-                              : "bg-white/10 text-white hover:bg-white/20 border border-white/20"
-                          }`}
-                        >
-                          {isSelected ? "Current Step" : "View Step"}
-                          {isSelected && <CheckCircle className="h-4 w-4" />}
-                          {!isSelected && (
+                        {!isSelected ? (
+                          <Link
+                            href="/signup"
+                            className="px-6 py-2 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center gap-2 bg-white/10 text-white hover:bg-white/20 border border-white/20"
+                          >
+                            View Step
                             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                          )}
-                        </button>
+                          </Link>
+                        ) : (
+                          <button className="px-6 py-2 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center gap-2 bg-gradient-to-r from-kobklein-accent to-kobklein-primary text-white shadow-lg">
+                            Current Step
+                            <CheckCircle className="h-4 w-4" />
+                          </button>
+                        )}
                       </motion.div>
                     </div>
 
@@ -345,10 +361,13 @@ export function WelcomeHowItWorks() {
                         transition={{ delay: 0.2 }}
                         className="mt-4 pt-4 border-t border-white/10"
                       >
-                        <button className="w-full bg-gradient-to-r from-kobklein-neon-blue-2 to-kobklein-neon-blue hover:from-kobklein-neon-blue hover:to-kobklein-neon-blue-3 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 hover:shadow-xl group flex items-center justify-center gap-2">
+                        <Link
+                          href="/signup"
+                          className="w-full bg-gradient-to-r from-kobklein-accent to-kobklein-primary hover:from-kobklein-primary hover:to-kobklein-secondary text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 hover:shadow-xl group flex items-center justify-center gap-2"
+                        >
                           Start This Step
                           <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                        </button>
+                        </Link>
                       </motion.div>
                     )}
                   </div>

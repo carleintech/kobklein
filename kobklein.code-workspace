@@ -1,0 +1,259 @@
+{
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+        // Editor Configuration
+        "editor.formatOnSave": true,
+        "editor.formatOnPaste": true,
+        "editor.codeActionsOnSave": {
+            "source.fixAll.eslint": "explicit",
+            "source.organizeImports": "explicit",
+            "source.removeUnusedImports": "explicit"
+        },
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true,
+        "editor.wordWrap": "bounded",
+        "editor.wordWrapColumn": 100,
+        "editor.rulers": [
+            80,
+            100
+        ],
+        // File Configuration
+        "files.autoSave": "onFocusChange",
+        "files.trimTrailingWhitespace": true,
+        "files.insertFinalNewline": true,
+        "files.trimFinalNewlines": true,
+        "files.exclude": {
+            "**/node_modules": true,
+            "**/.next": true,
+            "**/dist": true,
+            "**/build": true,
+            "**/.DS_Store": true,
+            "**/thumbs.db": true,
+            "**/*.tsbuildinfo": true
+        },
+        // Search Configuration
+        "search.exclude": {
+            "**/node_modules": true,
+            "**/.next": true,
+            "**/dist": true,
+            "**/build": true,
+            "**/coverage": true,
+            "**/*.log": true
+        },
+        // TypeScript Configuration
+        "typescript.preferences.quoteStyle": "double",
+        "typescript.preferences.importModuleSpecifier": "relative",
+        "typescript.suggest.autoImports": true,
+        "typescript.updateImportsOnFileMove.enabled": "always",
+        "typescript.preferences.includePackageJsonAutoImports": "on",
+        // ESLint Configuration
+        "eslint.validate": [
+            "javascript",
+            "javascriptreact",
+            "typescript",
+            "typescriptreact"
+        ],
+        "eslint.workingDirectories": [
+            "web"
+        ],
+        // Prettier Configuration
+        "prettier.configPath": ".prettierrc.json",
+        "prettier.requireConfig": true,
+        // Language Specific Settings
+        "[javascript]": {
+            "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[javascriptreact]": {
+            "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[typescript]": {
+            "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[typescriptreact]": {
+            "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[json]": {
+            "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[jsonc]": {
+            "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[markdown]": {
+            "editor.defaultFormatter": "esbenp.prettier-vscode",
+            "editor.wordWrap": "on"
+        },
+        // Git Configuration
+        "git.enableSmartCommit": true,
+        "git.confirmSync": false,
+        "git.autofetch": true,
+        // Terminal Configuration
+        "terminal.integrated.defaultProfile.windows": "PowerShell",
+        "terminal.integrated.cwd": "${workspaceFolder}/web",
+        // Emmet Configuration
+        "emmet.includeLanguages": {
+            "typescript": "html",
+            "typescriptreact": "html"
+        }
+    },
+    "extensions": {
+        "recommendations": [
+            // Essential
+            "esbenp.prettier-vscode",
+            "dbaeumer.vscode-eslint",
+            "ms-vscode.vscode-typescript-next",
+            // React/Next.js
+            "bradlc.vscode-tailwindcss",
+            "formulahendry.auto-rename-tag",
+            "christian-kohler.path-intellisense",
+            // Development Experience
+            "ms-vscode.vscode-json",
+            "yzhang.markdown-all-in-one",
+            "streetsidesoftware.code-spell-checker",
+            // Git
+            "eamodio.gitlens",
+            "github.vscode-pull-request-github",
+            // Productivity
+            "ms-vscode.vscode-todo-highlight",
+            "aaron-bond.better-comments",
+            "usernamehw.errorlens",
+            // Testing
+            "orta.vscode-jest",
+            // Optional but useful
+            "ms-vscode.vscode-thunder-client",
+            "ritwickdey.liveserver"
+        ]
+    },
+    "tasks": {
+        "version": "2.0.0",
+        "tasks": [
+            {
+                "label": "dev",
+                "type": "shell",
+                "command": "pnpm",
+                "args": [
+                    "dev"
+                ],
+                "group": "build",
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": false,
+                    "panel": "shared"
+                },
+                "isBackground": true,
+                "problemMatcher": {
+                    "owner": "typescript",
+                    "source": "ts",
+                    "fileLocation": [
+                        "relative",
+                        "${workspaceFolder}/web"
+                    ],
+                    "pattern": {
+                        "regexp": "^([^\\s].*)\\((\\d+|\\d+,\\d+|\\d+,\\d+,\\d+,\\d+)\\):\\s+(error|warning|info)\\s+(TS\\d+)\\s*:\\s*(.*)$",
+                        "file": 1,
+                        "location": 2,
+                        "severity": 3,
+                        "code": 4,
+                        "message": 5
+                    },
+                    "background": {
+                        "activeOnStart": true,
+                        "beginsPattern": ".*compiled client and server successfully.*",
+                        "endsPattern": ".*Local:.*"
+                    }
+                }
+            },
+            {
+                "label": "build",
+                "type": "shell",
+                "command": "pnpm",
+                "args": [
+                    "build"
+                ],
+                "group": {
+                    "kind": "build",
+                    "isDefault": true
+                }
+            },
+            {
+                "label": "test",
+                "type": "shell",
+                "command": "pnpm",
+                "args": [
+                    "test"
+                ],
+                "group": {
+                    "kind": "test",
+                    "isDefault": true
+                }
+            },
+            {
+                "label": "lint",
+                "type": "shell",
+                "command": "pnpm",
+                "args": [
+                    "lint"
+                ],
+                "group": "build"
+            },
+            {
+                "label": "type-check",
+                "type": "shell",
+                "command": "pnpm",
+                "args": [
+                    "type-check"
+                ],
+                "group": "build"
+            },
+            {
+                "label": "format",
+                "type": "shell",
+                "command": "pnpm",
+                "args": [
+                    "format"
+                ],
+                "group": "build"
+            }
+        ]
+    },
+    "launch": {
+        "version": "0.2.0",
+        "configurations": [
+            {
+                "name": "Next.js: debug server-side",
+                "type": "node",
+                "request": "attach",
+                "port": 9229,
+                "skipFiles": [
+                    "<node_internals>/**"
+                ]
+            },
+            {
+                "name": "Next.js: debug client-side",
+                "type": "chrome",
+                "request": "launch",
+                "url": "http://localhost:3000"
+            },
+            {
+                "name": "Next.js: debug full stack",
+                "type": "node",
+                "request": "launch",
+                "program": "${workspaceFolder}/node_modules/.bin/next",
+                "args": [
+                    "dev"
+                ],
+                "console": "integratedTerminal",
+                "serverReadyAction": {
+                    "pattern": "started server on .+, url: (https?://.+)",
+                    "uriFormat": "%s",
+                    "action": "debugWithChrome"
+                }
+            }
+        ]
+    }
+}

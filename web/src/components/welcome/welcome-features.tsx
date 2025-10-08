@@ -20,7 +20,7 @@ const cardTypes = [
       "Mobile Wallet Integration",
       "24/7 Customer Support",
     ],
-    color: "from-kobklein-neon-blue to-cyan-500",
+    color: "from-kobklein-accent to-kobklein-primary",
     image: "/images/features/send-receive-connection.png",
     altText: "Client card for everyday payments",
   },
@@ -40,7 +40,7 @@ const cardTypes = [
       "Multi-location Support",
       "Priority Customer Support",
     ],
-    color: "from-kobklein-accent to-orange-500",
+    color: "from-kobklein-primary to-kobklein-secondary",
     image: "/images/features/merchant-payment.png",
     altText: "Merchant card for business payments",
     popular: true,
@@ -61,7 +61,7 @@ const cardTypes = [
       "Exclusive Distributor Portal",
       "Dedicated Account Manager",
     ],
-    color: "from-kobklein-gold to-yellow-500",
+    color: "from-kobklein-secondary to-kobklein-accent",
     image: "/images/features/diaspora-remittance.png",
     altText: "Distributor card for card sales management",
   },
@@ -75,12 +75,17 @@ export function WelcomeFeatures() {
   return (
     <section
       id="features"
-      className="relative py-24 overflow-hidden bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900"
+      className="relative py-24 overflow-hidden bg-gradient-to-b from-kobklein-primary via-kobklein-secondary to-kobklein-primary"
     >
+      {/* 💙 PROFESSIONAL BLUE FADE SECTION SEPARATOR */}
+      <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-kobklein-primary/0 via-kobklein-accent/20 to-transparent pointer-events-none z-20" />
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-kobklein-primary/0 via-kobklein-accent/20 to-transparent pointer-events-none z-20" />
+
+      {/* 💎 PROFESSIONAL BLUE AMBIENT GLOW EFFECTS */}
       <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-1/6 w-80 h-80 bg-gradient-radial from-kobklein-neon-purple/20 to-transparent rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/6 w-80 h-80 bg-gradient-radial from-kobklein-neon-blue/20 to-transparent rounded-full blur-3xl" />
-        <div className="absolute top-3/4 left-1/8 w-60 h-60 bg-gradient-radial from-kobklein-green/15 to-transparent rounded-full blur-2xl" />
+        <div className="absolute top-1/4 left-1/6 w-80 h-80 bg-gradient-radial from-kobklein-accent/15 to-transparent rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/6 w-80 h-80 bg-gradient-radial from-kobklein-primary/20 to-transparent rounded-full blur-3xl" />
+        <div className="absolute top-3/4 left-1/8 w-60 h-60 bg-gradient-radial from-kobklein-secondary/12 to-transparent rounded-full blur-2xl" />
       </div>
 
       <div className="relative z-10 container mx-auto px-6 lg:px-12">
@@ -95,9 +100,9 @@ export function WelcomeFeatures() {
             initial={{ scale: 0.8 }}
             whileInView={{ scale: 1 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border-2 border-kobklein-neon-blue/30 rounded-full px-8 py-4 mb-8 shadow-xl"
+            className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border-2 border-kobklein-accent/40 rounded-full px-8 py-4 mb-8 shadow-xl"
           >
-            <CreditCard className="h-5 w-5 text-kobklein-neon-blue" />
+            <CreditCard className="h-5 w-5 text-kobklein-accent" />
             <span className="text-sm font-bold text-white">
               KobKlein Card Solutions
             </span>
@@ -107,10 +112,19 @@ export function WelcomeFeatures() {
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="text-4xl lg:text-7xl font-black text-white mb-8 leading-[0.9]"
+            className="text-4xl lg:text-7xl font-black mb-8 leading-[0.9]"
+            style={{
+              textShadow:
+                "0 4px 20px rgba(0,0,0,0.8), 0 0 40px rgba(0,0,0,0.6)",
+            }}
           >
-            <span className="block">One Platform,</span>
-            <span className="text-transparent bg-gradient-to-r from-kobklein-neon-blue via-kobklein-neon-purple to-kobklein-gold bg-clip-text animate-pulse">
+            <span className="block text-white drop-shadow-2xl">
+              One Platform,
+            </span>
+            <span
+              className="text-transparent bg-gradient-to-r from-kobklein-accent via-kobklein-secondary to-kobklein-primary bg-clip-text animate-pulse drop-shadow-2xl"
+              style={{ filter: "drop-shadow(0 2px 8px rgba(41,169,224,0.5))" }}
+            >
               Every Solution
             </span>
           </motion.h2>
@@ -119,23 +133,23 @@ export function WelcomeFeatures() {
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.5 }}
-            className="max-w-5xl mx-auto bg-white/5 backdrop-blur-xl rounded-2xl p-8 border border-white/20 shadow-2xl"
+            className="max-w-5xl mx-auto bg-slate-900/90 backdrop-blur-xl rounded-2xl p-8 border border-kobklein-accent/30 shadow-2xl"
           >
-            <p className="text-xl lg:text-2xl text-white font-semibold leading-relaxed mb-4">
+            <p className="text-xl lg:text-2xl text-white font-semibold leading-relaxed mb-4 drop-shadow-lg">
               From personal payments to business solutions - KobKlein adapts to
               your unique needs
             </p>
-            <p className="text-lg text-white/80 font-medium">
-              <span className="text-kobklein-neon-blue font-bold">
+            <p className="text-lg text-white font-medium drop-shadow-lg">
+              <span className="text-kobklein-accent font-bold drop-shadow-sm">
                 Client Cards
               </span>{" "}
               for everyday spending,
-              <span className="text-kobklein-gold font-bold">
+              <span className="text-kobklein-secondary font-bold drop-shadow-sm">
                 {" "}
                 Merchant Pro
               </span>{" "}
               for business growth, and
-              <span className="text-kobklein-neon-purple font-bold">
+              <span className="text-kobklein-primary font-bold drop-shadow-sm">
                 {" "}
                 Distributor Elite
               </span>{" "}
@@ -166,8 +180,8 @@ export function WelcomeFeatures() {
                   transition={{ delay: index * 0.1 + 0.6 }}
                   className={`relative group cursor-pointer rounded-2xl p-6 transition-all duration-300 ${
                     isActive
-                      ? "bg-gradient-to-br from-kobklein-neon-purple/20 to-pink-500/20 border-2 border-kobklein-neon-purple/60 shadow-xl shadow-kobklein-neon-purple/30"
-                      : "bg-slate-800/60 backdrop-blur-md border border-slate-600/30 hover:border-kobklein-neon-purple/40 hover:shadow-lg hover:shadow-kobklein-neon-purple/20"
+                      ? "bg-gradient-to-br from-kobklein-accent/20 to-kobklein-primary/20 border-2 border-kobklein-accent/60 shadow-xl shadow-kobklein-accent/30"
+                      : "bg-slate-800/60 backdrop-blur-md border border-slate-600/30 hover:border-kobklein-accent/40 hover:shadow-lg hover:shadow-kobklein-accent/20"
                   }`}
                   whileHover={{ y: -2 }}
                   whileTap={{ scale: 0.98 }}
@@ -176,7 +190,7 @@ export function WelcomeFeatures() {
                     <motion.div
                       initial={{ scale: 0, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
-                      className="absolute top-4 right-4 w-6 h-6 bg-gradient-to-r from-kobklein-neon-purple to-pink-500 rounded-full flex items-center justify-center"
+                      className="absolute top-4 right-4 w-6 h-6 bg-gradient-to-r from-kobklein-accent to-kobklein-primary rounded-full flex items-center justify-center"
                     >
                       <CheckCircle className="h-4 w-4 text-white" />
                     </motion.div>
@@ -203,7 +217,7 @@ export function WelcomeFeatures() {
                             {card.price}
                           </div>
                           {card.savings && (
-                            <div className="text-kobklein-green text-sm font-semibold">
+                            <div className="text-kobklein-accent text-sm font-semibold">
                               {card.savings}
                             </div>
                           )}
@@ -218,12 +232,12 @@ export function WelcomeFeatures() {
                             key={`${card.id}-${idx}`}
                             className="flex items-center gap-2 text-sm text-gray-200"
                           >
-                            <div className="w-1.5 h-1.5 bg-gradient-to-r from-kobklein-neon-purple to-pink-500 rounded-full flex-shrink-0"></div>
+                            <div className="w-1.5 h-1.5 bg-gradient-to-r from-kobklein-accent to-kobklein-primary rounded-full flex-shrink-0"></div>
                             <span>{feature}</span>
                           </div>
                         ))}
                         {card.features.length > 3 && (
-                          <div className="text-sm text-kobklein-neon-purple font-medium mt-1">
+                          <div className="text-sm text-kobklein-accent font-medium mt-1">
                             +{card.features.length - 3} more features
                           </div>
                         )}
@@ -242,16 +256,16 @@ export function WelcomeFeatures() {
             transition={{ duration: 0.8, delay: 0.6 }}
             className="relative"
           >
-            <div className="relative bg-slate-900/95 backdrop-blur-xl rounded-3xl border-2 border-kobklein-neon-purple/50 shadow-2xl shadow-kobklein-neon-purple/20 overflow-hidden">
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-kobklein-neon-purple/20 to-pink-500/20 blur-xl"></div>
+            <div className="relative bg-slate-900/95 backdrop-blur-xl rounded-3xl border-2 border-kobklein-accent/50 shadow-2xl shadow-kobklein-accent/20 overflow-hidden">
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-kobklein-accent/20 to-kobklein-primary/20 blur-xl"></div>
               <div className="relative bg-slate-900/98 rounded-3xl">
-                <div className="p-6 border-b border-kobklein-neon-purple/30 flex justify-between">
+                <div className="p-6 border-b border-kobklein-accent/30 flex justify-between">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 bg-red-500 rounded-full"></div>
                     <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
                     <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                   </div>
-                  <div className="text-kobklein-neon-purple text-sm font-medium">
+                  <div className="text-kobklein-accent text-sm font-medium">
                     KobKlein {currentCard.title} Demo
                   </div>
                 </div>

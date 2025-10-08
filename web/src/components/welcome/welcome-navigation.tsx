@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, ChevronDown, Menu, Star, X } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -23,13 +22,63 @@ export function WelcomeNavigation() {
     { code: "HT", label: "HT" },
   ];
 
+  // 🍊 REVOLUTIONARY NAVIGATION WITH DROPDOWN MENUS
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+
   const navItems = [
-    { key: "home", href: "/", label: "Home" },
-    { key: "about", href: "/about", label: "About" },
-    { key: "products", href: "/products", label: "Products" },
-    { key: "career", href: "/career", label: "Careers" },
-    { key: "how-it-works", href: "/how-it-works", label: "How It Works" },
-    { key: "contact", href: "/contact", label: "Contact" },
+    {
+      key: "about",
+      href: "/about",
+      label: "About Us",
+      type: "dropdown",
+      submenu: [
+        { label: "About KobKlein", href: "/about", icon: "🏢" },
+        { label: "Our Mission", href: "/mission", icon: "🎯" },
+        { label: "Team", href: "/team", icon: "👥" },
+        { label: "Careers", href: "/careers", icon: "�" },
+      ],
+    },
+    {
+      key: "products",
+      href: "/products",
+      label: "Products",
+      type: "dropdown",
+      submenu: [
+        { label: "KobKlein Card", href: "/card", icon: "💳" },
+        { label: "Mobile App", href: "/app", icon: "📱" },
+        { label: "Business Solutions", href: "/business", icon: "🏪" },
+        { label: "API Documentation", href: "/docs", icon: "🔗" },
+      ],
+    },
+    {
+      key: "support",
+      href: "/support",
+      label: "Support",
+      type: "dropdown",
+      submenu: [
+        { label: "Help Center", href: "/help", icon: "❓" },
+        { label: "Contact Us", href: "/contact", icon: "📞" },
+        { label: "Community", href: "/community", icon: "🌍" },
+        { label: "How It Works", href: "/how-it-works", icon: "⚡" },
+        {
+          label: "Developer Resources",
+          href: "/developer-resources",
+          icon: "🛠️",
+        },
+      ],
+    },
+    {
+      key: "legal",
+      href: "/legal",
+      label: "Legal",
+      type: "dropdown",
+      submenu: [
+        { label: "Privacy Policy", href: "/privacy", icon: "🔒" },
+        { label: "Terms of Service", href: "/terms", icon: "📋" },
+        { label: "Security", href: "/security", icon: "🛡️" },
+        { label: "Compliance", href: "/compliance", icon: "✅" },
+      ],
+    },
   ];
 
   useEffect(() => {
@@ -47,50 +96,73 @@ export function WelcomeNavigation() {
       transition={{ duration: 0.6 }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ${
         scrolled
-          ? "glass border-b border-kobklein-neon-blue/20 shadow-xl shadow-kobklein-neon-purple/10 backdrop-blur-xl"
-          : "bg-transparent"
+          ? "bg-gradient-to-r from-kobklein-primary/95 via-kobklein-secondary/95 to-kobklein-primary/95 backdrop-blur-2xl border-b-2 border-kobklein-accent/30 shadow-2xl shadow-kobklein-primary/20"
+          : "bg-gradient-to-r from-black/40 via-kobklein-primary/20 to-black/40 backdrop-blur-xl border-b border-white/10"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <Link href="/" className="no-underline">
+          {/* 💎 PROFESSIONAL KOBKLEIN TEXT LOGO */}
+          <Link href={`/${locale}`} className="no-underline">
             <motion.div
-              className="flex items-center gap-3 cursor-pointer group"
-              whileHover={{ scale: 1.02 }}
+              className="flex items-center cursor-pointer group"
+              whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.98 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              transition={{ type: "spring", stiffness: 400, damping: 15 }}
             >
-              {/* KobKlein Logo */}
               <motion.div
-                className="relative w-14 h-14 bg-gradient-to-br from-kobklein-neon-blue to-kobklein-neon-blue-2 rounded-2xl flex items-center justify-center shadow-neon-blue navbar-logo-glow overflow-hidden"
-                whileHover={{ rotate: 5, scale: 1.1 }}
-                transition={{ duration: 0.3 }}
+                className="flex items-center gap-1"
+                whileHover={{ x: 3 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
               >
-                <Image
-                  src="/images/logos/kobklein-logo.png"
-                  alt="KobKlein - Digital Financial Freedom"
-                  width={32}
-                  height={32}
-                  className="object-contain drop-shadow-lg filter brightness-110"
-                  priority
-                />
+                {/* K Letter with Premium Styling */}
+                <motion.span
+                  className="text-5xl font-black bg-gradient-to-br from-kobklein-primary via-kobklein-accent to-kobklein-primary bg-clip-text text-transparent drop-shadow-2xl relative"
+                  whileHover={{
+                    scale: 1.1,
+                    textShadow: "0 0 25px rgba(41, 169, 224, 0.8)",
+                  }}
+                  transition={{ duration: 0.4 }}
+                  style={{
+                    textShadow: scrolled
+                      ? "0 0 20px rgba(41, 169, 224, 0.6), 0 0 40px rgba(41, 169, 224, 0.4)"
+                      : "0 0 15px rgba(255, 255, 255, 0.8), 0 0 30px rgba(41, 169, 224, 0.6)",
+                  }}
+                >
+                  K
+                </motion.span>
+
+                {/* obklein Text with Professional Styling */}
+                <motion.span
+                  className={`text-2xl font-bold tracking-wide relative ${
+                    scrolled
+                      ? "text-white drop-shadow-xl"
+                      : "text-white drop-shadow-2xl"
+                  }`}
+                  whileHover={{ letterSpacing: "0.1em" }}
+                  transition={{ duration: 0.3 }}
+                  style={{
+                    textShadow: scrolled
+                      ? "2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 255, 255, 0.3)"
+                      : "2px 2px 12px rgba(0, 0, 0, 0.9), 0 0 20px rgba(255, 255, 255, 0.4)",
+                  }}
+                >
+                  obklein
+                </motion.span>
               </motion.div>
-              <div className="flex flex-col">
-                <div className="flex items-baseline gap-1">
-                  <span className="text-white font-black text-2xl tracking-tight bg-gradient-to-r from-kobklein-neon-blue via-white to-kobklein-neon-purple bg-clip-text text-transparent drop-shadow-2xl group-hover:from-kobklein-neon-purple group-hover:to-kobklein-neon-blue transition-all duration-300">
-                    KobKlein
-                  </span>
-                </div>
-                <div className="text-kobklein-blue-200 text-xs font-semibold -mt-0.5 group-hover:text-white transition-colors duration-300 drop-shadow-lg">
-                  Financial Freedom for Haiti
-                </div>
-              </div>
+
+              {/* Premium Underline Animation */}
+              <motion.div
+                className="absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-kobklein-primary via-kobklein-accent to-kobklein-primary opacity-0 group-hover:opacity-100"
+                initial={{ scaleX: 0 }}
+                whileHover={{ scaleX: 1 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+              />
             </motion.div>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-8">
+          {/* 🍊 REVOLUTIONARY DESKTOP NAVIGATION WITH DROPDOWNS */}
+          <div className="hidden lg:flex items-center gap-6">
             {navItems.map((item, index) => (
               <motion.div
                 key={item.key}
@@ -102,26 +174,145 @@ export function WelcomeNavigation() {
                   stiffness: 400,
                   damping: 10,
                 }}
+                className="relative"
+                onMouseEnter={() =>
+                  item.type === "dropdown" && setActiveDropdown(item.key)
+                }
+                onMouseLeave={() =>
+                  item.type === "dropdown" && setActiveDropdown(null)
+                }
               >
-                <Link
-                  href={
-                    item.href === "/" ? `/${locale}` : `/${locale}${item.href}`
-                  }
-                  className="relative text-white/90 hover:text-white font-semibold transition-all duration-300 py-3 px-5 rounded-xl hover:bg-white/10 hover:shadow-xl group backdrop-blur-md border border-transparent hover:border-kobklein-neon-blue/30 hover:backdrop-blur-lg"
-                >
-                  <motion.div whileHover={{ y: -2 }} className="relative">
-                    <span className="group-hover:text-kobklein-neon-blue transition-colors duration-300 drop-shadow-lg text-sm font-bold tracking-wide">
-                      {item.label}
-                    </span>
-                    <motion.div
-                      className="absolute -bottom-1 left-0 right-0 h-1 bg-gradient-to-r from-kobklein-neon-blue via-kobklein-neon-purple to-kobklein-neon-blue origin-left rounded-full shadow-neon-blue"
-                      initial={{ scaleX: 0, opacity: 0 }}
-                      whileHover={{ scaleX: 1, opacity: 1 }}
-                      transition={{ duration: 0.4, ease: "easeOut" }}
-                    />
-                    <motion.div className="absolute inset-0 bg-gradient-to-r from-kobklein-neon-blue/5 to-kobklein-neon-purple/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  </motion.div>
-                </Link>
+                {item.type === "simple" ? (
+                  <Link
+                    href={
+                      item.href === "/"
+                        ? `/${locale}`
+                        : `/${locale}${item.href}`
+                    }
+                    className="relative text-white/90 hover:text-white font-semibold transition-all duration-300 py-3 px-4 rounded-xl hover:bg-white/10 hover:shadow-xl group backdrop-blur-md border border-transparent hover:border-guava-400/30"
+                  >
+                    <motion.div whileHover={{ y: -2 }} className="relative">
+                      <span className="group-hover:text-guava-primary transition-colors duration-300 drop-shadow-lg text-sm font-bold tracking-wide">
+                        {item.label}
+                      </span>
+                      <motion.div
+                        className="absolute -bottom-1 left-0 right-0 h-1 bg-gradient-to-r from-guava-400 via-guava-500 to-guava-600 origin-left rounded-full"
+                        initial={{ scaleX: 0, opacity: 0 }}
+                        whileHover={{ scaleX: 1, opacity: 1 }}
+                        transition={{ duration: 0.4, ease: "easeOut" }}
+                      />
+                    </motion.div>
+                  </Link>
+                ) : (
+                  <>
+                    <button className="relative text-white/90 hover:text-white font-semibold transition-all duration-300 py-3 px-4 rounded-xl hover:bg-white/10 hover:shadow-xl group backdrop-blur-md border border-transparent hover:border-guava-400/30 flex items-center gap-2">
+                      <motion.div
+                        whileHover={{ y: -2 }}
+                        className="relative flex items-center gap-2"
+                      >
+                        <span className="group-hover:text-guava-primary transition-colors duration-300 drop-shadow-lg text-sm font-bold tracking-wide">
+                          {item.label}
+                        </span>
+                        <ChevronDown
+                          className={`h-4 w-4 transition-transform duration-300 ${
+                            activeDropdown === item.key
+                              ? "rotate-180 text-guava-400"
+                              : "text-white/70"
+                          }`}
+                        />
+                        <motion.div
+                          className="absolute -bottom-1 left-0 right-0 h-1 bg-gradient-to-r from-guava-400 via-guava-500 to-guava-600 origin-left rounded-full"
+                          initial={{ scaleX: 0, opacity: 0 }}
+                          animate={{
+                            scaleX: activeDropdown === item.key ? 1 : 0,
+                            opacity: activeDropdown === item.key ? 1 : 0,
+                          }}
+                          transition={{ duration: 0.4, ease: "easeOut" }}
+                        />
+                      </motion.div>
+                    </button>
+
+                    {/* Revolutionary Dropdown Menu */}
+                    <AnimatePresence>
+                      {activeDropdown === item.key && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 15, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 15, scale: 0.95 }}
+                          transition={{ duration: 0.25, ease: "easeOut" }}
+                          className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-72 z-50"
+                        >
+                          <div className="bg-kobklein-primary/95 backdrop-blur-3xl border-2 border-kobklein-accent/40 rounded-2xl shadow-2xl shadow-kobklein-primary/40 overflow-hidden">
+                            {/* Dropdown Header with Strong Background */}
+                            <div className="bg-gradient-to-r from-kobklein-secondary/90 via-kobklein-primary/90 to-kobklein-secondary/90 p-4 border-b border-kobklein-accent/30 relative overflow-hidden">
+                              <div className="absolute inset-0 bg-gradient-to-r from-kobklein-accent/20 to-kobklein-primary/20 animate-gradient-shift" />
+                              <h3 className="text-white font-bold text-base relative z-10 flex items-center gap-2 drop-shadow-lg">
+                                <span className="w-2 h-2 bg-kobklein-accent rounded-full animate-pulse" />
+                                {item.label}
+                              </h3>
+                            </div>
+
+                            {/* Dropdown Items with Strong Background */}
+                            <div className="p-3 bg-kobklein-primary/85">
+                              {item.submenu?.map((subItem, subIndex) => (
+                                <motion.div
+                                  key={`${item.key}-${subItem.href}-${subIndex}`}
+                                  initial={{ opacity: 0, x: -15 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  transition={{ delay: subIndex * 0.08 }}
+                                >
+                                  <Link
+                                    href={`/${locale}${subItem.href}`}
+                                    className="flex items-center gap-4 px-4 py-3.5 text-white hover:text-white hover:bg-kobklein-accent/30 rounded-xl transition-all duration-300 group relative overflow-hidden shadow-lg"
+                                  >
+                                    <div className="absolute inset-0 bg-gradient-to-r from-kobklein-accent/0 to-kobklein-secondary/0 group-hover:from-kobklein-accent/15 group-hover:to-kobklein-secondary/15 transition-all duration-300" />
+                                    <motion.span
+                                      className="text-xl group-hover:scale-110 transition-transform duration-300 relative z-10 drop-shadow-lg"
+                                      whileHover={{ rotate: 10 }}
+                                    >
+                                      {subItem.icon}
+                                    </motion.span>
+                                    <div className="flex-1 relative z-10">
+                                      <span className="font-bold text-sm text-white drop-shadow-md group-hover:text-kobklein-blue-100 transition-colors duration-300">
+                                        {subItem.label}
+                                      </span>
+                                    </div>
+                                    <motion.div
+                                      className="opacity-0 group-hover:opacity-100 relative z-10"
+                                      initial={{ x: -8 }}
+                                      whileHover={{ x: 0 }}
+                                      transition={{ duration: 0.2 }}
+                                    >
+                                      <ArrowRight className="h-4 w-4 text-kobklein-accent drop-shadow-lg" />
+                                    </motion.div>
+                                  </Link>
+                                </motion.div>
+                              ))}
+                            </div>
+
+                            {/* Dropdown Footer with Strong Background */}
+                            <div className="bg-gradient-to-r from-kobklein-secondary/80 to-kobklein-primary/80 p-3 border-t border-kobklein-accent/30">
+                              <div className="flex justify-center">
+                                <motion.div
+                                  className="w-16 h-1 bg-gradient-to-r from-kobklein-accent to-kobklein-secondary rounded-full"
+                                  animate={{
+                                    scaleX: [1, 1.2, 1],
+                                    opacity: [0.7, 1, 0.7],
+                                  }}
+                                  transition={{
+                                    duration: 2,
+                                    repeat: Infinity,
+                                    ease: "easeInOut",
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </>
+                )}
               </motion.div>
             ))}
           </div>
@@ -137,8 +328,11 @@ export function WelcomeNavigation() {
             >
               <button
                 onClick={() => setIsLangOpen(!isLangOpen)}
-                className="flex items-center gap-2 text-slate-900 font-bold bg-white/85 backdrop-blur-md px-4 py-2 rounded-lg hover:shadow-lg hover:bg-white transition-all duration-300 border-2 border-white/30"
-                style={{ textShadow: "1px 1px 2px rgba(255, 255, 255, 0.5)" }}
+                className={`flex items-center gap-2 font-bold px-4 py-2 rounded-lg hover:shadow-lg transition-all duration-300 border-2 ${
+                  scrolled
+                    ? "text-white bg-kobklein-primary/80 backdrop-blur-md border-kobklein-accent/30 hover:bg-kobklein-accent/60 hover:border-white/40"
+                    : "text-kobklein-primary bg-white/90 backdrop-blur-md border-white/40 hover:bg-white hover:border-kobklein-accent/50"
+                }`}
               >
                 <span className="font-bold text-sm">{currentLang}</span>
                 <ChevronDown
@@ -176,27 +370,84 @@ export function WelcomeNavigation() {
 
             {/* Desktop Buttons */}
             <div className="hidden sm:flex items-center gap-3">
-              {/* Gold KobKlein Connect Button */}
+              {/* 🌟 IRRESISTIBLE ACCESS PORTAL BUTTON */}
               <motion.div
-                whileHover={{ scale: 1.05, y: -2 }}
+                whileHover={{ scale: 1.08, y: -3 }}
                 whileTap={{ scale: 0.95 }}
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 1, duration: 0.5 }}
+                className="relative"
               >
-                <Link href={`/`}>
-                  <Button className="group relative overflow-hidden bg-gradient-to-r from-kobklein-neon-blue via-kobklein-neon-purple to-kobklein-neon-blue hover:from-kobklein-neon-purple hover:to-kobklein-neon-blue-2 text-white font-bold px-8 py-3 rounded-xl shadow-2xl shadow-kobklein-neon-blue/30 hover:shadow-kobklein-neon-purple/40 transition-all duration-500 border border-white/20 hover:border-white/40 backdrop-blur-md hover:scale-105 transform">
-                    <span className="relative z-10 font-bold text-sm tracking-wide drop-shadow-lg">
-                      Start Your Journey
-                    </span>
-                    <ArrowRight className="ml-2 h-4 w-4 relative z-10 transition-transform group-hover:translate-x-2 group-hover:scale-110 duration-300" />
-                    <motion.div className="absolute inset-0 bg-gradient-to-r from-white/10 to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                {/* Pulsing Glow Effect */}
+                <motion.div
+                  className="absolute -inset-1 bg-gradient-to-r from-kobklein-primary via-kobklein-accent to-kobklein-primary rounded-2xl blur-lg opacity-75"
+                  animate={{
+                    scale: [1, 1.05, 1],
+                    opacity: [0.75, 0.9, 0.75],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                />
+
+                <Link href={`/${locale}/auth/signin`}>
+                  <Button className="group relative overflow-hidden bg-gradient-to-r from-kobklein-primary via-kobklein-accent to-kobklein-primary hover:from-kobklein-accent hover:via-kobklein-primary hover:to-kobklein-accent text-white font-black px-10 py-4 rounded-2xl shadow-2xl shadow-kobklein-primary/40 hover:shadow-kobklein-accent/60 transition-all duration-700 border-2 border-white/30 hover:border-white/60 backdrop-blur-md transform hover:rotate-1">
+                    {/* Magical Shimmer Effect */}
                     <motion.div
-                      className="absolute inset-0 bg-gradient-to-r from-kobklein-neon-purple/30 to-kobklein-neon-blue/30"
-                      initial={{ x: "-100%" }}
-                      whileHover={{ x: "100%" }}
-                      transition={{ duration: 0.6 }}
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"
+                      initial={{ x: "-200%" }}
+                      animate={{ x: "200%" }}
+                      transition={{
+                        duration: 3,
+                        repeat: Infinity,
+                        ease: "linear",
+                      }}
                     />
+
+                    {/* Button Content */}
+                    <span className="relative z-10 font-black text-base tracking-wide drop-shadow-xl flex items-center gap-3">
+                      <motion.span
+                        className="bg-gradient-to-r from-white via-kobklein-blue-100 to-white bg-clip-text text-transparent"
+                        whileHover={{ scale: 1.05 }}
+                      >
+                        Access Your Portal
+                      </motion.span>
+                      <motion.div
+                        whileHover={{ rotate: 360, scale: 1.2 }}
+                        transition={{ duration: 0.5 }}
+                        className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center"
+                      >
+                        <ArrowRight className="h-4 w-4" />
+                      </motion.div>
+                    </span>
+
+                    {/* Premium Overlay */}
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-white/5 via-white/10 to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                      whileHover={{
+                        background:
+                          "linear-gradient(45deg, rgba(255,255,255,0.1), rgba(41,169,224,0.1), rgba(255,255,255,0.1))",
+                      }}
+                    />
+
+                    {/* Exclusive Badge */}
+                    <motion.div
+                      className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-xs font-black text-white shadow-lg"
+                      animate={{
+                        rotate: [0, 360],
+                        scale: [1, 1.1, 1],
+                      }}
+                      transition={{
+                        duration: 4,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
+                    >
+                      ★
+                    </motion.div>
                   </Button>
                 </Link>
               </motion.div>
@@ -273,39 +524,32 @@ export function WelcomeNavigation() {
 
                 {/* Mobile Action Buttons */}
                 <motion.div
-                  className="pt-4 border-t border-white/10 space-y-3"
+                  className="pt-4 border-t border-kobklein-accent/20 space-y-4"
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.6, duration: 0.4 }}
                 >
+                  {/* Mobile Access Portal Button */}
                   <Link href={`/${locale}/auth/signin`}>
                     <Button
-                      variant="ghost"
-                      className="w-full text-white hover:bg-white/10 border border-white/20 font-medium py-3"
+                      className="w-full bg-gradient-to-r from-kobklein-primary via-kobklein-accent to-kobklein-primary text-white font-black py-4 rounded-xl shadow-xl shadow-kobklein-primary/30 border-2 border-white/30 hover:shadow-kobklein-accent/40 transition-all duration-500"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      Sign In
+                      <span className="font-black tracking-wide">
+                        Access Your Portal
+                      </span>
+                      <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>
 
                   <Link href={`/${locale}/auth/signup`}>
                     <Button
-                      className="w-full bg-gradient-to-r from-[#2F6BFF] to-[#4A7BFF] text-white font-semibold py-3 shadow-lg"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Get Started
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </Link>
-
-                  <Link href={`/${locale}/distributor/signup`}>
-                    <Button
                       variant="outline"
-                      className="w-full border-[#FF8A00] text-[#FF8A00] hover:bg-[#FF8A00] hover:text-white font-medium py-3"
+                      className="w-full border-2 border-kobklein-accent text-white hover:bg-kobklein-accent/20 hover:border-white font-bold py-4 rounded-xl backdrop-blur-md"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      <Star className="mr-2 h-4 w-4" />
-                      Become Distributor
+                      Start Your Journey
+                      <Star className="ml-2 h-4 w-4" />
                     </Button>
                   </Link>
                 </motion.div>
