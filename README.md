@@ -1,149 +1,260 @@
-# 🌟 KobKlein - Digital Payment Ecosystem for Haiti
+# 🚀 KobKlein - Cashless, Borderless Digital Payment Ecosystem
 
-**Empowering Haiti's cashless future with secure digital payments and financial inclusion**
+> A comprehensive digital financial platform for Haiti and its diaspora, featuring NFC payments, multi-currency wallets, and real-time money transfers.
 
-[![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=flat&logo=vercel)](https://kobklein.vercel.app)
-[![Next.js](https://img.shields.io/badge/Framework-Next.js%2014-black?style=flat&logo=next.js)](https://nextjs.org)
-[![TypeScript](https://img.shields.io/badge/Language-TypeScript-blue?style=flat&logo=typescript)](https://typescriptlang.org)
-[![Supabase](https://img.shields.io/badge/Backend-Supabase-green?style=flat&logo=supabase)](https://supabase.com)
+[![License](https://img.shields.io/badge/license-PROPRIETARY-red.svg)](LICENSE)
+[![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
+[![pnpm](https://img.shields.io/badge/pnpm-9.0.0-orange.svg)](https://pnpm.io/)
 
-## 🚀 Live Demo
+## 📋 Table of Contents
 
-**Production Website**: [kobklein.com](https://kobklein.com) (via Vercel deployment)
-
-## 📁 Project Structure
-
-```
-kobklein/
-├── 📱 web/                    # Next.js web application
-├── 📱 mobile/                 # React Native mobile app (planned)
-├── ⚡ backend/                # API services and integrations
-├── 🗄️ supabase/              # Database and edge functions
-├── 🏗️ infrastructure/        # Docker, Terraform, deployment scripts
-├── 📚 docs/                  # Comprehensive documentation
-│   ├── phases/               # Development phase tracking
-│   ├── guides/               # Setup and configuration guides
-│   ├── deployment/           # Production deployment guides
-│   ├── project-status/       # Project completion tracking
-│   ├── testing/              # Testing strategies and docs
-│   └── performance/          # Monitoring and optimization
-└── � libs/                  # Shared libraries and utilities
-```
-
-## 🎯 Core Features
-
-- **Digital Wallet System** - Secure money transfers and payments
-- **Multi-User Ecosystem** - Clients, Distributors, and Merchants
-- **Global Network** - Connecting Haiti to international markets
-- **Mobile-First Design** - PWA-ready responsive interface
-- **Multi-Language Support** - Haitian Creole, French, Spanish, English
-
-## 🏗️ Architecture
-
-- **Frontend**: Next.js 14 with TypeScript, Tailwind CSS, Framer Motion
-- **Backend**: Supabase with Edge Functions
-- **Analytics**: Vercel Speed Insights & Analytics
-- **Deployment**: Vercel with custom domain
+- [Quick Start](#-quick-start)
+- [Project Structure](#-project-structure)
+- [Features](#-features)
+- [Development](#-development)
+- [Documentation](#-documentation)
+- [Tech Stack](#-tech-stack)
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js 18+
-- pnpm (recommended) or npm
-- Git
+- Node.js v18+
+- pnpm v9.0.0+
+- PostgreSQL (for backend)
 
 ### Installation
 
-1. **Clone the repository**
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/kobklein.git
+cd kobklein
 
-   ```bash
-   git clone https://github.com/carleintech/kobklein.git
-   cd kobklein
-   ```
+# Install dependencies
+pnpm install
 
-2. **Install dependencies**
+# Start development servers (Frontend + Backend)
+pnpm dev:all
 
-   ```bash
-   pnpm install
-   ```
+# Or use helper scripts:
+# Windows
+.\start-dev.ps1
 
-3. **Set up environment variables**
+# Mac/Linux
+./start-dev.sh
+```
 
-   ```bash
-   # Copy environment template
-   cp web/.env.example web/.env.local
+### Access the Application
 
-   # Add your Supabase credentials
-   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-   ```
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:3001
+- **API Documentation**: http://localhost:3001/api
 
-4. **Start development server**
+## 📁 Project Structure
 
-   ```bash
-   cd web
-   pnpm dev
-   ```
+```
+kobklein/
+├── web/                    # Frontend (Next.js 14)
+│   ├── src/
+│   │   ├── app/           # Next.js app directory
+│   │   ├── components/    # React components
+│   │   ├── contexts/      # React contexts
+│   │   └── hooks/         # Custom hooks
+│   └── package.json
+│
+├── backend/api/           # Backend (NestJS)
+│   ├── src/
+│   │   ├── auth/         # Authentication module
+│   │   ├── users/        # User management
+│   │   ├── wallets/      # Wallet system
+│   │   ├── transactions/ # Transaction processing
+│   │   └── payments/     # Payment integration
+│   └── package.json
+│
+├── mobile/                # Mobile app (React Native)
+│   └── package.json
+│
+├── docs/                  # Documentation
+│   ├── api/              # API documentation
+│   ├── guides/           # Setup guides
+│   └── phases/           # Development phases
+│
+└── infrastructure/        # DevOps & deployment
+    └── scripts/          # Utility scripts
+```
 
-5. **Open in browser**
-   ```
-   http://localhost:3000
-   ```
+## ✨ Features
 
-## � Documentation
+### 💳 Multi-Role System
+- **Client**: Personal wallet, NFC payments, QR transfers
+- **Merchant**: POS system, sales tracking, payment acceptance
+- **Distributor**: Card activation, cash refills, commission tracking
+- **Diaspora**: International money transfers, beneficiary management
+- **Admin**: Complete platform management and analytics
 
-### 📖 Project Phases
+### 💰 Payment Methods
+- NFC tap-to-pay
+- QR code scanning
+- Mobile wallet transfers
+- Cash refills via distributors
+- International remittances (USD → HTG)
 
-- [Phase 5: UI/UX Complete](./docs/phases/PHASE_05_COMPLETE.md)
-- [Phase 8: Completion Summary](./docs/phases/PHASE_08_COMPLETION_SUMMARY.md)
-- [Phase 9: Mobile & PWA Plan](./docs/phases/PHASE_09_MOBILE_PWA_PLAN.md)
-- [Phase 13: Production Environment Setup](./docs/phases/PHASE_13_PRODUCTION_ENVIRONMENT_SETUP.md)
+### 🌍 Multi-Currency Support
+- Haitian Gourde (HTG)
+- US Dollar (USD)
+- Real-time exchange rates
+- Automatic currency conversion
 
-### 🛠️ Development Guides
+### 🔒 Security Features
+- JWT authentication
+- Role-based access control (RBAC)
+- PIN verification for transactions
+- Encrypted data storage
+- Session management
 
-- [Environment Setup Guide](./docs/guides/environment-setup-guide.md)
-- [Firebase Setup Guide](./docs/guides/FIREBASE_SETUP_GUIDE.md)
-- [Supabase Migration Complete](./docs/guides/SUPABASE_MIGRATION_COMPLETE.md)
+### 📱 Real-Time Features
+- Live balance updates
+- Transaction notifications
+- WebSocket communication
+- Offline mode support
 
-### 🚀 Deployment & Operations
+## 🛠️ Development
 
-- [Production Deployment Guide](./docs/deployment/production-deployment.md)
-- [Database Deployment Guide](./docs/deployment/DATABASE_DEPLOYMENT_GUIDE.md)
-- [App Store Preparation](./docs/deployment/app-store-preparation.md)
+### Available Scripts
 
-### 📊 Project Status
+```bash
+# Development
+pnpm dev:all        # Start frontend + backend
+pnpm dev:web        # Start frontend only
+pnpm dev:backend    # Start backend only
 
-- [Project Status Overview](./docs/project/PROJECT_STATUS.md)
-- [Error Handling Complete](./docs/project-status/ERROR_HANDLING_COMPLETE.md)
-- [Documentation Reorganization](./docs/project-status/DOCUMENTATION_REORGANIZATION_SUMMARY.md)
+# Building
+pnpm build          # Build frontend
+pnpm build:backend  # Build backend
+pnpm build:all      # Build everything
 
-For a complete overview, visit [`docs/README.md`](./docs/README.md)
+# Testing
+pnpm test           # Run all tests
+pnpm test:coverage  # Run tests with coverage
+pnpm lint           # Lint all code
+pnpm type-check     # TypeScript type checking
+
+# Maintenance
+pnpm clean          # Clean node_modules
+pnpm clean:hard     # Deep clean + reinstall
+```
+
+### VSCode Integration
+
+Open the workspace file for the best development experience:
+
+```bash
+code kobklein.code-workspace
+```
+
+**Available Tasks:**
+- 🚀 Start All (Frontend + Backend)
+- 🌐 Frontend Dev Server
+- ⚙️ Backend Dev Server
+- 🧹 Clean All
+- 📦 Install Dependencies
+
+**Debug Configurations:**
+- 🚀 Debug Full Stack (Frontend + Backend)
+- 🌐 Debug Frontend (Next.js)
+- ⚙️ Debug Backend (NestJS)
+
+## 📚 Documentation
+
+- [Workspace Setup Guide](./WORKSPACE_SETUP.md) - Complete setup instructions
+- [Project Status](./docs/project/PROJECT_STATUS.md) - Current development status
+- [Development Workflow](./docs/development/WORKFLOW.md) - Development guidelines
+- [API Documentation](./docs/api/) - Backend API reference
+- [Frontend Documentation](./web/README.md) - Frontend architecture
+- [Backend Documentation](./backend/api/README.md) - Backend architecture
+
+## 🔧 Tech Stack
+
+### Frontend
+- **Framework**: Next.js 14 (App Router)
+- **Language**: TypeScript
+- **Styling**: TailwindCSS
+- **UI Components**: Shadcn UI, Radix UI
+- **State Management**: React Context, TanStack Query
+- **Authentication**: NextAuth.js
+- **Real-time**: Socket.io Client
+
+### Backend
+- **Framework**: NestJS
+- **Language**: TypeScript
+- **Database**: PostgreSQL
+- **ORM**: Prisma
+- **Authentication**: JWT, Passport
+- **Payments**: Stripe
+- **Real-time**: Socket.io
+- **API Docs**: Swagger/OpenAPI
+
+### DevOps
+- **Package Manager**: pnpm (workspaces)
+- **Version Control**: Git
+- **CI/CD**: GitHub Actions (planned)
+- **Deployment**: Vercel (frontend), AWS (backend)
+- **Monitoring**: Sentry (planned)
+
+## 🌟 Key Highlights
+
+- ✅ **90% Complete** - Fully functional platform
+- ✅ **9 Role-Based Dashboards** - Comprehensive user experiences
+- ✅ **Multi-Currency Wallet** - HTG and USD support
+- ✅ **Real-Time Updates** - WebSocket integration
+- ✅ **Multi-Language** - Kreyòl, French, English, Spanish
+- ✅ **Mobile-First Design** - Responsive and PWA-ready
+- ✅ **Production-Ready** - Error handling, loading states, security
+
+## 📊 Project Status
+
+**Current Phase**: Phase 11 - Mobile & PWA Features
+
+**Completed Phases**:
+1. ✅ Foundation Setup
+2. ✅ Internationalization
+3. ✅ Welcome Page Design
+4. ✅ Homepage & UI Foundation
+5. ✅ Core Components
+6. ✅ Authentication System
+7. ✅ Dashboard Architecture
+8. ✅ Wallet & Payment Features
+9. ✅ Backend Development
+10. ✅ Frontend-Backend Integration
+
+**Next Steps**:
+- Progressive Web App (PWA) configuration
+- Offline-first functionality
+- Push notifications
+- Mobile optimizations
+- Production deployment
+
+## 🤝 Contributing
+
+This is a proprietary project. For contribution guidelines, please contact the development team.
+
+## 📄 License
+
+Copyright © 2025 TECHKLEIN | Erickharlein Pierre. All rights reserved.
+
+This is proprietary software. Unauthorized copying, modification, distribution, or use of this software is strictly prohibited.
+
+## 👥 Team
+
+**Lead Developer**: Erickharlein Pierre
+**Organization**: TECHKLEIN
+
+## 📞 Support
+
+For support and inquiries:
+- Email: support@kobklein.com
+- Website: https://kobklein.com
 
 ---
 
-## 🚀 Deployment Status
-
-### ✅ Production Ready
-
-- **Website**: Fully deployed and optimized
-- **Performance**: Monitored with Speed Insights
-- **Analytics**: User behavior tracking active
-- **Domain**: Ready for kobklein.com connection
-
-### 🔄 In Progress
-
-- **Mobile App**: React Native development
-- **Backend APIs**: Supabase Edge Functions
-- **Payment Integration**: Secure transaction processing
-
-## 🌟 Vision
-
-**"Bridging families, merchants, and communities with secure, instant digital transactions from Miami to Montreal, Paris to Port-au-Prince."**
-
-KobKlein represents the future of financial inclusion in Haiti, providing accessible, secure, and innovative payment solutions that connect local communities to the global economy.
-
----
-
-**Built with ❤️ by the KobKlein Team**
-_Empowering Haiti's digital transformation, one transaction at a time._
+**Made with ❤️ for Haiti** 🇭🇹

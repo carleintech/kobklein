@@ -2,4 +2,5 @@ packages:
   - "web"
   - "mobile"
   - "backend"
+  - "backend/api"
   - "libs/*"

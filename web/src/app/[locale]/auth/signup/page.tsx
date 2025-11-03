@@ -6,6 +6,7 @@ export default function SignUpPage() {
     <AuthLayout
       title="Join KobKlein"
       subtitle="Create your account and start your journey with secure, bank-free payments. Connect with Haiti and the diaspora community worldwide."
+      backgroundImage="/images/auth/signupbg.png"
     >
       <ModernSignUpForm />
     </AuthLayout>

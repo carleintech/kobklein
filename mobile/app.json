@@ -4,13 +4,10 @@
     "slug": "kobklein-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "scheme": "kobklein",
     "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#0F172A"
+      "backgroundColor": "#0F2A6B"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -19,6 +16,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.techklein.kobklein",
       "buildNumber": "1.0.0",
+      "jsEngine": "hermes",
       "infoPlist": {
         "CFBundleAllowMixedLocalizations": true,
         "NSCameraUsageDescription": "KobKlein uses camera to scan QR codes for payments and card activation",
@@ -26,14 +24,16 @@
         "NSLocationWhenInUseUsageDescription": "KobKlein uses location for fraud prevention and nearby merchant discovery",
         "NSMicrophoneUsageDescription": "KobKlein uses microphone for voice commands and customer support"
       },
-      "associatedDomains": ["applinks:kobklein.app"]
+      "associatedDomains": [
+        "applinks:kobklein.app"
+      ]
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#0F172A"
+        "backgroundColor": "#0F2A6B"
       },
       "package": "com.techklein.kobklein",
+      "jsEngine": "hermes",
       "versionCode": 1,
       "permissions": [
         "android.permission.CAMERA",
@@ -55,12 +55,14 @@
               "host": "kobklein.app"
             }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ]
     },
     "web": {
-      "favicon": "./assets/favicon.png",
       "bundler": "metro"
     },
     "plugins": [
@@ -80,7 +82,6 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/notification-icon.png",
           "color": "#6C63FF"
         }
       ]

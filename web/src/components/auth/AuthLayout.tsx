@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { ReactNode } from "react";
 
 interface AuthLayoutProps {
@@ -8,30 +9,53 @@ interface AuthLayoutProps {
   title: string;
   subtitle: string;
   showParticles?: boolean;
+  backgroundImage?: string;
 }
 
 export default function AuthLayout({
   children,
   title,
   subtitle,
-  showParticles = true
+  showParticles = true,
+  backgroundImage,
 }: AuthLayoutProps) {
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Animated Background Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
-        <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/10 via-transparent to-purple-500/10" />
-        <motion.div
-          className="absolute inset-0 opacity-30"
-          animate={{
-            background: [
-              "radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%)",
-              "radial-gradient(circle at 80% 20%, rgba(120, 119, 198, 0.3) 0%, transparent 50%)",
-              "radial-gradient(circle at 40% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%)"
-            ]
-          }}
-          transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-        />
+      {/* Background with optional image */}
+      <div className="absolute inset-0">
+        {backgroundImage ? (
+          <>
+            {/* Background Image */}
+            <Image
+              src={backgroundImage}
+              alt="Authentication background"
+              fill
+              className="object-cover"
+              priority
+              quality={95}
+            />
+            {/* Professional Overlay for readability */}
+            <div className="absolute inset-0 bg-gradient-to-br from-[#0F2A6B]/70 via-[#0F2A6B]/60 to-[#29A9E0]/65" />
+          </>
+        ) : (
+          <>
+            {/* Default Animated Background Gradient */}
+            <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
+              <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/10 via-transparent to-purple-500/10" />
+              <motion.div
+                className="absolute inset-0 opacity-30"
+                animate={{
+                  background: [
+                    "radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%)",
+                    "radial-gradient(circle at 80% 20%, rgba(120, 119, 198, 0.3) 0%, transparent 50%)",
+                    "radial-gradient(circle at 40% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%)",
+                  ],
+                }}
+                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+              />
+            </div>
+          </>
+        )}
       </div>
 
       {/* Animated Particles */}
@@ -69,9 +93,15 @@ export default function AuthLayout({
       {/* CSS for grid pattern */}
       <style jsx>{`
         .auth-grid-pattern {
-          background-image:
-            linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
+          background-image: linear-gradient(
+              rgba(255, 255, 255, 0.1) 1px,
+              transparent 1px
+            ),
+            linear-gradient(
+              90deg,
+              rgba(255, 255, 255, 0.1) 1px,
+              transparent 1px
+            );
           background-size: 50px 50px;
         }
       `}</style>
@@ -131,7 +161,7 @@ export default function AuthLayout({
                 "🔒 Bank-level security",
                 "⚡ Instant transfers",
                 "🌍 Global network",
-                "💎 Zero hidden fees"
+                "💎 Zero hidden fees",
               ].map((feature, index) => (
                 <motion.div
                   key={index}
@@ -154,14 +184,16 @@ export default function AuthLayout({
               {[
                 { number: "10K+", label: "Users" },
                 { number: "$2M+", label: "Transferred" },
-                { number: "99.9%", label: "Uptime" }
+                { number: "99.9%", label: "Uptime" },
               ].map((stat, index) => (
                 <motion.div
                   key={index}
                   className="text-center"
                   whileHover={{ scale: 1.1 }}
                 >
-                  <div className="text-2xl font-bold text-cyan-300">{stat.number}</div>
+                  <div className="text-2xl font-bold text-cyan-300">
+                    {stat.number}
+                  </div>
                   <div className="text-sm text-blue-200">{stat.label}</div>
                 </motion.div>
               ))}
@@ -201,9 +233,7 @@ export default function AuthLayout({
               </div>
 
               {/* Form Content */}
-              <div className="relative z-10">
-                {children}
-              </div>
+              <div className="relative z-10">{children}</div>
             </motion.div>
           </motion.div>
         </div>

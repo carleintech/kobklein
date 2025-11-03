@@ -4,23 +4,55 @@ import { Button } from "@/components/ui/button";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, ChevronDown, Menu, Star, X } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter, usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
 export function WelcomeNavigation() {
+  const tNav = useTranslations('navigation');
+  const tCommon = useTranslations('common');
   const params = useParams();
+  const router = useRouter();
+  const pathname = usePathname();
   const locale = params.locale as string;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
-  const [currentLang, setCurrentLang] = useState("EN");
 
   const languages = [
-    { code: "FR", label: "FR" },
-    { code: "EN", label: "EN" },
-    { code: "SP", label: "SP" },
-    { code: "HT", label: "HT" },
+    { code: "fr", label: "FR", locale: "fr" },
+    { code: "en", label: "EN", locale: "en" },
+    { code: "es", label: "SP", locale: "es" },
+    { code: "ht", label: "HT", locale: "ht" },
   ];
+
+  // Get current language label based on current locale
+  const getCurrentLangLabel = () => {
+    const currentLang = languages.find(lang => lang.locale === locale);
+    return currentLang?.label || "EN";
+  };
+
+  // Handle language change
+  const handleLanguageChange = (newLocale: string) => {
+    if (newLocale === locale) return;
+
+    // Replace the current locale in the pathname
+    const segments = pathname.split('/');
+    const isLocaleInPath = ['en', 'es', 'fr', 'ht'].includes(segments[1]);
+    
+    let newPathname;
+    if (isLocaleInPath) {
+      // Replace existing locale
+      segments[1] = newLocale;
+      newPathname = segments.join('/');
+    } else {
+      // Add locale to the beginning
+      newPathname = `/${newLocale}${pathname}`;
+    }
+
+    router.push(newPathname);
+    setIsLangOpen(false);
+  };
 
   // 🍊 REVOLUTIONARY NAVIGATION WITH DROPDOWN MENUS
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -334,7 +366,7 @@ export function WelcomeNavigation() {
                     : "text-kobklein-primary bg-white/90 backdrop-blur-md border-white/40 hover:bg-white hover:border-kobklein-accent/50"
                 }`}
               >
-                <span className="font-bold text-sm">{currentLang}</span>
+                <span className="font-bold text-sm">{getCurrentLangLabel()}</span>
                 <ChevronDown
                   className={`h-3 w-3 transition-transform duration-200 ${
                     isLangOpen ? "rotate-180" : ""
@@ -354,11 +386,10 @@ export function WelcomeNavigation() {
                     {languages.map((lang) => (
                       <button
                         key={lang.code}
-                        onClick={() => {
-                          setCurrentLang(lang.code);
-                          setIsLangOpen(false);
-                        }}
-                        className="block w-full px-3 py-2 text-white hover:bg-kobklein-neon-blue/20 hover:text-kobklein-neon-blue transition-all duration-200 text-center font-medium"
+                        onClick={() => handleLanguageChange(lang.locale)}
+                        className={`block w-full px-3 py-2 hover:bg-kobklein-neon-blue/20 hover:text-kobklein-neon-blue transition-all duration-200 text-center font-medium ${
+                          lang.locale === locale ? 'bg-kobklein-accent/20 text-kobklein-accent' : 'text-white'
+                        }`}
                       >
                         {lang.label}
                       </button>

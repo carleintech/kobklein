@@ -1,7 +1,16 @@
 {
     "folders": [
         {
+            "name": "🏠 Root",
             "path": "."
+        },
+        {
+            "name": "🌐 Frontend (Web)",
+            "path": "web"
+        },
+        {
+            "name": "⚙️ Backend (API)",
+            "path": "backend/api"
         }
     ],
     "settings": {
@@ -59,7 +68,8 @@
             "typescriptreact"
         ],
         "eslint.workingDirectories": [
-            "web"
+            "web",
+            "backend/api"
         ],
         // Prettier Configuration
         "prettier.configPath": ".prettierrc.json",
@@ -93,7 +103,7 @@
         "git.autofetch": true,
         // Terminal Configuration
         "terminal.integrated.defaultProfile.windows": "PowerShell",
-        "terminal.integrated.cwd": "${workspaceFolder}/web",
+        "terminal.integrated.cwd": "${workspaceFolder}",
         // Emmet Configuration
         "emmet.includeLanguages": {
             "typescript": "html",
@@ -132,10 +142,33 @@
         "version": "2.0.0",
         "tasks": [
             {
-                "label": "dev",
+                "label": "🚀 Start All (Frontend + Backend)",
                 "type": "shell",
                 "command": "pnpm",
                 "args": [
+                    "dev:all"
+                ],
+                "group": {
+                    "kind": "build",
+                    "isDefault": true
+                },
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": false,
+                    "panel": "dedicated",
+                    "showReuseMessage": false
+                },
+                "isBackground": true,
+                "problemMatcher": []
+            },
+            {
+                "label": "🌐 Frontend Dev Server",
+                "type": "shell",
+                "command": "pnpm",
+                "args": [
+                    "--filter",
+                    "web",
                     "dev"
                 ],
                 "group": "build",
@@ -143,7 +176,8 @@
                     "echo": true,
                     "reveal": "always",
                     "focus": false,
-                    "panel": "shared"
+                    "panel": "dedicated",
+                    "showReuseMessage": false
                 },
                 "isBackground": true,
                 "problemMatcher": {
@@ -163,10 +197,65 @@
                     },
                     "background": {
                         "activeOnStart": true,
-                        "beginsPattern": ".*compiled client and server successfully.*",
-                        "endsPattern": ".*Local:.*"
+                        "beginsPattern": ".*compiled.*",
+                        "endsPattern": ".*Local:.*|.*ready.*"
                     }
                 }
+            },
+            {
+                "label": "⚙️ Backend Dev Server",
+                "type": "shell",
+                "command": "pnpm",
+                "args": [
+                    "--filter",
+                    "api",
+                    "start:dev"
+                ],
+                "group": "build",
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": false,
+                    "panel": "dedicated",
+                    "showReuseMessage": false
+                },
+                "isBackground": true,
+                "problemMatcher": {
+                    "owner": "typescript",
+                    "source": "ts",
+                    "fileLocation": [
+                        "relative",
+                        "${workspaceFolder}/backend/api"
+                    ],
+                    "pattern": {
+                        "regexp": "^([^\\s].*)\\((\\d+|\\d+,\\d+|\\d+,\\d+,\\d+,\\d+)\\):\\s+(error|warning|info)\\s+(TS\\d+)\\s*:\\s*(.*)$",
+                        "file": 1,
+                        "location": 2,
+                        "severity": 3,
+                        "code": 4,
+                        "message": 5
+                    },
+                    "background": {
+                        "activeOnStart": true,
+                        "beginsPattern": ".*Starting.*",
+                        "endsPattern": ".*Nest application successfully started.*|.*started.*"
+                    }
+                }
+            },
+            {
+                "label": "dev",
+                "dependsOn": [
+                    "🌐 Frontend Dev Server",
+                    "⚙️ Backend Dev Server"
+                ],
+                "group": "build",
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": false,
+                    "panel": "shared"
+                },
+                "problemMatcher": []
             },
             {
                 "label": "build",
@@ -218,6 +307,24 @@
                     "format"
                 ],
                 "group": "build"
+            },
+            {
+                "label": "🧹 Clean All",
+                "type": "shell",
+                "command": "pnpm",
+                "args": [
+                    "clean"
+                ],
+                "group": "build"
+            },
+            {
+                "label": "📦 Install Dependencies",
+                "type": "shell",
+                "command": "pnpm",
+                "args": [
+                    "install"
+                ],
+                "group": "build"
             }
         ]
     },
@@ -225,26 +332,12 @@
         "version": "0.2.0",
         "configurations": [
             {
-                "name": "Next.js: debug server-side",
-                "type": "node",
-                "request": "attach",
-                "port": 9229,
-                "skipFiles": [
-                    "<node_internals>/**"
-                ]
-            },
-            {
-                "name": "Next.js: debug client-side",
-                "type": "chrome",
-                "request": "launch",
-                "url": "http://localhost:3000"
-            },
-            {
-                "name": "Next.js: debug full stack",
+                "name": "🌐 Debug Frontend (Next.js)",
                 "type": "node",
                 "request": "launch",
-                "program": "${workspaceFolder}/node_modules/.bin/next",
-                "args": [
+                "cwd": "${workspaceFolder}/web",
+                "runtimeExecutable": "pnpm",
+                "runtimeArgs": [
                     "dev"
                 ],
                 "console": "integratedTerminal",
@@ -253,6 +346,62 @@
                     "uriFormat": "%s",
                     "action": "debugWithChrome"
                 }
+            },
+            {
+                "name": "⚙️ Debug Backend (NestJS)",
+                "type": "node",
+                "request": "launch",
+                "cwd": "${workspaceFolder}/backend/api",
+                "runtimeExecutable": "pnpm",
+                "runtimeArgs": [
+                    "start:debug"
+                ],
+                "console": "integratedTerminal",
+                "restart": true,
+                "protocol": "inspector",
+                "skipFiles": [
+                    "<node_internals>/**"
+                ]
+            },
+            {
+                "name": "🌐 Attach to Frontend",
+                "type": "node",
+                "request": "attach",
+                "port": 9229,
+                "skipFiles": [
+                    "<node_internals>/**"
+                ]
+            },
+            {
+                "name": "⚙️ Attach to Backend",
+                "type": "node",
+                "request": "attach",
+                "port": 9230,
+                "skipFiles": [
+                    "<node_internals>/**"
+                ]
+            },
+            {
+                "name": "🌐 Debug Frontend Client-Side",
+                "type": "chrome",
+                "request": "launch",
+                "url": "http://localhost:3000",
+                "webRoot": "${workspaceFolder}/web"
+            }
+        ],
+        "compounds": [
+            {
+                "name": "🚀 Debug Full Stack (Frontend + Backend)",
+                "configurations": [
+                    "🌐 Debug Frontend (Next.js)",
+                    "⚙️ Debug Backend (NestJS)"
+                ],
+                "presentation": {
+                    "hidden": false,
+                    "group": "Full Stack",
+                    "order": 1
+                },
+                "stopAll": true
             }
         ]
     }

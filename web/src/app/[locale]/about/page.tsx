@@ -305,9 +305,9 @@ export default function AboutPage() {
     >
       <WelcomeNavigation />
 
-      {/* HERO SECTION WITH VIDEO BACKGROUND */}
+      {/* STUNNING HERO SECTION WITH VIDEO BACKGROUND */}
       <motion.section
-        className="relative overflow-hidden pt-20 pb-24 min-h-screen flex items-center"
+        className="relative overflow-hidden min-h-screen flex items-end"
         initial="hidden"
         whileInView="show"
         viewport={{ once: true }}
@@ -321,28 +321,34 @@ export default function AboutPage() {
             muted
             loop
             playsInline
+            poster="/images/video-poster.jpg"
           >
-            <source src="/test-video.mp4" type="video/mp4" />
-            <source src="/videos/kobklein-story.mp4" type="video/mp4" />
+            <source src="/videos/about/hero.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
           </video>
 
-          {/* Dark overlay for text readability */}
-          <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-black/70"></div>
+          {/* Light overlay for text readability - much more transparent */}
+          <div className="absolute inset-0 bg-gradient-to-br from-kobklein-primary/30 via-kobklein-primary/20 to-kobklein-primary/40"></div>
+
+          {/* Stronger overlay at bottom for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
         </div>
 
-        <div className="relative z-10 mx-auto max-w-7xl px-6 w-full">
-          {/* Header Content */}
+        {/* Content positioned at bottom */}
+        <div className="relative z-10 mx-auto max-w-7xl px-6 w-full pb-20 pt-32">
           <div className="text-center">
+            {/* Badge */}
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               whileInView={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-6 py-3 mb-8"
+              className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-6 py-3 mb-8"
             >
-              <Heart className="h-5 w-5 text-red-400" />
+              <Heart className="h-5 w-5 text-kobklein-accent" />
               <span className="text-sm font-medium text-white">Our Story</span>
             </motion.div>
 
+            {/* Main Heading */}
             <motion.h1
               className="text-4xl sm:text-5xl lg:text-7xl font-extrabold tracking-tight leading-tight text-white mb-8"
               initial={{ opacity: 0, y: 30 }}
@@ -350,44 +356,42 @@ export default function AboutPage() {
               transition={{ duration: 0.8, delay: 0.3 }}
             >
               About{" "}
-              <span className="text-transparent bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text">
+              <span className="text-transparent bg-gradient-to-r from-kobklein-accent to-blue-300 bg-clip-text">
                 KobKlein
               </span>
             </motion.h1>
 
+            {/* Description */}
             <motion.p
-              className="text-xl text-blue-100 max-w-4xl mx-auto leading-relaxed mb-12"
+              className="text-xl sm:text-2xl text-white/90 leading-relaxed max-w-4xl mx-auto mb-12"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
             >
-              Watch our story unfold as we revolutionize digital payments for
-              Haitians worldwide, connecting families and empowering communities
-              across the globe.
+              Revolutionizing digital payments for Haitians worldwide. Our
+              mission is to connect families, empower communities, and build a
+              cashless future for Haiti.
             </motion.p>
 
-            {/* Call to Action */}
+            {/* Call to Action Buttons */}
             <motion.div
               className="flex flex-col sm:flex-row gap-6 justify-center items-center"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.6 }}
             >
-              <button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold px-8 py-4 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-blue-500/25">
+              <button className="bg-gradient-to-r from-kobklein-accent to-blue-500 hover:from-blue-500 hover:to-kobklein-accent text-white font-semibold px-10 py-4 rounded-full transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-kobklein-accent/30">
                 Join Our Mission
               </button>
-              <button className="border-2 border-white/30 hover:border-white/50 text-white font-semibold px-8 py-4 rounded-full transition-all duration-300 backdrop-blur-sm hover:bg-white/10">
-                Learn More
+              <button className="border-2 border-white/40 hover:border-white/60 text-white font-semibold px-10 py-4 rounded-full transition-all duration-300 backdrop-blur-md hover:bg-white/10">
+                Watch Our Story
               </button>
             </motion.div>
           </div>
         </div>
 
-        {/* Floating Elements */}
-        <div className="absolute inset-0 pointer-events-none z-5">
-          <div className="absolute top-1/4 right-1/6 w-64 h-64 bg-gradient-radial from-blue-500/20 to-transparent rounded-full blur-3xl"></div>
-          <div className="absolute bottom-1/4 left-1/6 w-64 h-64 bg-gradient-radial from-purple-500/20 to-transparent rounded-full blur-3xl"></div>
-        </div>
+        {/* Blue fade separator */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-kobklein-primary via-kobklein-primary/50 to-transparent"></div>
       </motion.section>
 
       {/* GLOBAL NETWORK SECTION */}
@@ -798,12 +802,221 @@ export default function AboutPage() {
               </defs>
             </svg>
           </div>
+
+          {/* GLOBAL IMAGE SHOWCASE */}
+          <motion.div
+            className="mt-20 text-center"
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          >
+            <div className="relative max-w-5xl mx-auto">
+              <div className="relative rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
+                <img
+                  src="/videos/about/global.png"
+                  alt="KobKlein Global Network - Connecting Haitians Worldwide"
+                  className="w-full h-auto"
+                />
+
+                {/* Image overlay for professional effect */}
+                <div className="absolute inset-0 bg-gradient-to-t from-kobklein-primary/20 via-transparent to-transparent pointer-events-none"></div>
+              </div>
+
+              {/* Floating decorations around image */}
+              <div className="absolute -top-8 -right-8 w-32 h-32 bg-gradient-to-br from-kobklein-accent/20 to-blue-500/20 rounded-full blur-xl"></div>
+              <div className="absolute -bottom-8 -left-8 w-24 h-24 bg-gradient-to-br from-purple-500/20 to-kobklein-primary/20 rounded-full blur-xl"></div>
+
+              {/* Caption */}
+              <motion.p
+                className="mt-6 text-lg text-blue-200 max-w-3xl mx-auto"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.6 }}
+              >
+                Our global ecosystem connects Haitians across continents,
+                creating seamless digital payment flows worldwide.
+              </motion.p>
+            </div>
+          </motion.div>
         </div>
+
+        {/* Blue fade separator */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-kobklein-primary via-kobklein-primary/50 to-transparent"></div>
+      </motion.section>
+
+      {/* STUNNING IMAGE GALLERY SECTION */}
+      <motion.section
+        className="relative overflow-hidden py-24 bg-gradient-to-br from-kobklein-primary via-[#1B4A9B] to-[#0A1D4A]"
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true }}
+        variants={sectionVariants}
+      >
+        <div className="relative mx-auto max-w-7xl px-6">
+          {/* Header */}
+          <motion.div
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            <div className="inline-flex items-center gap-2 bg-kobklein-accent/10 backdrop-blur-sm border border-kobklein-accent/30 rounded-full px-6 py-3 mb-8">
+              <Users className="h-5 w-5 text-kobklein-accent" />
+              <span className="text-sm font-medium text-white">
+                Our Journey
+              </span>
+            </div>
+
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-6">
+              <span className="text-transparent bg-gradient-to-r from-kobklein-accent to-blue-300 bg-clip-text">
+                Visual Story
+              </span>
+            </h2>
+            <p className="text-xl text-blue-100 max-w-4xl mx-auto leading-relaxed">
+              Witness the transformation as we build Haiti's digital future, one
+              innovation at a time
+            </p>
+          </motion.div>
+
+          {/* Image Gallery Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Large Featured Image - Space for your main image */}
+            <motion.div
+              className="lg:col-span-2 lg:row-span-2"
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+            >
+              <div className="relative h-96 lg:h-full rounded-3xl overflow-hidden border border-white/10 group cursor-pointer">
+                <div className="absolute inset-0 bg-gradient-to-br from-kobklein-accent/20 to-kobklein-primary/40 flex items-center justify-center">
+                  <div className="text-center text-white">
+                    <div className="w-16 h-16 bg-kobklein-accent/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                      <span className="text-2xl font-bold">📸</span>
+                    </div>
+                    <h3 className="text-xl font-bold mb-2">Featured Story</h3>
+                    <p className="text-sm text-blue-100">
+                      Your main image goes here
+                    </p>
+                  </div>
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-kobklein-primary/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+            </motion.div>
+
+            {/* Image Slot 2 */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <div className="relative h-48 rounded-2xl overflow-hidden border border-white/10 group cursor-pointer">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-kobklein-primary/40 flex items-center justify-center">
+                  <div className="text-center text-white">
+                    <div className="w-12 h-12 bg-blue-500/30 rounded-xl flex items-center justify-center mx-auto mb-3">
+                      <span className="text-lg font-bold">🌟</span>
+                    </div>
+                    <p className="text-sm">Innovation Hub</p>
+                  </div>
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-kobklein-primary/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+            </motion.div>
+
+            {/* Image Slot 3 */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+            >
+              <div className="relative h-48 rounded-2xl overflow-hidden border border-white/10 group cursor-pointer">
+                <div className="absolute inset-0 bg-gradient-to-br from-kobklein-accent/20 to-purple-500/40 flex items-center justify-center">
+                  <div className="text-center text-white">
+                    <div className="w-12 h-12 bg-kobklein-accent/30 rounded-xl flex items-center justify-center mx-auto mb-3">
+                      <span className="text-lg font-bold">🤝</span>
+                    </div>
+                    <p className="text-sm">Community</p>
+                  </div>
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-kobklein-primary/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+            </motion.div>
+
+            {/* Image Slot 4 */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+            >
+              <div className="relative h-48 rounded-2xl overflow-hidden border border-white/10 group cursor-pointer">
+                <div className="absolute inset-0 bg-gradient-to-br from-green-500/20 to-kobklein-primary/40 flex items-center justify-center">
+                  <div className="text-center text-white">
+                    <div className="w-12 h-12 bg-green-500/30 rounded-xl flex items-center justify-center mx-auto mb-3">
+                      <span className="text-lg font-bold">🚀</span>
+                    </div>
+                    <p className="text-sm">Growth</p>
+                  </div>
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-kobklein-primary/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+            </motion.div>
+
+            {/* Image Slot 5 */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.7 }}
+            >
+              <div className="relative h-48 rounded-2xl overflow-hidden border border-white/10 group cursor-pointer">
+                <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/20 to-kobklein-primary/40 flex items-center justify-center">
+                  <div className="text-center text-white">
+                    <div className="w-12 h-12 bg-yellow-500/30 rounded-xl flex items-center justify-center mx-auto mb-3">
+                      <span className="text-lg font-bold">💡</span>
+                    </div>
+                    <p className="text-sm">Innovation</p>
+                  </div>
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-kobklein-primary/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Additional Image Slots Row */}
+          <motion.div
+            className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-8"
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.8 }}
+          >
+            {/* Small image slots */}
+            {[
+              { icon: "🏢", label: "Office" },
+              { icon: "👥", label: "Team" },
+              { icon: "🌍", label: "Global" },
+              { icon: "📱", label: "App" },
+            ].map((item, index) => (
+              <div
+                key={index}
+                className="relative h-32 rounded-xl overflow-hidden border border-white/10 group cursor-pointer"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-kobklein-accent/10 to-kobklein-primary/30 flex items-center justify-center">
+                  <div className="text-center text-white">
+                    <div className="text-2xl mb-2">{item.icon}</div>
+                    <p className="text-xs">{item.label}</p>
+                  </div>
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-kobklein-primary/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+
+        {/* Blue fade separator */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-kobklein-primary via-kobklein-primary/50 to-transparent"></div>
       </motion.section>
 
       {/* MISSION */}
       <motion.section
-        className="bg-[#0B1736] py-24"
+        className="relative bg-gradient-to-br from-kobklein-primary via-[#1B4A9B] to-[#0A1D4A] py-24"
         initial="hidden"
         whileInView="show"
         viewport={{ once: true }}
@@ -815,9 +1028,9 @@ export default function AboutPage() {
               initial={{ scale: 0.8 }}
               whileInView={{ scale: 1 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-6 py-3 mb-8"
+              className="inline-flex items-center gap-2 bg-kobklein-accent/10 backdrop-blur-sm border border-kobklein-accent/30 rounded-full px-6 py-3 mb-8"
             >
-              <TrendingUp className="h-5 w-5 text-green-400" />
+              <TrendingUp className="h-5 w-5 text-kobklein-accent" />
               <span className="text-sm font-medium text-white">
                 Our Mission
               </span>
@@ -825,7 +1038,7 @@ export default function AboutPage() {
 
             <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
               Empowering{" "}
-              <span className="text-transparent bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text">
+              <span className="text-transparent bg-gradient-to-r from-kobklein-accent to-blue-300 bg-clip-text">
                 Haiti's
               </span>{" "}
               Future
@@ -864,6 +1077,7 @@ export default function AboutPage() {
             </div>
           </div>
 
+          {/* IMAGE SPACE: Mission Visual */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -871,29 +1085,39 @@ export default function AboutPage() {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="relative"
           >
-            <div className="aspect-square bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-3xl p-8 border border-white/10 backdrop-blur-sm">
-              <div className="h-full w-full bg-gradient-to-br from-cyan-400/10 to-blue-600/10 rounded-2xl flex items-center justify-center">
+            <div className="aspect-square bg-gradient-to-br from-kobklein-accent/20 to-kobklein-primary/40 rounded-3xl p-8 border border-white/10 backdrop-blur-sm group cursor-pointer overflow-hidden">
+              {/* Placeholder for your mission image */}
+              <div className="h-full w-full bg-gradient-to-br from-kobklein-accent/10 to-kobklein-primary/20 rounded-2xl flex items-center justify-center">
                 <div className="text-center">
-                  <div className="w-24 h-24 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                  <div className="w-24 h-24 bg-gradient-to-br from-kobklein-accent to-blue-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                     <Globe className="h-12 w-12 text-white" />
                   </div>
                   <h3 className="text-xl font-bold text-white mb-4">
                     Global Impact
                   </h3>
                   <p className="text-blue-200 text-sm leading-relaxed">
-                    Connecting families across continents with secure, instant
-                    digital payments
+                    Your mission image goes here - showing global connections
+                    and digital transformation
                   </p>
                 </div>
               </div>
+
+              {/* Hover overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-kobklein-primary/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </div>
+
+            {/* Floating decoration */}
+            <div className="absolute -top-4 -right-4 w-16 h-16 bg-gradient-to-br from-kobklein-accent/30 to-blue-500/30 rounded-full blur-xl"></div>
           </motion.div>
         </div>
+
+        {/* Blue fade separator */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-kobklein-primary via-kobklein-primary/50 to-transparent"></div>
       </motion.section>
 
       {/* HOW IT WORKS */}
       <motion.section
-        className="bg-[#07122B] py-24"
+        className="relative bg-gradient-to-br from-kobklein-primary via-[#1B4A9B] to-[#0A1D4A] py-24"
         initial="hidden"
         whileInView="show"
         viewport={{ once: true }}
@@ -905,9 +1129,9 @@ export default function AboutPage() {
               initial={{ scale: 0.8 }}
               whileInView={{ scale: 1 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-6 py-3 mb-8"
+              className="inline-flex items-center gap-2 bg-kobklein-accent/10 backdrop-blur-sm border border-kobklein-accent/30 rounded-full px-6 py-3 mb-8"
             >
-              <Zap className="h-5 w-5 text-yellow-400" />
+              <Zap className="h-5 w-5 text-kobklein-accent" />
               <span className="text-sm font-medium text-white">
                 How It Works
               </span>
@@ -915,7 +1139,7 @@ export default function AboutPage() {
 
             <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
               The{" "}
-              <span className="text-transparent bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text">
+              <span className="text-transparent bg-gradient-to-r from-kobklein-accent to-blue-300 bg-clip-text">
                 KobKlein
               </span>{" "}
               Ecosystem
@@ -1079,11 +1303,142 @@ export default function AboutPage() {
             </div>
           </motion.div>
         </div>
+
+        {/* Blue fade separator */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-kobklein-primary via-kobklein-primary/50 to-transparent"></div>
+      </motion.section>
+
+      {/* TEAM & CULTURE IMAGE SECTION */}
+      <motion.section
+        className="relative overflow-hidden py-24 bg-gradient-to-br from-kobklein-primary via-[#1B4A9B] to-[#0A1D4A]"
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true }}
+        variants={sectionVariants}
+      >
+        <div className="relative mx-auto max-w-7xl px-6">
+          {/* Header */}
+          <motion.div
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            <div className="inline-flex items-center gap-2 bg-kobklein-accent/10 backdrop-blur-sm border border-kobklein-accent/30 rounded-full px-6 py-3 mb-8">
+              <Users className="h-5 w-5 text-kobklein-accent" />
+              <span className="text-sm font-medium text-white">Our People</span>
+            </div>
+
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-6">
+              <span className="text-transparent bg-gradient-to-r from-kobklein-accent to-blue-300 bg-clip-text">
+                Team & Culture
+              </span>
+            </h2>
+            <p className="text-xl text-blue-100 max-w-4xl mx-auto leading-relaxed">
+              Meet the passionate individuals building Haiti's digital future
+              together
+            </p>
+          </motion.div>
+
+          {/* Team Image Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Large Team Photo Space */}
+            <motion.div
+              className="lg:col-span-2"
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+            >
+              <div className="relative h-96 rounded-3xl overflow-hidden border border-white/10 group cursor-pointer">
+                <div className="absolute inset-0 bg-gradient-to-br from-kobklein-accent/20 to-kobklein-primary/40 flex items-center justify-center">
+                  <div className="text-center text-white">
+                    <div className="w-20 h-20 bg-kobklein-accent/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                      <Users className="h-10 w-10 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-bold mb-4">Team Photo</h3>
+                    <p className="text-blue-100 max-w-md mx-auto">
+                      Your main team photo showcasing the passionate individuals
+                      behind KobKlein goes here
+                    </p>
+                  </div>
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-kobklein-primary/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+            </motion.div>
+
+            {/* Side Images */}
+            <motion.div
+              className="space-y-6"
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+            >
+              {/* Office Culture Image */}
+              <div className="relative h-44 rounded-2xl overflow-hidden border border-white/10 group cursor-pointer">
+                <div className="absolute inset-0 bg-gradient-to-br from-green-500/20 to-kobklein-primary/40 flex items-center justify-center">
+                  <div className="text-center text-white">
+                    <div className="w-12 h-12 bg-green-500/30 rounded-xl flex items-center justify-center mx-auto mb-3">
+                      <Settings className="h-6 w-6 text-white" />
+                    </div>
+                    <h4 className="text-lg font-bold mb-2">Office Culture</h4>
+                    <p className="text-xs text-blue-100">Workspace vibes</p>
+                  </div>
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-kobklein-primary/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+
+              {/* Innovation Space */}
+              <div className="relative h-44 rounded-2xl overflow-hidden border border-white/10 group cursor-pointer">
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-kobklein-primary/40 flex items-center justify-center">
+                  <div className="text-center text-white">
+                    <div className="w-12 h-12 bg-purple-500/30 rounded-xl flex items-center justify-center mx-auto mb-3">
+                      <Zap className="h-6 w-6 text-white" />
+                    </div>
+                    <h4 className="text-lg font-bold mb-2">Innovation</h4>
+                    <p className="text-xs text-blue-100">Creative process</p>
+                  </div>
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-kobklein-primary/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Values Preview Grid */}
+          <motion.div
+            className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16"
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+          >
+            {[
+              { icon: "🎯", label: "Focus", color: "from-kobklein-accent/20" },
+              { icon: "🤝", label: "Trust", color: "from-green-500/20" },
+              { icon: "🚀", label: "Innovation", color: "from-purple-500/20" },
+              { icon: "🌟", label: "Excellence", color: "from-yellow-500/20" },
+            ].map((value, index) => (
+              <div
+                key={index}
+                className={`relative h-32 rounded-xl overflow-hidden border border-white/10 group cursor-pointer bg-gradient-to-br ${value.color} to-kobklein-primary/30`}
+              >
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center text-white">
+                    <div className="text-2xl mb-2">{value.icon}</div>
+                    <p className="text-sm font-semibold">{value.label}</p>
+                  </div>
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-kobklein-primary/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+
+        {/* Blue fade separator */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-kobklein-primary via-kobklein-primary/50 to-transparent"></div>
       </motion.section>
 
       {/* VALUES */}
       <motion.section
-        className="bg-[#07122B] py-24"
+        className="relative bg-gradient-to-br from-kobklein-primary via-[#1B4A9B] to-[#0A1D4A] py-24"
         initial="hidden"
         whileInView="show"
         viewport={{ once: true }}
@@ -1095,15 +1450,15 @@ export default function AboutPage() {
               initial={{ scale: 0.8 }}
               whileInView={{ scale: 1 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-6 py-3 mb-8"
+              className="inline-flex items-center gap-2 bg-kobklein-accent/10 backdrop-blur-sm border border-kobklein-accent/30 rounded-full px-6 py-3 mb-8"
             >
-              <Shield className="h-5 w-5 text-green-400" />
+              <Shield className="h-5 w-5 text-kobklein-accent" />
               <span className="text-sm font-medium text-white">Our Values</span>
             </motion.div>
 
             <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
               Core{" "}
-              <span className="text-transparent bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text">
+              <span className="text-transparent bg-gradient-to-r from-kobklein-accent to-blue-300 bg-clip-text">
                 Values
               </span>
             </h2>
@@ -1167,7 +1522,7 @@ export default function AboutPage() {
 
       {/* VISION */}
       <motion.section
-        className="bg-[#0B1736] py-24"
+        className="relative bg-gradient-to-br from-kobklein-primary via-[#1B4A9B] to-[#0A1D4A] py-24"
         initial="hidden"
         whileInView="show"
         viewport={{ once: true }}
@@ -1178,15 +1533,15 @@ export default function AboutPage() {
             initial={{ scale: 0.8 }}
             whileInView={{ scale: 1 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-6 py-3 mb-8"
+            className="inline-flex items-center gap-2 bg-kobklein-accent/10 backdrop-blur-sm border border-kobklein-accent/30 rounded-full px-6 py-3 mb-8"
           >
-            <TrendingUp className="h-5 w-5 text-yellow-400" />
+            <TrendingUp className="h-5 w-5 text-kobklein-accent" />
             <span className="text-sm font-medium text-white">Our Vision</span>
           </motion.div>
 
           <h2 className="text-4xl lg:text-5xl font-bold text-white mb-8 leading-tight">
             Looking{" "}
-            <span className="text-transparent bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text">
+            <span className="text-transparent bg-gradient-to-r from-kobklein-accent to-blue-300 bg-clip-text">
               Ahead
             </span>
           </h2>
@@ -1235,6 +1590,9 @@ export default function AboutPage() {
             ))}
           </div>
         </div>
+
+        {/* Blue fade separator */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#07122B] via-kobklein-primary/50 to-transparent"></div>
       </motion.section>
 
       <WelcomeFooter />

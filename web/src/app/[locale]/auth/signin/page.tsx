@@ -6,6 +6,7 @@ export default function SignInPage() {
     <AuthLayout
       title="Welcome Back"
       subtitle="Sign in to your KobKlein account and continue your journey with secure, bank-free payments."
+      backgroundImage="/images/auth/signbg.png"
     >
       <ModernSignInForm />
     </AuthLayout>

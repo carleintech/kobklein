@@ -1,0 +1,18 @@
+# 🔧 Supabase Connection Fix Guide
+
+## Step 1: Check Supabase Dashboard
+1. Go to: https://app.supabase.com/projects
+2. Find project: lwkqfvadgcdiawmyazdi
+3. Check if it's active/paused
+
+## Step 2: Get Fresh Database URL
+1. Go to: Project Settings > Database
+2. Copy the 'Connection string' under 'Connection parameters'
+3. Replace <password> with your actual database password
+
+## Step 3: Update .env file
+Replace the DATABASE_URL and DIRECT_URL with fresh values
+
+## Step 4: Test connection
+Run: npx prisma db pull
+

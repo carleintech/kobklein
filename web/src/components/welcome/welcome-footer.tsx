@@ -6,43 +6,43 @@ import { useTranslations } from "next-intl";
 import Image from "next/image";
 
 export function WelcomeFooter() {
-  const t = useTranslations();
+  const tFooter = useTranslations('footer');
 
   const footerSections = [
     {
-      title: "Company",
+      title: tFooter('company'),
       links: [
-        { label: "About KobKlein", href: "/about" },
-        { label: "Our Mission", href: "/mission" },
-        { label: "Team", href: "/team" },
-        { label: "Careers", href: "/careers" },
+        { label: tFooter('aboutKobKlein'), href: "/about" },
+        { label: tFooter('ourMission'), href: "/mission" },
+        { label: tFooter('team'), href: "/team" },
+        { label: tFooter('careers'), href: "/careers" },
       ],
     },
     {
-      title: "Products",
+      title: tFooter('products'),
       links: [
-        { label: "KobKlein Card", href: "/card" },
-        { label: "Mobile App", href: "/app" },
-        { label: "Business Solutions", href: "/business" },
-        { label: "API Documentation", href: "/docs" },
+        { label: tFooter('kobKleinCard'), href: "/card" },
+        { label: tFooter('mobileApp'), href: "/app" },
+        { label: tFooter('businessSolutions'), href: "/business" },
+        { label: tFooter('apiDocumentation'), href: "/docs" },
       ],
     },
     {
-      title: "Support",
+      title: tFooter('support'),
       links: [
-        { label: "Help Center", href: "/help" },
-        { label: "Contact Us", href: "/contact" },
-        { label: "Community", href: "/community" },
-        { label: "Developer Resources", href: "/developer-resources" },
+        { label: tFooter('helpCenter'), href: "/help" },
+        { label: tFooter('contactUs'), href: "/contact" },
+        { label: tFooter('community'), href: "/community" },
+        { label: tFooter('developerResources'), href: "/developer-resources" },
       ],
     },
     {
-      title: "Legal",
+      title: tFooter('legal'),
       links: [
-        { label: "Privacy Policy", href: "/privacy" },
-        { label: "Terms of Service", href: "/terms" },
-        { label: "Security", href: "/security" },
-        { label: "Compliance", href: "/compliance" },
+        { label: tFooter('privacyPolicy'), href: "/privacy" },
+        { label: tFooter('termsOfService'), href: "/terms" },
+        { label: tFooter('security'), href: "/security" },
+        { label: tFooter('compliance'), href: "/compliance" },
       ],
     },
   ];

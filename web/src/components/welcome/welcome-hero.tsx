@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, CreditCard, Shield, Smartphone, Zap } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 
 // Counter Animation Component
@@ -34,6 +35,7 @@ const CounterAnimation = ({ end, duration = 2 }) => {
 };
 
 export function WelcomeHero() {
+  const t = useTranslations('welcome');
   // Advanced Parallax and Mouse Effects
   const containerRef = useRef(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -288,7 +290,7 @@ export function WelcomeHero() {
               <Shield className="w-4 h-4 text-white" />
             </div>
             <div className="text-white text-xs font-bold">
-              Bank-Grade Security
+              {t('bankGradeSecurity')}
             </div>
           </div>
         </motion.div>
@@ -351,7 +353,7 @@ export function WelcomeHero() {
             animate={{ opacity: [0.3, 0.6, 0.3] }}
             transition={{ duration: 3, repeat: Infinity }}
           >
-            Digital Financial Freedom
+            {t('heroTitle')}
           </motion.h1>
 
           {/* Main Text - Simplified & Powerful */}
@@ -361,7 +363,7 @@ export function WelcomeHero() {
               animate={{ backgroundPosition: ["0%", "100%", "0%"] }}
               transition={{ duration: 4, repeat: Infinity }}
             >
-              Digital Financial Freedom
+              {t('heroTitle')}
             </motion.span>
           </h1>
 
@@ -384,14 +386,14 @@ export function WelcomeHero() {
           className="relative"
         >
           <p className="text-lg sm:text-xl lg:text-2xl text-white/90 max-w-2xl text-center leading-relaxed font-medium drop-shadow-lg">
-            Send money instantly. No banks required.{" "}
+            {t('heroSubtitle')}{" "}
             <span className="relative inline-block overflow-hidden">
               <motion.span
                 className="bg-gradient-to-r from-guava-primary via-yellow-400 to-guava-primary bg-clip-text text-transparent font-bold"
                 animate={{ backgroundPosition: ["0%", "200%", "0%"] }}
                 transition={{ duration: 3, repeat: Infinity }}
               >
-                Earn 50% bonus
+                {t('earnBonus')}
               </motion.span>
               <motion.div
                 className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12"
@@ -404,7 +406,7 @@ export function WelcomeHero() {
                 }}
               />
             </span>{" "}
-            on every deposit.
+            {t('onEveryDeposit')}
           </p>
         </motion.div>
 
