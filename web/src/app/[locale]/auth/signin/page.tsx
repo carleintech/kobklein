@@ -1,7 +1,13 @@
 import AuthLayout from "@/components/auth/AuthLayout";
 import ModernSignInForm from "@/components/auth/ModernSignInForm";
+import { unstable_setRequestLocale } from "next-intl/server";
 
-export default function SignInPage() {
+type PageProps = {
+  params: { locale: string };
+};
+
+export default function SignInPage({ params: { locale } }: PageProps) {
+  unstable_setRequestLocale(locale);
   return (
     <AuthLayout
       title="Welcome Back"

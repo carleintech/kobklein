@@ -22,12 +22,14 @@
     },
     "navigation": {
         "home": "Accueil",
+        "features": "Fonctionnalités",
         "about": "À propos",
+        "security": "Sécurité",
         "app": "App",
         "merchant": "Commerçant",
         "join": "Rejoindre",
         "contact": "Contact",
-        "login": "Connexion",
+        "login": "Se connecter",
         "getStarted": "Commencer",
         "dashboard": "Tableau de bord",
         "transactions": "Transactions",
@@ -36,7 +38,7 @@
         "logout": "Déconnexion"
     },
     "welcome": {
-        "heroTitle": "Liberté Financière Numérique",
+        "heroTitle": "L'Avenir de la Liberté Financière Numérique",
         "heroSubtitle": "Envoyez de l'argent instantanément. Aucune banque requise.",
         "earnBonus": "Gagnez 50% de bonus",
         "onEveryDeposit": "sur chaque dépôt.",
@@ -46,7 +48,98 @@
         "becomeDistributor": "Devenir Distributeur",
         "availableOn": "Disponible uniquement sur iOS et Android",
         "learnMore": "En Savoir Plus",
-        "bankGradeSecurity": "Sécurité de Niveau Bancaire"
+        "bankGradeSecurity": "Sécurité de Niveau Bancaire",
+        "trustedBy": "Utilisé par plus de 100 000 personnes",
+        "features": {
+            "instant": {
+                "title": "Transferts Instantanés",
+                "description": "Envoyez et recevez de l'argent en temps réel avec votre téléphone"
+            },
+            "secure": {
+                "title": "Sécurité Bancaire",
+                "description": "Protection de niveau bancaire avec chiffrement avancé"
+            },
+            "global": {
+                "title": "Réseau Mondial",
+                "description": "Connectez-vous avec la diaspora haïtienne partout dans le monde"
+            }
+        }
+    },
+    "testimonials": {
+        "title": "Témoignages de Clients",
+        "subtitle": "Découvrez pourquoi des milliers de personnes nous font confiance",
+        "users": [
+            {
+                "name": "Marie Dubois",
+                "role": "Propriétaire d'Entreprise",
+                "location": "Port-au-Prince",
+                "testimonial": "KobKlein a révolutionné la façon dont je gère les paiements dans mon magasin. C'est rapide, sécurisé et mes clients adorent."
+            },
+            {
+                "name": "Jean Baptiste",
+                "role": "Travailleur de la Diaspora",
+                "location": "Miami, FL",
+                "testimonial": "Envoyer de l'argent à ma famille en Haïti n'a jamais été aussi simple. Les frais sont transparents et les transferts sont instantanés."
+            },
+            {
+                "name": "Sophie Laurent",
+                "role": "Étudiante",
+                "location": "Cap-Haïtien",
+                "testimonial": "En tant qu'étudiante, j'ai besoin d'un moyen abordable de recevoir de l'argent. KobKlein est parfait pour mes besoins."
+            }
+        ],
+        "stats": {
+            "users": {
+                "number": "100K+",
+                "label": "Utilisateurs Actifs"
+            },
+            "transactions": {
+                "number": "$50M+",
+                "label": "Traités"
+            },
+            "uptime": {
+                "number": "99.9%",
+                "label": "Disponibilité"
+            }
+        }
+    },
+    "howItWorks": {
+        "title": "Comment Ça Marche",
+        "subtitle": "Commencez en quelques minutes seulement",
+        "steps": [
+            {
+                "number": "01",
+                "title": "Télécharger l'App",
+                "description": "Disponible gratuitement sur iOS et Android"
+            },
+            {
+                "number": "02",
+                "title": "Créer un Compte",
+                "description": "Inscription simple avec juste votre numéro de téléphone"
+            },
+            {
+                "number": "03",
+                "title": "Ajouter des Fonds",
+                "description": "Rechargez via un distributeur local ou depuis l'étranger"
+            },
+            {
+                "number": "04",
+                "title": "Commencer à Payer",
+                "description": "Envoyez, recevez et payez instantanément"
+            }
+        ]
+    },
+    "download": {
+        "title": "Téléchargez l'App KobKlein",
+        "subtitle": "Disponible maintenant sur iOS et Android",
+        "features": [
+            "Transferts instantanés",
+            "Sécurité de niveau bancaire",
+            "Réseau de distributeurs",
+            "Support 24/7"
+        ],
+        "cta": "Télécharger Maintenant",
+        "comingSoon": "Bientôt Disponible"
     },
     "footer": {
         "company": "Entreprise",
@@ -142,17 +235,5 @@
         "payMerchant": "Payer un commerçant",
         "withdraw": "Retirer",
         "viewAll": "Voir tout"
-    },
-    "footer": {
-        "tagline": "Conçu avec ❤️ en Haïti",
-        "links": {
-            "about": "À propos",
-            "partners": "Partenaires",
-            "contact": "Contact",
-            "support": "Support",
-            "privacy": "Politique de confidentialité",
-            "terms": "Conditions d'utilisation"
-        },
-        "copyright": "© 2025 TECHKLEIN. Tous droits réservés."
     }
 }

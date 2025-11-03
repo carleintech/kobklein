@@ -15,6 +15,8 @@ export const STORES = {
   AUTH: "auth",
   CONTACTS: "contacts",
   NOTIFICATIONS: "notifications",
+  WALLET_STATE: "walletState",
+  ERROR_LOGS: "errorLogs",
 } as const;
 
 export interface TransactionRecord {
@@ -95,6 +97,24 @@ export interface NotificationRecord {
   metadata?: Record<string, any>;
 }
 
+export interface WalletStateRecord {
+  id: string;
+  balance: number;
+  currency: string;
+  lastUpdated: number;
+  synced: boolean;
+  pendingAmount?: number;
+}
+
+export interface ErrorLogRecord {
+  id: string;
+  error: string;
+  context: string;
+  timestamp: number;
+  level: "info" | "warn" | "error" | "debug";
+  metadata?: Record<string, any>;
+}
+
 class OfflineDatabase {
   private db: IDBPDatabase | null = null;
   private isInitialized = false;
@@ -172,6 +192,26 @@ class OfflineDatabase {
             notificationStore.createIndex("timestamp", "timestamp");
             notificationStore.createIndex("read", "read");
             notificationStore.createIndex("type", "type");
+          }
+
+          // Wallet state store
+          if (!db.objectStoreNames.contains(STORES.WALLET_STATE)) {
+            const walletStore = db.createObjectStore(STORES.WALLET_STATE, {
+              keyPath: "id",
+            });
+            walletStore.createIndex("currency", "currency");
+            walletStore.createIndex("lastUpdated", "lastUpdated");
+            walletStore.createIndex("synced", "synced");
+          }
+
+          // Error logs store
+          if (!db.objectStoreNames.contains(STORES.ERROR_LOGS)) {
+            const errorStore = db.createObjectStore(STORES.ERROR_LOGS, {
+              keyPath: "id",
+            });
+            errorStore.createIndex("timestamp", "timestamp");
+            errorStore.createIndex("level", "level");
+            errorStore.createIndex("context", "context");
           }
         },
       });
@@ -543,6 +583,239 @@ class OfflineDatabase {
     if (existing) {
       await store.put({ ...existing, read: true });
     }
+  }
+
+  // Wallet state operations
+  async setWalletState(walletState: WalletStateRecord): Promise<void> {
+    await this.init();
+    if (!this.db) throw new Error("Database not initialized");
+
+    await this.db.put(STORES.WALLET_STATE, walletState);
+  }
+
+  async getWalletState(currency: string = "USD"): Promise<WalletStateRecord | null> {
+    await this.init();
+    if (!this.db) return null;
+
+    const index = this.db
+      .transaction(STORES.WALLET_STATE, "readonly")
+      .objectStore(STORES.WALLET_STATE)
+      .index("currency");
+
+    const results = await index.getAll(IDBKeyRange.only(currency));
+    return results.length > 0 ? results[0] : null;
+  }
+
+  async getAllWalletStates(): Promise<WalletStateRecord[]> {
+    await this.init();
+    if (!this.db) return [];
+
+    return await this.db.getAll(STORES.WALLET_STATE);
+  }
+
+  // Error logging operations
+  async logError(
+    error: string,
+    context: string,
+    level: ErrorLogRecord["level"] = "error",
+    metadata?: Record<string, any>
+  ): Promise<void> {
+    await this.init();
+    if (!this.db) return;
+
+    const record: ErrorLogRecord = {
+      id: `error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      error,
+      context,
+      level,
+      timestamp: Date.now(),
+      metadata,
+    };
+
+    try {
+      await this.db.add(STORES.ERROR_LOGS, record);
+      
+      // Keep only last 1000 error logs
+      await this.cleanupErrorLogs();
+    } catch (err) {
+      console.error("Failed to log error:", err);
+    }
+  }
+
+  async getErrorLogs(options?: {
+    level?: ErrorLogRecord["level"];
+    context?: string;
+    limit?: number;
+  }): Promise<ErrorLogRecord[]> {
+    await this.init();
+    if (!this.db) return [];
+
+    const tx = this.db.transaction(STORES.ERROR_LOGS, "readonly");
+    const store = tx.objectStore(STORES.ERROR_LOGS);
+
+    let results: ErrorLogRecord[];
+
+    if (options?.level) {
+      const index = store.index("level");
+      results = await index.getAll(IDBKeyRange.only(options.level));
+    } else if (options?.context) {
+      const index = store.index("context");
+      results = await index.getAll(IDBKeyRange.only(options.context));
+    } else {
+      results = await store.getAll();
+    }
+
+    // Sort by timestamp (newest first)
+    results.sort((a, b) => b.timestamp - a.timestamp);
+
+    return options?.limit ? results.slice(0, options.limit) : results;
+  }
+
+  private async cleanupErrorLogs(): Promise<void> {
+    if (!this.db) return;
+
+    const tx = this.db.transaction(STORES.ERROR_LOGS, "readwrite");
+    const store = tx.objectStore(STORES.ERROR_LOGS);
+    const index = store.index("timestamp");
+
+    const allKeys = await index.getAllKeys();
+    if (allKeys.length > 1000) {
+      // Remove oldest entries, keep newest 1000
+      const keysToDelete = allKeys.slice(1000);
+      for (const key of keysToDelete) {
+        await store.delete(key);
+      }
+    }
+  }
+
+  // Batch operations for better performance
+  async batchAddTransactions(transactions: Omit<TransactionRecord, "synced" | "syncAttempts">[]): Promise<void> {
+    await this.init();
+    if (!this.db) throw new Error("Database not initialized");
+
+    const tx = this.db.transaction([STORES.TRANSACTIONS, STORES.SYNC_QUEUE], "readwrite");
+    const transactionStore = tx.objectStore(STORES.TRANSACTIONS);
+    const syncStore = tx.objectStore(STORES.SYNC_QUEUE);
+
+    for (const transaction of transactions) {
+      const record: TransactionRecord = {
+        ...transaction,
+        synced: false,
+        syncAttempts: 0,
+      };
+
+      await transactionStore.add(record);
+
+      // Add to sync queue
+      await syncStore.add({
+        id: `sync_transaction_${transaction.id}`,
+        type: "transaction",
+        endpoint: "/api/transactions",
+        method: "POST",
+        data: record,
+        timestamp: Date.now(),
+        attempts: 0,
+        nextRetry: Date.now(),
+        priority: "high",
+      });
+    }
+  }
+
+  async batchUpdateTransactions(updates: { id: string; updates: Partial<TransactionRecord> }[]): Promise<void> {
+    await this.init();
+    if (!this.db) throw new Error("Database not initialized");
+
+    const tx = this.db.transaction(STORES.TRANSACTIONS, "readwrite");
+    const store = tx.objectStore(STORES.TRANSACTIONS);
+
+    for (const { id, updates: updateData } of updates) {
+      const existing = await store.get(id);
+      if (existing) {
+        await store.put({ ...existing, ...updateData });
+      }
+    }
+  }
+
+  // Advanced query operations
+  async getTransactionsByDateRange(
+    startDate: number,
+    endDate: number,
+    options?: { type?: TransactionRecord["type"]; status?: TransactionRecord["status"] }
+  ): Promise<TransactionRecord[]> {
+    await this.init();
+    if (!this.db) return [];
+
+    const tx = this.db.transaction(STORES.TRANSACTIONS, "readonly");
+    const store = tx.objectStore(STORES.TRANSACTIONS);
+    const index = store.index("timestamp");
+
+    const range = IDBKeyRange.bound(startDate, endDate);
+    const results = await index.getAll(range);
+
+    let filtered = results;
+
+    if (options?.type) {
+      filtered = filtered.filter((t) => t.type === options.type);
+    }
+
+    if (options?.status) {
+      filtered = filtered.filter((t) => t.status === options.status);
+    }
+
+    return filtered.sort((a, b) => b.timestamp - a.timestamp);
+  }
+
+  async getTransactionStats(): Promise<{
+    total: number;
+    pending: number;
+    completed: number;
+    failed: number;
+    totalAmount: number;
+    pendingAmount: number;
+  }> {
+    await this.init();
+    if (!this.db) return {
+      total: 0,
+      pending: 0,
+      completed: 0,
+      failed: 0,
+      totalAmount: 0,
+      pendingAmount: 0,
+    };
+
+    const transactions = await this.getTransactions();
+
+    const stats = transactions.reduce(
+      (acc, transaction) => {
+        acc.total++;
+        
+        switch (transaction.status) {
+          case "pending":
+            acc.pending++;
+            acc.pendingAmount += transaction.amount;
+            break;
+          case "completed":
+            acc.completed++;
+            acc.totalAmount += transaction.amount;
+            break;
+          case "failed":
+            acc.failed++;
+            break;
+        }
+
+        return acc;
+      },
+      {
+        total: 0,
+        pending: 0,
+        completed: 0,
+        failed: 0,
+        totalAmount: 0,
+        pendingAmount: 0,
+      }
+    );
+
+    return stats;
   }
 
   // Utility operations

@@ -7,11 +7,6 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "db:generate": "prisma generate",
-    "db:migrate": "prisma migrate dev",
-    "db:push": "prisma db push",
-    "db:seed": "tsx prisma/seed.ts",
-    "db:studio": "prisma studio",
     "app-store:assets": "node ../infrastructure/scripts/generate-app-store-assets.js public/logos/logo.svg ./app-store-assets",
     "app-store:validate": "lighthouse --chrome-flags=\"--headless\" --output=json --output=html --output-path=./lighthouse-report http://localhost:3000",
     "pwa:test": "npm run build && npm run start & wait-on http://localhost:3000 && npm run app-store:validate"
@@ -19,7 +14,6 @@
   "dependencies": {
     "@heroicons/react": "^2.0.18",
     "@hookform/resolvers": "^3.3.2",
-    "@prisma/client": "^6.16.2",
     "@radix-ui/react-avatar": "^1.1.10",
     "@radix-ui/react-checkbox": "^1.3.3",
     "@radix-ui/react-dialog": "^1.1.15",
@@ -40,6 +34,7 @@
     "@types/web-push": "^3.6.4",
     "@vercel/analytics": "^1.5.0",
     "@vercel/speed-insights": "^1.2.0",
+    "axios": "^1.12.2",
     "bcryptjs": "^3.0.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "2.0.0",
@@ -47,8 +42,9 @@
     "framer-motion": "^12.23.15",
     "idb": "^8.0.3",
     "lucide-react": "0.263.1",
-    "next": "14.1.0",
+    "next": "14.2.33",
     "next-intl": "3.9.0",
+    "next-pwa": "5.6.0",
     "next-themes": "^0.4.6",
     "nextjs-toploader": "^3.9.17",
     "react": "^18",
@@ -59,6 +55,7 @@
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^1.1.2",
     "web-push": "^3.6.7",
+    "workbox-webpack-plugin": "7.3.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
@@ -68,9 +65,8 @@
     "@types/react-dom": "^18.2.18",
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
-    "eslint-config-next": "14.1.0",
+    "eslint-config-next": "14.2.33",
     "postcss": "^8",
-    "prisma": "^6.16.2",
     "tailwindcss": "^3.3.0",
     "tsx": "^4.20.5",
     "typescript": "^5"

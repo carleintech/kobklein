@@ -3,289 +3,183 @@ import {
   Controller,
   Delete,
   Get,
-  HttpException,
-  HttpStatus,
   Param,
   Patch,
   Post,
   Query,
+  Request,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiQuery,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
-import { KYCStatus, UserRole } from '@prisma/client';
+import { ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { KycStatus, UserRole } from '../types/database.types';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
+import { KycSubmissionDto } from './dto/kyc-submission.dto';
+import { UpdateKycStatusDto } from './dto/update-kyc-status.dto';
 import { UsersService } from './users.service';
 
-@ApiTags('Users')
 @Controller('users')
 @UseGuards(AuthGuard('jwt'))
-@ApiBearerAuth()
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Create a new user (Admin only)' })
-  @ApiResponse({ status: 201, description: 'User successfully created' })
-  @ApiResponse({ status: 400, description: 'Bad request' })
-  @ApiResponse({ status: 403, description: 'Forbidden' })
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   async create(@Body() createUserDto: CreateUserDto) {
-    try {
-      const user = await this.usersService.create(createUserDto);
-      return {
-        statusCode: HttpStatus.CREATED,
-        message: 'User created successfully',
-        data: user,
-      };
-    } catch (error) {
-      throw new HttpException(
-        {
-          statusCode: HttpStatus.BAD_REQUEST,
-          message: error.message,
-          error: 'User creation failed',
-        },
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    const result = await this.usersService.create(createUserDto);
+    return result;
   }
 
   @Get()
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.DISTRIBUTOR)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.AGENT)
   @ApiOperation({ summary: 'Get all users with pagination and filters' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiQuery({ name: 'role', required: false, enum: UserRole })
-  @ApiQuery({ name: 'kycStatus', required: false, enum: KYCStatus })
+  @ApiQuery({ name: 'kycStatus', required: false, enum: KycStatus })
   @ApiQuery({ name: 'isActive', required: false, type: Boolean })
+  @ApiQuery({ name: 'search', required: false, type: String })
   @ApiResponse({ status: 200, description: 'Users retrieved successfully' })
   async findAll(
     @Query('page') page?: string,
     @Query('limit') limit?: string,
     @Query('role') role?: UserRole,
-    @Query('kycStatus') kycStatus?: KYCStatus,
+    @Query('kycStatus') kycStatus?: KycStatus,
     @Query('isActive') isActive?: string,
+    @Query('search') search?: string,
   ) {
-    try {
-      const pageNum = parseInt(page) || 1;
-      const pageSize = parseInt(limit) || 10;
-      const skip = (pageNum - 1) * pageSize;
+    const pageNum = parseInt(page) || 1;
+    const pageSize = parseInt(limit) || 10;
 
-      const users = await this.usersService.findAll({
-        skip,
-        take: pageSize,
-        role,
-        kycStatus,
-        isActive: isActive !== undefined ? isActive === 'true' : undefined,
-      });
+    const result = await this.usersService.findAll({
+      skip: (pageNum - 1) * pageSize,
+      take: pageSize,
+      role,
+      kycStatus,
+      // isActive: isActive !== undefined ? isActive === 'true' : undefined, // Removed - not part of the UserFilterOptions type
+      search,
+    });
 
-      return {
-        statusCode: HttpStatus.OK,
-        message: 'Users retrieved successfully',
-        data: users,
-      };
-    } catch (error) {
-      throw new HttpException(
-        {
-          statusCode: HttpStatus.BAD_REQUEST,
-          message: 'Failed to retrieve users',
-          error: error.message,
-        },
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    return result;
+  }
+
+  @Get('profile/me')
+  @ApiOperation({ summary: 'Get current user profile' })
+  @ApiResponse({ status: 200, description: 'Profile retrieved successfully' })
+  async getMyProfile(@Request() req) {
+    const result = await this.usersService.findOne(req.user.sub);
+    return result;
   }
 
   @Get(':id')
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.DISTRIBUTOR)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.AGENT)
   @ApiOperation({ summary: 'Get user by ID' })
   @ApiResponse({ status: 200, description: 'User retrieved successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
   async findOne(@Param('id') id: string) {
-    try {
-      const user = await this.usersService.findOne(id);
-      return {
-        statusCode: HttpStatus.OK,
-        message: 'User retrieved successfully',
-        data: user,
-      };
-    } catch (error) {
-      throw new HttpException(
-        {
-          statusCode: HttpStatus.NOT_FOUND,
-          message: error.message,
-          error: 'User not found',
-        },
-        HttpStatus.NOT_FOUND,
-      );
-    }
+    const result = await this.usersService.findOne(id);
+    return result;
   }
 
   @Get(':id/stats')
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.DISTRIBUTOR)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.AGENT)
   @ApiOperation({ summary: 'Get user statistics' })
   @ApiResponse({
     status: 200,
     description: 'User statistics retrieved successfully',
   })
   async getUserStats(@Param('id') id: string) {
-    try {
-      const stats = await this.usersService.getUserStats(id);
-      return {
-        statusCode: HttpStatus.OK,
-        message: 'User statistics retrieved successfully',
-        data: stats,
-      };
-    } catch (error) {
-      throw new HttpException(
-        {
-          statusCode: HttpStatus.NOT_FOUND,
-          message: error.message,
-          error: 'Failed to retrieve user statistics',
-        },
-        HttpStatus.NOT_FOUND,
-      );
-    }
+    const result = await this.usersService.getUserStats(id);
+    return result;
+  }
+
+  @Patch('profile/me')
+  @ApiOperation({ summary: 'Update current user profile' })
+  @ApiResponse({ status: 200, description: 'Profile updated successfully' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  async updateMyProfile(
+    @Request() req,
+    @Body() updateProfileDto: UpdateProfileDto,
+  ) {
+    const result = await this.usersService.updateProfile(req.user.sub, updateProfileDto);
+    return result;
+  }
+
+  @Post('kyc/submit')
+  @ApiOperation({ summary: 'Submit KYC documents' })
+  @ApiResponse({ status: 200, description: 'KYC documents submitted successfully' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  async submitKyc(
+    @Request() req,
+    @Body() kycSubmissionDto: KycSubmissionDto,
+  ) {
+    const result = await this.usersService.submitKyc(req.user.sub, kycSubmissionDto);
+    return result;
   }
 
   @Patch(':id')
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Update user (Admin only)' })
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+  @ApiOperation({ summary: 'Update user (Admin/Super Admin only)' })
   @ApiResponse({ status: 200, description: 'User updated successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    try {
-      const user = await this.usersService.update(id, updateUserDto);
-      return {
-        statusCode: HttpStatus.OK,
-        message: 'User updated successfully',
-        data: user,
-      };
-    } catch (error) {
-      throw new HttpException(
-        {
-          statusCode: HttpStatus.BAD_REQUEST,
-          message: error.message,
-          error: 'User update failed',
-        },
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    const result = await this.usersService.update(id, updateUserDto);
+    return result;
   }
 
   @Patch(':id/kyc-status')
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.DISTRIBUTOR)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.AGENT)
   @ApiOperation({ summary: 'Update user KYC status' })
   @ApiResponse({ status: 200, description: 'KYC status updated successfully' })
   async updateKYCStatus(
     @Param('id') id: string,
-    @Body('status') status: KYCStatus,
+    @Body() updateKycStatusDto: UpdateKycStatusDto,
   ) {
-    try {
-      const user = await this.usersService.updateKYCStatus(id, status);
-      return {
-        statusCode: HttpStatus.OK,
-        message: 'KYC status updated successfully',
-        data: user,
-      };
-    } catch (error) {
-      throw new HttpException(
-        {
-          statusCode: HttpStatus.BAD_REQUEST,
-          message: error.message,
-          error: 'KYC status update failed',
-        },
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    const result = await this.usersService.updateKYCStatus(id, updateKycStatusDto.status, updateKycStatusDto.reviewNotes);
+    return result;
   }
 
-  @Patch(':id/activate')
+  @Patch(':id/status')
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Activate user account' })
-  @ApiResponse({ status: 200, description: 'User activated successfully' })
-  async activate(@Param('id') id: string) {
-    try {
-      const user = await this.usersService.activate(id);
-      return {
-        statusCode: HttpStatus.OK,
-        message: 'User activated successfully',
-        data: user,
-      };
-    } catch (error) {
-      throw new HttpException(
-        {
-          statusCode: HttpStatus.BAD_REQUEST,
-          message: error.message,
-          error: 'User activation failed',
-        },
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-  }
-
-  @Patch(':id/deactivate')
-  @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Deactivate user account' })
-  @ApiResponse({ status: 200, description: 'User deactivated successfully' })
-  async deactivate(@Param('id') id: string) {
-    try {
-      const user = await this.usersService.deactivate(id);
-      return {
-        statusCode: HttpStatus.OK,
-        message: 'User deactivated successfully',
-        data: user,
-      };
-    } catch (error) {
-      throw new HttpException(
-        {
-          statusCode: HttpStatus.BAD_REQUEST,
-          message: error.message,
-          error: 'User deactivation failed',
-        },
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+  @ApiOperation({ summary: 'Update user status (activate/deactivate)' })
+  @ApiResponse({ status: 200, description: 'User status updated successfully' })
+  async updateStatus(
+    @Param('id') id: string,
+    @Body('isActive') isActive: boolean,
+    @Body('reason') reason?: string,
+  ) {
+    const result = await this.usersService.updateUserStatus(id, isActive, reason);
+    return result;
   }
 
   @Delete(':id')
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   @ApiOperation({ summary: 'Delete user (soft delete)' })
   @ApiResponse({ status: 200, description: 'User deleted successfully' })
-  async remove(@Param('id') id: string) {
-    try {
-      await this.usersService.remove(id);
-      return {
-        statusCode: HttpStatus.OK,
-        message: 'User deleted successfully',
-      };
-    } catch (error) {
-      throw new HttpException(
-        {
-          statusCode: HttpStatus.BAD_REQUEST,
-          message: error.message,
-          error: 'User deletion failed',
-        },
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+  async remove(@Param('id') id: string, @Body('reason') reason?: string) {
+    const result = await this.usersService.remove(id, reason);
+    return result;
+  }
+
+  @Get('analytics/overview')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+  @ApiOperation({ summary: 'Get user analytics overview' })
+  @ApiResponse({ status: 200, description: 'Analytics retrieved successfully' })
+  async getAnalytics() {
+    const result = await this.usersService.getAnalytics();
+    return result;
   }
 }

@@ -1,14 +1,11 @@
-import { PartialType } from '@nestjs/swagger';
-import { KYCStatus } from '@prisma/client';
-import { IsBoolean, IsEnum, IsOptional } from 'class-validator';
-import { CreateUserDto } from './create-user.dto';
+import { UserStatus, CurrencyCode } from '../../types/database.types';
 
-export class UpdateUserDto extends PartialType(CreateUserDto) {
-  @IsOptional()
-  @IsEnum(KYCStatus)
-  kycStatus?: KYCStatus;
-
-  @IsOptional()
-  @IsBoolean()
-  isActive?: boolean;
+export class UpdateUserDto {
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  country?: string;
+  preferredCurrency?: CurrencyCode;
+  status?: UserStatus;
 }

@@ -1,5 +1,7 @@
 import DevModeToggle from "@/components/dev/DevModeToggle";
 import DevUserIndicator from "@/components/dev/DevUserIndicator";
+import PWAInstallPrompt from "@/components/PWAInstallPrompt";
+import PWAStatusBar from "@/components/PWAStatusBar";
 import { ClientOnly } from "@/components/ui/client-only";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import {
@@ -103,6 +105,12 @@ export default function RootLayout({
                     </ClientOnly>
                     <ClientOnly>
                       <DevUserIndicator />
+                    </ClientOnly>
+                    <ClientOnly>
+                      <PWAInstallPrompt />
+                    </ClientOnly>
+                    <ClientOnly>
+                      <PWAStatusBar />
                     </ClientOnly>
                   </WebSocketProvider>
                 </AuthProvider>

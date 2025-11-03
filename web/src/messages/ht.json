@@ -22,7 +22,9 @@
     },
     "navigation": {
         "home": "Lakay",
+        "features": "Karakteristik",
         "about": "Sou nou",
+        "security": "Sekirite",
         "app": "App",
         "merchant": "Komèsan",
         "join": "Rantre",
@@ -36,7 +38,7 @@
         "logout": "Dekonekte"
     },
     "welcome": {
-        "heroTitle": "Libète Finansyè Dijital",
+        "heroTitle": "Lavni Libèté Finansyè Dijital la",
         "heroSubtitle": "Voye lajan nan yon sèl kou. Pa gen bank ki nesèsè.",
         "earnBonus": "Resevwa 50% bonus",
         "onEveryDeposit": "sou chak depo.",
@@ -46,7 +48,98 @@
         "becomeDistributor": "Vin Distribitè",
         "availableOn": "Sèlman sou iOS ak Android",
         "learnMore": "Aprann pi plis",
-        "bankGradeSecurity": "Sekirite Nivo Bank"
+        "bankGradeSecurity": "Sekirite Nivo Bank",
+        "trustedBy": "Pi pase 100,000 moun ki gen konfyans nan nou",
+        "features": {
+            "instant": {
+                "title": "Transfè Rapidman",
+                "description": "Voye ak resevwa lajan ak telefòn ou an menm tan"
+            },
+            "secure": {
+                "title": "Sekirite Bank",
+                "description": "Pwoteksyon nivo bank ak chifman avanse"
+            },
+            "global": {
+                "title": "Rezo Mondyal",
+                "description": "Konekte ak dyaspora Ayisyen nan mond lan"
+            }
+        }
+    },
+    "testimonials": {
+        "title": "Temwayaj Kliyan yo",
+        "subtitle": "Dekouvri poukisa dè milye moun gen konfyans nan nou",
+        "users": [
+            {
+                "name": "Marie Dupont",
+                "role": "Pwopriyètè Biznis",
+                "location": "Pòtoprens",
+                "testimonial": "KobKlein revolisyone jan m ap jere peman yo nan boutik mwen an. Li rapid, li solid ak kliyan yo renmen l."
+            },
+            {
+                "name": "Jean Charles",
+                "role": "Travayè Dyaspora",
+                "location": "Miami, FL",
+                "testimonial": "Voye lajan bay fanmi m nan Ayiti pa t janm fasil konsa. Pri yo klè ak transfè yo rapid."
+            },
+            {
+                "name": "Sophie Pierre",
+                "role": "Etidyan",
+                "location": "Okap",
+                "testimonial": "Kòm etidyan, m bezwen yon fason ki pa chè pou resevwa lajan. KobKlein paèt pou bezwen mwen yo."
+            }
+        ],
+        "stats": {
+            "users": {
+                "number": "100K+",
+                "label": "Itilizatè Aktif"
+            },
+            "transactions": {
+                "number": "$50M+",
+                "label": "Pwosede"
+            },
+            "uptime": {
+                "number": "99.9%",
+                "label": "Disponib"
+            }
+        }
+    },
+    "howItWorks": {
+        "title": "Ki jan Li Fonksyone",
+        "subtitle": "Kòmanse nan kèk minit sèlman",
+        "steps": [
+            {
+                "number": "01",
+                "title": "Telechaje App lan",
+                "description": "Disponib gratis sou iOS ak Android"
+            },
+            {
+                "number": "02",
+                "title": "Kreye yon Kont",
+                "description": "Enskripsyon senp ak jis nimewo telefòn ou"
+            },
+            {
+                "number": "03",
+                "title": "Mete Lajan",
+                "description": "Rechaje nan yon distribitè lokal oswa soti nan etranje"
+            },
+            {
+                "number": "04",
+                "title": "Kòmanse Peye",
+                "description": "Voye, resevwa ak peye rapidman"
+            }
+        ]
+    },
+    "download": {
+        "title": "Telechaje App KobKlein an",
+        "subtitle": "Disponib kounye a sou iOS ak Android",
+        "features": [
+            "Transfè rapidman",
+            "Sekirite nivo bank",
+            "Rezo distribitè yo",
+            "Sipò 24/7"
+        ],
+        "cta": "Telechaje Kounye a",
+        "comingSoon": "Ap Vini Byento"
     },
     "footer": {
         "company": "Konpayi",
@@ -116,23 +209,6 @@
         "total": "Total",
         "exchangeRate": "To chanje"
     },
-    "auth": {
-        "signIn": "Konekte",
-        "signUp": "Enskrire",
-        "email": "Imel",
-        "password": "Mo de pas",
-        "confirmPassword": "Konfime mo de pas la",
-        "firstName": "Premye non",
-        "lastName": "Depo non",
-        "phone": "Nimewo telefòn",
-        "forgotPassword": "Bliye mo de pas?",
-        "resetPassword": "Rès mo de pas la",
-        "createAccount": "Kreye kont",
-        "alreadyHaveAccount": "Ou gen kont deja?",
-        "dontHaveAccount": "Ou pa gen kont?",
-        "signInWith": "Konekte ak",
-        "orContinueWith": "Oswa kontinye ak"
-    },
     "dashboard": {
         "welcome": "Kontan wè ou ankò",
         "quickActions": "Aksyon rapid yo",
@@ -142,17 +218,5 @@
         "payMerchant": "Peye komèsan",
         "withdraw": "Retire",
         "viewAll": "Gade tout"
-    },
-    "footer": {
-        "tagline": "Fèt ak ❤️ nan Ayiti",
-        "links": {
-            "about": "Sou nou",
-            "partners": "Patnè yo",
-            "contact": "Kontak",
-            "support": "Sipò",
-            "privacy": "Politik konfidansyalite",
-            "terms": "Kondisyon yo"
-        },
-        "copyright": "© 2025 TECHKLEIN. Tout dwa yo rezève."
     }
 }

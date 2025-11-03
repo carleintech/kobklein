@@ -541,6 +541,11 @@ export const uploadApi = {
   },
 };
 
+/**
+ * Advanced Payments API Import
+ */
+import { advancedPaymentsApi } from './advanced-payments-api';
+
 // Export all APIs as a single object for convenience
 export const api = {
   auth: authApi,
@@ -555,6 +560,8 @@ export const api = {
   admin: adminApi,
   websocket: websocketApi,
   upload: uploadApi,
+  // Advanced Payment Systems
+  advancedPayments: advancedPaymentsApi,
 };
 
 export default api;

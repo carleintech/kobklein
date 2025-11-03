@@ -22,12 +22,14 @@
     },
     "navigation": {
         "home": "Home",
+        "features": "Features",
         "about": "About",
+        "security": "Security",
         "app": "App",
         "merchant": "Merchant",
         "join": "Join",
         "contact": "Contact",
-        "login": "Login",
+        "login": "Sign In",
         "getStarted": "Get Started",
         "dashboard": "Dashboard",
         "transactions": "Transactions",
@@ -36,17 +38,108 @@
         "logout": "Logout"
     },
     "welcome": {
-        "heroTitle": "Digital Financial Freedom",
+        "heroTitle": "The Future of Digital Financial Freedom",
         "heroSubtitle": "Send money instantly. No banks required.",
         "earnBonus": "Earn 50% bonus",
         "onEveryDeposit": "on every deposit.",
         "title": "Bank-Free Payments. Powered by You.",
-        "subtitle": "A secure and cashless digital wallet system designed for Haitians and their families worldwide.",
+        "subtitle": "A secure, cashless digital wallet system designed for Haitians and their families worldwide.",
         "getApp": "Get the App",
-        "becomeDistributor": "Become a Distributor",
-        "availableOn": "Available on iOS and Android only",
+        "becomeDistributor": "Become Distributor",
+        "availableOn": "Available only on iOS and Android",
         "learnMore": "Learn More",
-        "bankGradeSecurity": "Bank-Grade Security"
+        "bankGradeSecurity": "Bank-Grade Security",
+        "trustedBy": "Trusted by over 100,000 people",
+        "features": {
+            "instant": {
+                "title": "Instant Transfers",
+                "description": "Send and receive money in real-time with your phone"
+            },
+            "secure": {
+                "title": "Bank-Grade Security",
+                "description": "Bank-level protection with advanced encryption"
+            },
+            "global": {
+                "title": "Global Network",
+                "description": "Connect with the Haitian diaspora worldwide"
+            }
+        }
+    },
+    "testimonials": {
+        "title": "Customer Testimonials",
+        "subtitle": "Discover why thousands of people trust us",
+        "users": [
+            {
+                "name": "Marie Johnson",
+                "role": "Business Owner",
+                "location": "Port-au-Prince",
+                "testimonial": "KobKlein has revolutionized how I handle payments in my store. It's fast, secure, and my customers love it."
+            },
+            {
+                "name": "Jean Baptiste",
+                "role": "Diaspora Worker",
+                "location": "Miami, FL",
+                "testimonial": "Sending money to my family in Haiti has never been this easy. The fees are transparent and transfers are instant."
+            },
+            {
+                "name": "Sophie Laurent",
+                "role": "Student",
+                "location": "Cap-Haïtien",
+                "testimonial": "As a student, I need an affordable way to receive money. KobKlein is perfect for my needs."
+            }
+        ],
+        "stats": {
+            "users": {
+                "number": "100K+",
+                "label": "Active Users"
+            },
+            "transactions": {
+                "number": "$50M+",
+                "label": "Processed"
+            },
+            "uptime": {
+                "number": "99.9%",
+                "label": "Uptime"
+            }
+        }
+    },
+    "howItWorks": {
+        "title": "How It Works",
+        "subtitle": "Get started in just minutes",
+        "steps": [
+            {
+                "number": "01",
+                "title": "Download the App",
+                "description": "Available free on iOS and Android"
+            },
+            {
+                "number": "02",
+                "title": "Create an Account",
+                "description": "Simple sign-up with just your phone number"
+            },
+            {
+                "number": "03",
+                "title": "Add Funds",
+                "description": "Top up via local distributor or from abroad"
+            },
+            {
+                "number": "04",
+                "title": "Start Paying",
+                "description": "Send, receive, and pay instantly"
+            }
+        ]
+    },
+    "download": {
+        "title": "Download the KobKlein App",
+        "subtitle": "Available now on iOS and Android",
+        "features": [
+            "Instant transfers",
+            "Bank-grade security",
+            "Distributor network",
+            "24/7 support"
+        ],
+        "cta": "Download Now",
+        "comingSoon": "Coming Soon"
     },
     "footer": {
         "company": "Company",
@@ -94,8 +187,8 @@
     },
     "features": {
         "sendReceive": {
-            "title": "Send & Receive Instantly",
-            "description": "With just a phone number or card."
+            "title": "Send and Receive Instantly",
+            "description": "With just a phone number or a card."
         },
         "merchantReady": {
             "title": "Merchant Ready",
@@ -103,7 +196,7 @@
         },
         "diasporaPowered": {
             "title": "Diaspora Powered",
-            "description": "Reload a wallet from anywhere in the world."
+            "description": "Top up a wallet from anywhere in the world."
         }
     },
     "currency": {
@@ -116,23 +209,6 @@
         "total": "Total",
         "exchangeRate": "Exchange Rate"
     },
-    "auth": {
-        "signIn": "Sign In",
-        "signUp": "Sign Up",
-        "email": "Email",
-        "password": "Password",
-        "confirmPassword": "Confirm Password",
-        "firstName": "First Name",
-        "lastName": "Last Name",
-        "phone": "Phone Number",
-        "forgotPassword": "Forgot Password?",
-        "resetPassword": "Reset Password",
-        "createAccount": "Create Account",
-        "alreadyHaveAccount": "Already have an account?",
-        "dontHaveAccount": "Don't have an account?",
-        "signInWith": "Sign in with",
-        "orContinueWith": "Or continue with"
-    },
     "dashboard": {
         "welcome": "Welcome back",
         "quickActions": "Quick Actions",
@@ -142,17 +218,5 @@
         "payMerchant": "Pay Merchant",
         "withdraw": "Withdraw",
         "viewAll": "View All"
-    },
-    "footer": {
-        "tagline": "Built with ❤️ in Haiti",
-        "links": {
-            "about": "About",
-            "partners": "Partners",
-            "contact": "Contact",
-            "support": "Support",
-            "privacy": "Privacy Policy",
-            "terms": "Terms of Service"
-        },
-        "copyright": "© 2025 TECHKLEIN. All rights reserved."
     }
 }

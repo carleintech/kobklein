@@ -5,15 +5,20 @@
     "private": true,
     "packageManager": "pnpm@9.0.0",
     "scripts": {
-        "dev": "pnpm --filter web dev",
+        "bootstrap": "powershell -ExecutionPolicy Bypass -File scripts/setup-dev.ps1",
+        "bootstrap:local": "powershell -ExecutionPolicy Bypass -File scripts/setup-dev.ps1 -SkipServices",
+        "bootstrap:full": "powershell -ExecutionPolicy Bypass -File scripts/setup-dev.ps1",
+        "bootstrap:help": "powershell -ExecutionPolicy Bypass -File scripts/setup-dev.ps1 -Help",
+        "dev": "concurrently \"pnpm dev:web\" \"pnpm dev:api\" --names \"WEB,API\" --prefix-colors \"cyan,magenta\"",
         "dev:web": "pnpm --filter web dev",
         "dev:mobile": "pnpm --filter mobile dev",
-        "dev:backend": "pnpm --filter api start:dev",
-        "dev:api": "pnpm --filter api start:dev",
-        "dev:all": "concurrently \"pnpm dev:web\" \"pnpm dev:backend\" --names \"WEB,API\" --prefix-colors \"cyan,magenta\"",
+        "dev:backend": "pnpm --filter api run build && pnpm --filter api start:dev",
+        "dev:api": "pnpm --filter api run build && pnpm --filter api start:dev",
+        "dev:all": "concurrently \"pnpm dev:web\" \"pnpm dev:backend\" \"pnpm dev:mobile\" --names \"WEB,API,MOBILE\" --prefix-colors \"cyan,magenta,yellow\"",
         "dev:fullstack": "pnpm dev:all",
         "build": "pnpm --filter web build",
         "build:backend": "pnpm --filter api build",
+        "build:mobile": "pnpm --filter mobile build",
         "build:all": "pnpm -r build",
         "start": "pnpm --filter web start",
         "start:backend": "pnpm --filter api start:prod",
@@ -25,6 +30,8 @@
         "format": "pnpm -r format",
         "clean": "pnpm -r clean && rm -rf node_modules",
         "clean:hard": "rm -rf node_modules pnpm-lock.yaml && pnpm -r exec rm -rf node_modules && pnpm install",
+        "reset": "pnpm clean:hard && pnpm bootstrap:local",
+        "doctor": "pnpm type-check && pnpm lint && pnpm test",
         "deps:check": "pnpm audit --recursive",
         "deps:update": "pnpm update --latest --recursive",
         "install:all": "pnpm install",
@@ -50,6 +57,7 @@
         "tailwindcss-animate": "^1.0.7"
     },
     "devDependencies": {
-        "concurrently": "^8.2.2"
+        "concurrently": "^8.2.2",
+        "prisma": "^6.16.2"
     }
 }

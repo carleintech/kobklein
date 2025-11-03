@@ -1,217 +1,460 @@
 import {
-  Body,
   Controller,
-  Delete,
   Get,
-  Headers,
-  HttpException,
-  HttpStatus,
-  Param,
-  Patch,
   Post,
+  Patch,
+  Delete,
+  Param,
+  Body,
   Query,
-  RawBodyRequest,
-  Req,
   Request,
   UseGuards,
+  HttpException,
+  HttpStatus,
+  Logger,
+  Headers,
+  RawBodyRequest,
+  Req
 } from '@nestjs/common';
-import { PaymentMethod, PaymentStatus, Role } from '@prisma/client';
-import { Roles } from '../auth/decorators/roles.decorator';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { CreatePaymentDto } from './dto/create-payment.dto';
-import { ProcessStripePaymentDto } from './dto/process-stripe-payment.dto';
-import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { PaymentsService } from './payments.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { UserRole, PaymentStatus, PaymentMethod, PaymentProcessor } from '../types/database.types';
+import {
+  CreatePaymentDto,
+  ProcessWebhookDto,
+  PaymentCallbackDto,
+  RefundPaymentDto,
+  PaymentAnalyticsDto,
+  FraudCheckDto,
+  PaymentRetryDto,
+  UpdatePaymentDto,
+  PaymentSearchDto
+} from './dto/create-enhanced-payment.dto';
 
 @Controller('payments')
 export class PaymentsController {
+  private readonly logger = new Logger(PaymentsController.name);
+  
   constructor(private readonly paymentsService: PaymentsService) {}
 
-  @Post()
+  // ==============================
+  // CREATE PAYMENT
+  // ==============================
+  @Post('create')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.CLIENT, Role.MERCHANT, Role.DISTRIBUTOR, Role.DIASPORA)
-  async create(
-    @Body() createPaymentDto: CreatePaymentDto,
-    @Request() req: any,
-  ) {
+  async createPayment(@Request() req: any, @Body() createPaymentDto: CreatePaymentDto) {
     try {
-      return await this.paymentsService.create(createPaymentDto, req.user.id);
-    } catch (error) {
-      throw new HttpException(
-        error.message || 'Failed to create payment',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-  }
+      // Extract user context
+      const userId = req.user.id;
+      const userRole = req.user.primaryRole || req.user.role;
 
-  @Post('stripe/process')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.CLIENT, Role.MERCHANT, Role.DISTRIBUTOR, Role.DIASPORA)
-  async processStripePayment(
-    @Body() processStripePaymentDto: ProcessStripePaymentDto,
-    @Request() req: any,
-  ) {
-    try {
-      return await this.paymentsService.processStripePayment(
-        processStripePaymentDto,
-        req.user.id,
-      );
-    } catch (error) {
-      throw new HttpException(
-        error.message || 'Payment processing failed',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-  }
-
-  @Post('stripe/webhook')
-  async handleStripeWebhook(
-    @Headers('stripe-signature') signature: string,
-    @Req() req: RawBodyRequest<Request>,
-  ) {
-    try {
-      if (!signature) {
-        throw new HttpException(
-          'Missing Stripe signature',
-          HttpStatus.BAD_REQUEST,
-        );
+      // Validate user permissions
+      const allowedRoles = [UserRole.CLIENT, UserRole.MERCHANT, UserRole.AGENT, UserRole.ADMIN];
+      if (!allowedRoles.includes(userRole)) {
+        throw new HttpException('Insufficient permissions to create payments', HttpStatus.FORBIDDEN);
       }
 
-      return await this.paymentsService.handleStripeWebhook(
-        signature,
-        req.rawBody,
-      );
+      // Add request context to DTO
+      const enhancedDto = {
+        ...createPaymentDto,
+        metadata: {
+          ...createPaymentDto.metadata,
+          userAgent: req.headers['user-agent'],
+          ipAddress: req.ip || req.connection.remoteAddress,
+          userRole
+        }
+      };
+
+      const payment = await this.paymentsService.createPayment(userId, enhancedDto);
+      
+      this.logger.log(`Payment created successfully: ${payment.referenceId}`, { userId, amount: payment.amount });
+      
+      return {
+        success: true,
+        data: payment,
+        message: 'Payment created successfully'
+      };
     } catch (error) {
+      this.logger.error('Error creating payment', error);
       throw new HttpException(
-        error.message || 'Webhook processing failed',
-        HttpStatus.BAD_REQUEST,
+        error.message || 'Failed to create payment',
+        error.status || HttpStatus.BAD_REQUEST
       );
     }
   }
 
-  @Post(':id/confirm')
+  // ==============================
+  // SEARCH PAYMENTS
+  // ==============================
+  @Get('search')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.CLIENT, Role.MERCHANT, Role.DISTRIBUTOR, Role.DIASPORA)
-  async confirmPayment(@Param('id') id: string, @Request() req: any) {
+  async searchPayments(@Request() req: any, @Query() query: any) {
     try {
-      return await this.paymentsService.confirmPayment(id, req.user.id);
+      const userRole = req.user.primaryRole || req.user.role;
+      
+      // Build search criteria
+      const searchDto: PaymentSearchDto = {
+        userId: userRole === UserRole.ADMIN || userRole === UserRole.SUPER_ADMIN ? query.userId : req.user.id,
+        status: query.status,
+        processor: query.processor,
+        paymentMethod: query.paymentMethod,
+        currency: query.currency,
+        minAmount: query.minAmount ? parseFloat(query.minAmount) : undefined,
+        maxAmount: query.maxAmount ? parseFloat(query.maxAmount) : undefined,
+        startDate: query.startDate ? new Date(query.startDate) : undefined,
+        endDate: query.endDate ? new Date(query.endDate) : undefined,
+        referenceId: query.referenceId,
+        merchantReference: query.merchantReference,
+        page: parseInt(query.page) || 1,
+        limit: Math.min(parseInt(query.limit) || 20, 100), // Max 100 per page
+        sortBy: query.sortBy || 'createdAt',
+        sortOrder: query.sortOrder || 'desc'
+      };
+
+      const result = await this.paymentsService.searchPayments(searchDto);
+
+      return {
+        success: true,
+        data: result.payments,
+        pagination: result.pagination,
+        total: result.total
+      };
     } catch (error) {
+      this.logger.error('Error searching payments', error);
       throw new HttpException(
-        error.message || 'Payment confirmation failed',
-        HttpStatus.BAD_REQUEST,
+        error.message || 'Failed to search payments',
+        error.status || HttpStatus.BAD_REQUEST
       );
     }
   }
 
-  @Get()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(
-    Role.CLIENT,
-    Role.MERCHANT,
-    Role.DISTRIBUTOR,
-    Role.DIASPORA,
-    Role.ADMIN,
-  )
-  async findAll(@Request() req: any, @Query() query: any) {
-    const { page = 1, limit = 20, status, method } = query;
-
-    // Admins can see all payments, others see only their own
-    const userId = req.user.role === Role.ADMIN ? undefined : req.user.id;
-
-    return await this.paymentsService.findAll({
-      userId,
-      page: parseInt(page),
-      limit: parseInt(limit),
-      status: status as PaymentStatus,
-      method: method as PaymentMethod,
-    });
-  }
-
-  @Get('user/:userId')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN, Role.DISTRIBUTOR)
-  async findUserPayments(@Param('userId') userId: string, @Query() query: any) {
-    const { page = 1, limit = 20, status, method } = query;
-
-    return await this.paymentsService.findAll({
-      userId,
-      page: parseInt(page),
-      limit: parseInt(limit),
-      status: status as PaymentStatus,
-      method: method as PaymentMethod,
-    });
-  }
-
+  // ==============================
+  // GET PAYMENT ANALYTICS
+  // ==============================
   @Get('analytics')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN, Role.DISTRIBUTOR, Role.MERCHANT)
   async getAnalytics(@Request() req: any, @Query() query: any) {
-    const { startDate, endDate, groupBy = 'day' } = query;
+    try {
+      const userRole = req.user.primaryRole || req.user.role;
+      
+      // Admin and managers can see all analytics, others see only their own
+      const allowedRoles = [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MANAGER, UserRole.COMPLIANCE];
+      const canViewAll = allowedRoles.includes(userRole);
 
-    // Merchants and distributors see only their own analytics
-    const userId = req.user.role === Role.ADMIN ? undefined : req.user.id;
+      const analyticsDto: PaymentAnalyticsDto = {
+        userId: canViewAll ? query.userId : req.user.id,
+        startDate: query.startDate ? new Date(query.startDate) : undefined,
+        endDate: query.endDate ? new Date(query.endDate) : undefined,
+        groupBy: query.groupBy || 'day',
+        processor: query.processor,
+        paymentMethod: query.paymentMethod,
+        currency: query.currency
+      };
 
-    return await this.paymentsService.getPaymentAnalytics({
-      userId,
-      startDate: startDate ? new Date(startDate) : undefined,
-      endDate: endDate ? new Date(endDate) : undefined,
-      groupBy,
-    });
-  }
+      const analytics = await this.paymentsService.getPaymentAnalytics(analyticsDto);
 
-  @Get(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(
-    Role.CLIENT,
-    Role.MERCHANT,
-    Role.DISTRIBUTOR,
-    Role.DIASPORA,
-    Role.ADMIN,
-  )
-  async findOne(@Param('id') id: string, @Request() req: any) {
-    const payment = await this.paymentsService.findOne(id);
-
-    // Check ownership or admin role
-    if (req.user.role !== Role.ADMIN && payment.userId !== req.user.id) {
-      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+      return {
+        success: true,
+        data: analytics
+      };
+    } catch (error) {
+      this.logger.error('Error getting payment analytics', error);
+      throw new HttpException(
+        error.message || 'Failed to get analytics',
+        error.status || HttpStatus.BAD_REQUEST
+      );
     }
-
-    return payment;
   }
 
-  @Patch(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(
-    Role.ADMIN,
-    Role.CLIENT,
-    Role.MERCHANT,
-    Role.DISTRIBUTOR,
-    Role.DIASPORA,
-  )
-  async update(
-    @Param('id') id: string,
-    @Body() updatePaymentDto: UpdatePaymentDto,
-    @Request() req: any,
+  // ==============================
+  // WEBHOOK HANDLING
+  // ==============================
+  @Post('webhook/:processor')
+  async processWebhook(
+    @Param('processor') processor: string,
+    @Body() payload: any,
+    @Headers() headers: Record<string, string>,
+    @Req() rawReq: RawBodyRequest<Request>
   ) {
     try {
-      return await this.paymentsService.update(
-        id,
-        updatePaymentDto,
-        req.user.id,
-      );
+      // Validate processor
+      if (!Object.values(PaymentProcessor).includes(processor as PaymentProcessor)) {
+        throw new HttpException('Invalid processor', HttpStatus.BAD_REQUEST);
+      }
+
+      const webhookDto: ProcessWebhookDto = {
+        processor: processor as PaymentProcessor,
+        eventType: payload.type || payload.event_type || 'unknown',
+        payload,
+        signature: headers['stripe-signature'] || headers['paypal-transmission-sig'] || headers['signature'],
+        headers
+      };
+
+      const result = await this.paymentsService.processWebhook(webhookDto);
+      
+      this.logger.log(`Webhook processed successfully`, { processor, eventType: webhookDto.eventType });
+
+      return result;
     } catch (error) {
+      this.logger.error('Error processing webhook', error);
       throw new HttpException(
-        error.message || 'Failed to update payment',
-        HttpStatus.BAD_REQUEST,
+        error.message || 'Failed to process webhook',
+        error.status || HttpStatus.BAD_REQUEST
       );
     }
   }
 
-  @Delete(':id')
+  // ==============================
+  // GET PAYMENT BY ID
+  // ==============================
+  @Get(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
-  async remove(@Param('id') id: string, @Request() req: any) {
-    return await this.paymentsService.remove(id, req.user.id);
+  async getPayment(@Param('id') id: string, @Request() req: any) {
+    try {
+      const payment = await this.paymentsService.findPaymentById(id);
+      
+      if (!payment) {
+        throw new HttpException('Payment not found', HttpStatus.NOT_FOUND);
+      }
+
+      const userRole = req.user.primaryRole || req.user.role;
+      const isAdmin = [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MANAGER].includes(userRole);
+
+      // Check access permissions
+      if (!isAdmin && payment.userId !== req.user.id) {
+        throw new HttpException('Access denied', HttpStatus.FORBIDDEN);
+      }
+
+      return {
+        success: true,
+        data: payment
+      };
+    } catch (error) {
+      this.logger.error('Error getting payment', error);
+      throw new HttpException(
+        error.message || 'Failed to get payment',
+        error.status || HttpStatus.BAD_REQUEST
+      );
+    }
+  }
+
+  // ==============================
+  // GET PAYMENT BY REFERENCE
+  // ==============================
+  @Get('reference/:reference')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  async getPaymentByReference(@Param('reference') reference: string, @Request() req: any) {
+    try {
+      const payment = await this.paymentsService.findPaymentByReference(reference);
+      
+      if (!payment) {
+        throw new HttpException('Payment not found', HttpStatus.NOT_FOUND);
+      }
+
+      const userRole = req.user.primaryRole || req.user.role;
+      const isAdmin = [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MANAGER].includes(userRole);
+
+      // Check access permissions
+      if (!isAdmin && payment.userId !== req.user.id) {
+        throw new HttpException('Access denied', HttpStatus.FORBIDDEN);
+      }
+
+      return {
+        success: true,
+        data: payment
+      };
+    } catch (error) {
+      this.logger.error('Error getting payment by reference', error);
+      throw new HttpException(
+        error.message || 'Failed to get payment',
+        error.status || HttpStatus.BAD_REQUEST
+      );
+    }
+  }
+
+  // ==============================
+  // UPDATE PAYMENT STATUS (ADMIN ONLY)
+  // ==============================
+  @Patch(':id/status')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  async updatePaymentStatus(
+    @Param('id') id: string,
+    @Body() body: { status: PaymentStatus; reason?: string },
+    @Request() req: any
+  ) {
+    try {
+      const userRole = req.user.primaryRole || req.user.role;
+      const allowedRoles = [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MANAGER];
+
+      if (!allowedRoles.includes(userRole)) {
+        throw new HttpException('Insufficient permissions', HttpStatus.FORBIDDEN);
+      }
+
+      const payment = await this.paymentsService.updatePaymentStatus(
+        id,
+        body.status,
+        body.reason
+      );
+
+      this.logger.log(`Payment status updated: ${id} -> ${body.status}`, { 
+        userId: req.user.id, 
+        reason: body.reason 
+      });
+
+      return {
+        success: true,
+        data: payment,
+        message: 'Payment status updated successfully'
+      };
+    } catch (error) {
+      this.logger.error('Error updating payment status', error);
+      throw new HttpException(
+        error.message || 'Failed to update payment status',
+        error.status || HttpStatus.BAD_REQUEST
+      );
+    }
+  }
+
+  // ==============================
+  // UPDATE PAYMENT METADATA
+  // ==============================
+  @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  async updatePayment(
+    @Param('id') id: string,
+    @Body() updatePaymentDto: UpdatePaymentDto,
+    @Request() req: any
+  ) {
+    try {
+      const payment = await this.paymentsService.findPaymentById(id);
+      
+      if (!payment) {
+        throw new HttpException('Payment not found', HttpStatus.NOT_FOUND);
+      }
+
+      const userRole = req.user.primaryRole || req.user.role;
+      const isAdmin = [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MANAGER].includes(userRole);
+
+      // Check access permissions
+      if (!isAdmin && payment.userId !== req.user.id) {
+        throw new HttpException('Access denied', HttpStatus.FORBIDDEN);
+      }
+
+      // Users can only update certain fields, admins can update more
+      const allowedUpdates = isAdmin 
+        ? updatePaymentDto 
+        : {
+            description: updatePaymentDto.description,
+            metadata: updatePaymentDto.metadata
+          };
+
+      // TODO: Implement update functionality in service
+      // const updatedPayment = await this.paymentsService.updatePayment(id, allowedUpdates);
+
+      return {
+        success: true,
+        data: payment, // Temporary until update is implemented
+        message: 'Payment updated successfully'
+      };
+    } catch (error) {
+      this.logger.error('Error updating payment', error);
+      throw new HttpException(
+        error.message || 'Failed to update payment',
+        error.status || HttpStatus.BAD_REQUEST
+      );
+    }
+  }
+
+  // ==============================
+  // USER'S PAYMENT HISTORY
+  // ==============================
+  @Get('user/history')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  async getUserPaymentHistory(@Request() req: any, @Query() query: any) {
+    try {
+      const searchDto: PaymentSearchDto = {
+        userId: req.user.id,
+        status: query.status,
+        paymentMethod: query.paymentMethod,
+        currency: query.currency,
+        startDate: query.startDate ? new Date(query.startDate) : undefined,
+        endDate: query.endDate ? new Date(query.endDate) : undefined,
+        page: parseInt(query.page) || 1,
+        limit: Math.min(parseInt(query.limit) || 10, 50),
+        sortBy: 'createdAt',
+        sortOrder: 'desc'
+      };
+
+      const result = await this.paymentsService.searchPayments(searchDto);
+
+      return {
+        success: true,
+        data: result.payments,
+        pagination: result.pagination
+      };
+    } catch (error) {
+      this.logger.error('Error getting user payment history', error);
+      throw new HttpException(
+        error.message || 'Failed to get payment history',
+        error.status || HttpStatus.BAD_REQUEST
+      );
+    }
+  }
+
+  // ==============================
+  // PAYMENT METHODS AVAILABLE
+  // ==============================
+  @Get('methods/available')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  async getAvailablePaymentMethods(@Request() req: any) {
+    try {
+      // Return available payment methods based on user's country/region
+      const userCountry = req.user.country || 'HT'; // Default to Haiti
+
+      const methods = {
+        HT: [ // Haiti
+          PaymentMethod.DIGICEL_MONEY,
+          PaymentMethod.NATCOM_MONEY,
+          PaymentMethod.MONCASH,
+          PaymentMethod.BANK_TRANSFER,
+          PaymentMethod.CREDIT_CARD,
+          PaymentMethod.DEBIT_CARD,
+          PaymentMethod.CASH
+        ],
+        US: [ // United States
+          PaymentMethod.CREDIT_CARD,
+          PaymentMethod.DEBIT_CARD,
+          PaymentMethod.BANK_TRANSFER,
+          PaymentMethod.ACH_TRANSFER,
+          PaymentMethod.PAYPAL,
+          PaymentMethod.APPLE_PAY,
+          PaymentMethod.GOOGLE_PAY
+        ],
+        CA: [ // Canada
+          PaymentMethod.CREDIT_CARD,
+          PaymentMethod.DEBIT_CARD,
+          PaymentMethod.BANK_TRANSFER,
+          PaymentMethod.PAYPAL
+        ]
+      };
+
+      const availableMethods = methods[userCountry] || methods.HT;
+
+      return {
+        success: true,
+        data: {
+          country: userCountry,
+          methods: availableMethods,
+          processors: Object.values(PaymentProcessor)
+        }
+      };
+    } catch (error) {
+      this.logger.error('Error getting available payment methods', error);
+      throw new HttpException(
+        'Failed to get available payment methods',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
   }
 }

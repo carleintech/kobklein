@@ -95,11 +95,11 @@ export function generateMetadata({
 
 // Generate viewport configuration for all locales
 export const viewport = {
-  themeColor: "#0d1b2a",
+  themeColor: "#0F2A6B",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  maximumScale: 5,
+  userScalable: true,
   viewportFit: "cover",
 };
 

@@ -4,7 +4,6 @@ import { ParticleBackground } from "@/components/background/particle-background"
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { WelcomeHowItWorks } from "@/components/welcome/welcome-card-showcase";
 import { WelcomeDownload } from "@/components/welcome/welcome-download";
-import { WelcomeFeatureRail } from "@/components/welcome/welcome-feature-rail";
 import { WelcomeFeatures } from "@/components/welcome/welcome-features";
 import { WelcomeFooter } from "@/components/welcome/welcome-footer";
 import { WelcomeHero } from "@/components/welcome/welcome-hero";
@@ -34,59 +33,51 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* KobKlein Purple→Cyan Gradient Overlay */}
-      <div className="absolute inset-0 bg-kobklein-primary z-0" />
+    <div className="min-h-screen relative overflow-hidden bg-white">
+      {/* Clean Professional Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-gray-50" />
+      
+      {/* Subtle Fintech Accent Gradients */}
+      <div className="absolute inset-0 opacity-40">
+        <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-kobklein-primary/5 via-transparent to-transparent" />
+        <div className="absolute bottom-0 right-0 w-full h-96 bg-gradient-to-t from-kobklein-accent/3 via-transparent to-transparent" />
+      </div>
 
-      {/* Enhanced Particle Background with Purple→Cyan Theme */}
-      <ParticleBackground className="fixed inset-0" />
+      {/* Minimal Professional Particle System */}
+      <ParticleBackground className="fixed inset-0 opacity-20" />
 
-      {/* Content with Enhanced Z-Index Management */}
-      <div className="relative z-50">
+      {/* Content with Professional Spacing */}
+      <div className="relative z-10">
         {/* Navigation */}
         <WelcomeNavigation />
 
-        {/* Main Content with Seamless Fade Transitions */}
+        {/* Clean Fintech Layout */}
         <main className="relative">
           {/* Hero Section */}
-          <section className="relative">
+          <section className="relative bg-gradient-to-br from-kobklein-primary via-kobklein-secondary to-purple-600">
             <WelcomeHero />
-            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-transparent via-kobklein-primary/50 to-transparent pointer-events-none" />
-          </section>
-
-          {/* Interactive Feature Rail */}
-          <section className="relative -mt-16 pt-16">
-            <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-transparent via-kobklein-primary/30 to-transparent pointer-events-none" />
-            <WelcomeFeatureRail />
-            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-transparent via-kobklein-primary/30 to-transparent pointer-events-none" />
           </section>
 
           {/* Features Section */}
-          <section className="relative -mt-16 pt-16">
-            <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-transparent via-kobklein-primary/30 to-transparent pointer-events-none" />
+          <section className="relative bg-white">
+            <div className="absolute inset-0 bg-gradient-to-b from-gray-50/50 to-white" />
             <WelcomeFeatures />
-            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-transparent via-kobklein-primary/30 to-transparent pointer-events-none" />
           </section>
 
           {/* How It Works */}
-          <section className="relative -mt-16 pt-16">
-            <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-transparent via-kobklein-primary/30 to-transparent pointer-events-none" />
+          <section className="relative bg-gradient-to-b from-white to-slate-50">
             <WelcomeHowItWorks />
-            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-transparent via-kobklein-primary/30 to-transparent pointer-events-none" />
           </section>
 
           {/* Testimonials */}
-          <section className="relative -mt-16 pt-16">
-            <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-transparent via-kobklein-primary/30 to-transparent pointer-events-none" />
+          <section className="relative bg-slate-50">
+            <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-gray-50 to-white" />
             <WelcomeTestimonials />
-            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-transparent via-kobklein-primary/30 to-transparent pointer-events-none" />
           </section>
 
           {/* Download Section */}
-          <section className="relative -mt-16 pt-16">
-            <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-transparent via-kobklein-primary/30 to-transparent pointer-events-none" />
+          <section className="relative bg-gradient-to-b from-white to-kobklein-primary/5">
             <WelcomeDownload />
-            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-transparent via-kobklein-primary/50 to-transparent pointer-events-none" />
           </section>
         </main>
 

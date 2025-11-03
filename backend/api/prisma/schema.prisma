@@ -3,72 +3,72 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
   id                                                  String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   email                                               String              @unique @db.VarChar(255)
   phone                                               String?             @unique @db.VarChar(20)
-  first_name                                          String              @db.VarChar(100)
-  last_name                                           String              @db.VarChar(100)
-  role                                                user_role
-  status                                              user_status?        @default(PENDING_VERIFICATION)
-  date_of_birth                                       DateTime?           @db.Date
+  firstName                                           String              @map("first_name") @db.VarChar(100)
+  lastName                                            String              @map("last_name") @db.VarChar(100)
+  role                                                UserRole            @map("role")
+  status                                              UserStatus?         @default(PENDING_VERIFICATION) @map("status")
+  dateOfBirth                                         DateTime?           @map("date_of_birth") @db.Date
   address                                             String?
   city                                                String?             @db.VarChar(100)
   country                                             String?             @default("HT") @db.VarChar(2)
   language                                            String?             @default("ht") @db.VarChar(2)
   password                                            String?             @db.VarChar(255)
-  pin_hash                                            String?             @db.VarChar(255)
-  two_factor_enabled                                  Boolean?            @default(false)
-  created_at                                          DateTime?           @default(now()) @db.Timestamptz(6)
-  updated_at                                          DateTime?           @default(now()) @db.Timestamptz(6)
-  last_login_at                                       DateTime?           @db.Timestamptz(6)
-  email_verified_at                                   DateTime?           @db.Timestamptz(6)
-  admin_profiles                                      AdminProfile?
-  audit_logs                                          AuditLog[]
-  beneficiaries_beneficiaries_client_user_idTousers   Beneficiary[]       @relation("beneficiaries_client_user_idTousers")
-  beneficiaries_beneficiaries_diaspora_user_idTousers Beneficiary[]       @relation("beneficiaries_diaspora_user_idTousers")
-  cards_cards_issued_byTousers                        Card[]              @relation("cards_issued_byTousers")
-  cards_cards_user_idTousers                          Card[]              @relation("cards_user_idTousers")
-  client_profiles                                     ClientProfile?
-  diaspora_profiles                                   DiasporaProfile?
-  distributor_profiles                                DistributorProfile?
-  merchant_profiles                                   MerchantProfile?
+  pinHash                                             String?             @map("pin_hash") @db.VarChar(255)
+  twoFactorEnabled                                    Boolean?            @map("two_factor_enabled") @default(false)
+  createdAt                                           DateTime?           @map("created_at") @default(now()) @db.Timestamptz(6)
+  updatedAt                                           DateTime?           @map("updated_at") @default(now()) @db.Timestamptz(6)
+  lastLoginAt                                         DateTime?           @map("last_login_at") @db.Timestamptz(6)
+  emailVerifiedAt                                     DateTime?           @map("email_verified_at") @db.Timestamptz(6)
+  adminProfile                                        AdminProfile?
+  auditLogs                                           AuditLog[]
+  beneficiariesAsClient                               Beneficiary[]       @relation("beneficiaries_client_user_idTousers")
+  beneficiariesAsDiaspora                             Beneficiary[]       @relation("beneficiaries_diaspora_user_idTousers")
+  cardsIssued                                         Card[]              @relation("cards_issued_byTousers")
+  cardsOwned                                          Card[]              @relation("cards_user_idTousers")
+  clientProfile                                       ClientProfile?
+  diasporaProfile                                     DiasporaProfile?
+  distributorProfile                                  DistributorProfile?
+  merchantProfile                                     MerchantProfile?
   notifications                                       Notification[]
-  payments                                            Payment[]
-  refill_requests_refill_requests_from_user_idTousers RefillRequest[]     @relation("refill_requests_from_user_idTousers")
-  refill_requests_refill_requests_processed_byTousers RefillRequest[]     @relation("refill_requests_processed_byTousers")
-  transactions_transactions_processed_byTousers       Transaction[]       @relation("transactions_processed_byTousers")
-  transactions_transactions_receiver_idTousers        Transaction[]       @relation("transactions_receiver_idTousers")
-  transactions_transactions_sender_idTousers          Transaction[]       @relation("transactions_sender_idTousers")
-  user_sessions                                       UserSession[]
+  refillRequestsFrom                                  RefillRequest[]     @relation("refill_requests_from_user_idTousers")
+  refillRequestsProcessed                             RefillRequest[]     @relation("refill_requests_processed_byTousers")
+  transactionsProcessed                               Transaction[]       @relation("transactions_processed_byTousers")
+  transactionsReceived                                Transaction[]       @relation("transactions_receiver_idTousers")
+  transactionsSent                                    Transaction[]       @relation("transactions_sender_idTousers")
+  userSessions                                        UserSession[]
   wallets                                             Wallet[]
 
   // 🔍 Enhanced Security & Financial Infrastructure Relations
-  kyc_verification   KYCVerification?
-  kyc_reviews        KYCVerification[]  @relation("KYCReviewedBy")
-  card_activities    CardActivity[]
-  commission_records CommissionRecord[]
-  disputes_raised    Dispute[]          @relation("DisputeRaisedBy")
-  disputes_assigned  Dispute[]          @relation("DisputeAssignedTo")
-  devices            Device[]
-  referral_codes     ReferralCode[]
-  referral_uses      ReferralUse[]
-  account_recoveries AccountRecovery[]
+  kycVerification   KYCVerification?
+  kycReviews        KYCVerification[]  @relation("KYCReviewedBy")
+  cardActivities    CardActivity[]
+  commissionRecords CommissionRecord[]
+  disputesRaised    Dispute[]          @relation("DisputeRaisedBy")
+  disputesAssigned  Dispute[]          @relation("DisputeAssignedTo")
+  devices           Device[]
+  referralCodes     ReferralCode[]
+  referralUses      ReferralUse[]
+  accountRecoveries AccountRecovery[]
 
   // 🔧 Operational & Support Infrastructure Relations
-  support_tickets          SupportTicket[]
-  support_tickets_assigned SupportTicket[]       @relation("TicketAssignedTo")
-  pos_devices_merchant     POSDevice[]           @relation("POSMerchant")
-  pos_devices_distributor  POSDevice[]           @relation("POSDistributor")
-  card_inventories         CardInventory[]
-  app_configs              AppConfig[]
-  user_activity_logs       UserActivityLog[]
-  push_notification_logs   PushNotificationLog[]
+  supportTickets         SupportTicket[]
+  supportTicketsAssigned SupportTicket[]       @relation("TicketAssignedTo")
+  posDevicesAsMerchant   POSDevice[]           @relation("POSMerchant")
+  posDevicesAsDistributor POSDevice[]          @relation("POSDistributor")
+  cardInventories        CardInventory[]
+  appConfigs             AppConfig[]
+  userActivityLogs       UserActivityLog[]
+  pushNotificationLogs   PushNotificationLog[]
+
+  payments Payment[]
 
   @@index([country], map: "idx_users_country")
   @@index([email], map: "idx_users_email")
@@ -79,203 +79,203 @@ model User {
 }
 
 model ClientProfile {
-  id                    String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  user_id               String    @unique @db.Uuid
-  preferred_language    String?   @default("ht") @db.VarChar(2)
-  receive_notifications Boolean?  @default(true)
-  preferred_currency    String?   @default("HTG") @db.VarChar(3)
-  created_at            DateTime? @default(now()) @db.Timestamptz(6)
-  updated_at            DateTime? @default(now()) @db.Timestamptz(6)
-  users                 User      @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id                   String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId               String    @unique @map("user_id") @db.Uuid
+  preferredLanguage    String?   @map("preferred_language") @default("ht") @db.VarChar(2)
+  receiveNotifications Boolean?  @map("receive_notifications") @default(true)
+  preferredCurrency    String?   @map("preferred_currency") @default("HTG") @db.VarChar(3)
+  createdAt            DateTime? @map("created_at") @default(now()) @db.Timestamptz(6)
+  updatedAt            DateTime? @map("updated_at") @default(now()) @db.Timestamptz(6)
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@map("client_profiles")
 }
 
 model MerchantProfile {
-  id                     String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  user_id                String    @unique @db.Uuid
-  business_name          String    @db.VarChar(255)
-  business_type          String    @db.VarChar(100)
-  business_address       String?
-  business_phone         String?   @db.VarChar(20)
-  tax_id                 String?   @db.VarChar(50)
-  is_verified            Boolean?  @default(false)
-  verified_at            DateTime? @db.Timestamptz(6)
-  auto_accept_payments   Boolean?  @default(true)
-  max_transaction_amount Decimal?  @default(100000) @db.Decimal(15, 2)
-  created_at             DateTime? @default(now()) @db.Timestamptz(6)
-  updated_at             DateTime? @default(now()) @db.Timestamptz(6)
-  users                  User      @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id                    String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId                String    @unique @map("user_id") @db.Uuid
+  businessName          String    @map("business_name") @db.VarChar(255)
+  businessType          String    @map("business_type") @db.VarChar(100)
+  businessAddress       String?   @map("business_address")
+  businessPhone         String?   @map("business_phone") @db.VarChar(20)
+  taxId                 String?   @map("tax_id") @db.VarChar(50)
+  isVerified            Boolean?  @map("is_verified") @default(false)
+  verifiedAt            DateTime? @map("verified_at") @db.Timestamptz(6)
+  autoAcceptPayments    Boolean?  @map("auto_accept_payments") @default(true)
+  maxTransactionAmount  Decimal?  @map("max_transaction_amount") @default(100000) @db.Decimal(15, 2)
+  createdAt             DateTime? @map("created_at") @default(now()) @db.Timestamptz(6)
+  updatedAt             DateTime? @map("updated_at") @default(now()) @db.Timestamptz(6)
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@map("merchant_profiles")
 }
 
 model DistributorProfile {
-  id                         String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  user_id                    String    @unique @db.Uuid
-  territory_name             String    @db.VarChar(255)
-  territory_code             String    @unique @db.VarChar(20)
-  region                     String    @db.VarChar(100)
-  is_active                  Boolean?  @default(true)
-  refill_commission_rate     Decimal?  @default(0.02) @db.Decimal(5, 4)
-  withdrawal_commission_rate Decimal?  @default(0.02) @db.Decimal(5, 4)
-  cards_in_stock             Int?      @default(0)
-  last_restock_at            DateTime? @db.Timestamptz(6)
-  created_at                 DateTime? @default(now()) @db.Timestamptz(6)
-  updated_at                 DateTime? @default(now()) @db.Timestamptz(6)
-  users                      User      @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id                        String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId                    String    @unique @map("user_id") @db.Uuid
+  territoryName             String    @map("territory_name") @db.VarChar(255)
+  territoryCode             String    @unique @map("territory_code") @db.VarChar(20)
+  region                    String    @db.VarChar(100)
+  isActive                  Boolean?  @map("is_active") @default(true)
+  refillCommissionRate      Decimal?  @map("refill_commission_rate") @default(0.02) @db.Decimal(5, 4)
+  withdrawalCommissionRate  Decimal?  @map("withdrawal_commission_rate") @default(0.02) @db.Decimal(5, 4)
+  cardsInStock              Int?      @map("cards_in_stock") @default(0)
+  lastRestockAt             DateTime? @map("last_restock_at") @db.Timestamptz(6)
+  createdAt                 DateTime? @map("created_at") @default(now()) @db.Timestamptz(6)
+  updatedAt                 DateTime? @map("updated_at") @default(now()) @db.Timestamptz(6)
+  user                      User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@map("distributor_profiles")
 }
 
 model DiasporaProfile {
-  id                    String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  user_id               String    @unique @db.Uuid
-  country_of_residence  String    @db.VarChar(2)
-  preferred_currency    String?   @default("USD") @db.VarChar(3)
-  auto_refill_enabled   Boolean?  @default(false)
-  auto_refill_amount    Decimal?  @db.Decimal(15, 2)
-  auto_refill_frequency String?   @db.VarChar(20)
-  next_auto_refill_date DateTime? @db.Timestamptz(6)
-  created_at            DateTime? @default(now()) @db.Timestamptz(6)
-  updated_at            DateTime? @default(now()) @db.Timestamptz(6)
-  users                 User      @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id                   String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId               String    @unique @map("user_id") @db.Uuid
+  countryOfResidence   String    @map("country_of_residence") @db.VarChar(2)
+  preferredCurrency    String?   @map("preferred_currency") @default("USD") @db.VarChar(3)
+  autoRefillEnabled    Boolean?  @map("auto_refill_enabled") @default(false)
+  autoRefillAmount     Decimal?  @map("auto_refill_amount") @db.Decimal(15, 2)
+  autoRefillFrequency  String?   @map("auto_refill_frequency") @db.VarChar(20)
+  nextAutoRefillDate   DateTime? @map("next_auto_refill_date") @db.Timestamptz(6)
+  createdAt            DateTime? @map("created_at") @default(now()) @db.Timestamptz(6)
+  updatedAt            DateTime? @map("updated_at") @default(now()) @db.Timestamptz(6)
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@map("diaspora_profiles")
 }
 
 model AdminProfile {
   id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  user_id     String    @unique @db.Uuid
+  userId      String    @unique @map("user_id") @db.Uuid
   department  String    @db.VarChar(100)
   permissions Json?     @default("[]")
-  created_at  DateTime? @default(now()) @db.Timestamptz(6)
-  updated_at  DateTime? @default(now()) @db.Timestamptz(6)
-  users       User      @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  createdAt   DateTime? @map("created_at") @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime? @map("updated_at") @default(now()) @db.Timestamptz(6)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@map("admin_profiles")
 }
 
 model Wallet {
-  id                                                    String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  user_id                                               String          @db.Uuid
-  currency                                              String?         @default("HTG") @db.VarChar(3)
-  balance                                               Decimal?        @default(0) @db.Decimal(15, 2)
-  status                                                wallet_status?  @default(ACTIVE)
-  daily_limit                                           Decimal?        @default(50000) @db.Decimal(15, 2)
-  monthly_limit                                         Decimal?        @default(500000) @db.Decimal(15, 2)
-  created_at                                            DateTime?       @default(now()) @db.Timestamptz(6)
-  updated_at                                            DateTime?       @default(now()) @db.Timestamptz(6)
-  refill_requests                                       RefillRequest[]
-  transactions_transactions_receiver_wallet_idTowallets Transaction[]   @relation("transactions_receiver_wallet_idTowallets")
-  transactions_transactions_sender_wallet_idTowallets   Transaction[]   @relation("transactions_sender_wallet_idTowallets")
-  users                                                 User            @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id                      String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId                  String          @map("user_id") @db.Uuid
+  currency                String?         @default("HTG") @db.VarChar(3)
+  balance                 Decimal?        @default(0) @db.Decimal(15, 2)
+  status                  WalletStatus?   @map("status") @default(ACTIVE)
+  dailyLimit              Decimal?        @map("daily_limit") @default(50000) @db.Decimal(15, 2)
+  monthlyLimit            Decimal?        @map("monthly_limit") @default(500000) @db.Decimal(15, 2)
+  createdAt               DateTime?       @map("created_at") @default(now()) @db.Timestamptz(6)
+  updatedAt               DateTime?       @map("updated_at") @default(now()) @db.Timestamptz(6)
+  refillRequests          RefillRequest[]
+  transactionsReceived    Transaction[]   @relation("transactions_receiver_wallet_idTowallets")
+  transactionsSent        Transaction[]   @relation("transactions_sender_wallet_idTowallets")
+  user                    User            @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@unique([user_id, currency])
+  @@unique([userId, currency])
   @@index([currency], map: "idx_wallets_currency")
   @@index([status], map: "idx_wallets_status")
-  @@index([user_id], map: "idx_wallets_user_id")
+  @@index([userId], map: "idx_wallets_user_id")
   @@map("wallets")
 }
 
 model Transaction {
-  id                                               String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  type                                             transaction_type
-  status                                           transaction_status? @default(PENDING)
-  amount                                           Decimal             @db.Decimal(15, 2)
-  currency                                         String?             @default("HTG") @db.VarChar(3)
-  fee                                              Decimal?            @default(0) @db.Decimal(15, 2)
-  sender_id                                        String              @db.Uuid
-  receiver_id                                      String              @db.Uuid
-  sender_wallet_id                                 String              @db.Uuid
-  receiver_wallet_id                               String              @db.Uuid
-  method                                           payment_method
-  reference                                        String              @unique @db.VarChar(100)
-  description                                      String?
-  card_id                                          String?             @db.Uuid
-  stripe_payment_id                                String?             @db.VarChar(255)
-  processed_at                                     DateTime?           @db.Timestamptz(6)
-  processed_by                                     String?             @db.Uuid
-  failure_reason                                   String?
-  metadata                                         Json?
-  ip_address                                       String?             @db.Inet
-  user_agent                                       String?
-  location                                         Json?
-  created_at                                       DateTime?           @default(now()) @db.Timestamptz(6)
-  updated_at                                       DateTime?           @default(now()) @db.Timestamptz(6)
-  cards                                            Card?               @relation(fields: [card_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_transactions_card_id")
-  users_transactions_processed_byTousers           User?               @relation("transactions_processed_byTousers", fields: [processed_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  users_transactions_receiver_idTousers            User                @relation("transactions_receiver_idTousers", fields: [receiver_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  wallets_transactions_receiver_wallet_idTowallets Wallet              @relation("transactions_receiver_wallet_idTowallets", fields: [receiver_wallet_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  users_transactions_sender_idTousers              User                @relation("transactions_sender_idTousers", fields: [sender_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  wallets_transactions_sender_wallet_idTowallets   Wallet              @relation("transactions_sender_wallet_idTowallets", fields: [sender_wallet_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id                 String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  type               TransactionType    @map("type")
+  status             TransactionStatus? @map("status") @default(PENDING)
+  amount             Decimal            @db.Decimal(15, 2)
+  currency           String?            @default("HTG") @db.VarChar(3)
+  fee                Decimal?           @default(0) @db.Decimal(15, 2)
+  senderId           String             @map("sender_id") @db.Uuid
+  receiverId         String             @map("receiver_id") @db.Uuid
+  senderWalletId     String             @map("sender_wallet_id") @db.Uuid
+  receiverWalletId   String             @map("receiver_wallet_id") @db.Uuid
+  method             PaymentMethod      @map("method")
+  reference          String             @unique @db.VarChar(100)
+  description        String?
+  cardId             String?            @map("card_id") @db.Uuid
+  stripePaymentId    String?            @map("stripe_payment_id") @db.VarChar(255)
+  processedAt        DateTime?          @map("processed_at") @db.Timestamptz(6)
+  processedBy        String?            @map("processed_by") @db.Uuid
+  failureReason      String?            @map("failure_reason")
+  metadata           Json?
+  ipAddress          String?            @map("ip_address") @db.Inet
+  userAgent          String?            @map("user_agent")
+  location           Json?
+  createdAt          DateTime?          @map("created_at") @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime?          @map("updated_at") @default(now()) @db.Timestamptz(6)
+  card               Card?              @relation(fields: [cardId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_transactions_card_id")
+  processedByUser    User?              @relation("transactions_processed_byTousers", fields: [processedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  receiver           User               @relation("transactions_receiver_idTousers", fields: [receiverId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  receiverWallet     Wallet             @relation("transactions_receiver_wallet_idTowallets", fields: [receiverWalletId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  sender             User               @relation("transactions_sender_idTousers", fields: [senderId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  senderWallet       Wallet             @relation("transactions_sender_wallet_idTowallets", fields: [senderWalletId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   // 💰 Financial Infrastructure Relations
-  commission_records CommissionRecord[] // Commission tracking
-  disputes           Dispute[] // Dispute handling
+  commissionRecords CommissionRecord[] // Commission tracking
+  disputes          Dispute[] // Dispute handling
 
-  @@index([created_at], map: "idx_transactions_created_at")
-  @@index([receiver_id], map: "idx_transactions_receiver_id")
+  @@index([createdAt], map: "idx_transactions_created_at")
+  @@index([receiverId], map: "idx_transactions_receiver_id")
   @@index([reference], map: "idx_transactions_reference")
-  @@index([sender_id], map: "idx_transactions_sender_id")
+  @@index([senderId], map: "idx_transactions_sender_id")
   @@index([status], map: "idx_transactions_status")
   @@index([type], map: "idx_transactions_type")
   @@map("transactions")
 }
 
 model Card {
-  id                           String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  uid                          String         @unique @db.VarChar(50)
-  type                         card_type
-  status                       card_status?   @default(INACTIVE)
-  user_id                      String?        @db.Uuid
-  issued_by                    String         @db.Uuid
-  issued_at                    DateTime       @db.Timestamptz(6)
-  activated_at                 DateTime?      @db.Timestamptz(6)
-  expires_at                   DateTime?      @db.Timestamptz(6)
-  last_used_at                 DateTime?      @db.Timestamptz(6)
-  usage_count                  Int?           @default(0)
-  card_number                  String?        @unique @db.VarChar(50)
-  printed_name                 String?        @db.VarChar(255)
-  created_at                   DateTime?      @default(now()) @db.Timestamptz(6)
-  updated_at                   DateTime?      @default(now()) @db.Timestamptz(6)
-  users_cards_issued_byTousers User           @relation("cards_issued_byTousers", fields: [issued_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  users_cards_user_idTousers   User?          @relation("cards_user_idTousers", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  transactions                 Transaction[]
-  activities                   CardActivity[] // Card lifecycle tracking
+  id           String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  uid          String         @unique @db.VarChar(50)
+  type         CardType       @map("type")
+  status       CardStatus?    @map("status") @default(INACTIVE)
+  userId       String?        @map("user_id") @db.Uuid
+  issuedBy     String         @map("issued_by") @db.Uuid
+  issuedAt     DateTime       @map("issued_at") @db.Timestamptz(6)
+  activatedAt  DateTime?      @map("activated_at") @db.Timestamptz(6)
+  expiresAt    DateTime?      @map("expires_at") @db.Timestamptz(6)
+  lastUsedAt   DateTime?      @map("last_used_at") @db.Timestamptz(6)
+  usageCount   Int?           @map("usage_count") @default(0)
+  cardNumber   String?        @unique @map("card_number") @db.VarChar(50)
+  printedName  String?        @map("printed_name") @db.VarChar(255)
+  createdAt    DateTime?      @map("created_at") @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime?      @map("updated_at") @default(now()) @db.Timestamptz(6)
+  issuer       User           @relation("cards_issued_byTousers", fields: [issuedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user         User?          @relation("cards_user_idTousers", fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  transactions Transaction[]
+  activities   CardActivity[] // Card lifecycle tracking
 
   @@index([status], map: "idx_cards_status")
   @@index([type], map: "idx_cards_type")
   @@index([uid], map: "idx_cards_uid")
-  @@index([user_id], map: "idx_cards_user_id")
+  @@index([userId], map: "idx_cards_user_id")
   @@map("cards")
 }
 
 model RefillRequest {
-  id                                        String                 @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  from_user_id                              String                 @db.Uuid
-  to_wallet_id                              String                 @db.Uuid
-  amount                                    Decimal                @db.Decimal(15, 2)
-  currency                                  String?                @default("HTG") @db.VarChar(3)
-  status                                    refill_request_status? @default(PENDING)
-  note                                      String?
-  processed_by                              String?                @db.Uuid
-  processed_at                              DateTime?              @db.Timestamptz(6)
-  expires_at                                DateTime?              @default(dbgenerated("(now() + '24:00:00'::interval)")) @db.Timestamptz(6)
-  stripe_payment_id                         String?                @db.VarChar(255)
-  payment_method                            payment_method?
-  created_at                                DateTime?              @default(now()) @db.Timestamptz(6)
-  updated_at                                DateTime?              @default(now()) @db.Timestamptz(6)
-  users_refill_requests_from_user_idTousers User                   @relation("refill_requests_from_user_idTousers", fields: [from_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  users_refill_requests_processed_byTousers User?                  @relation("refill_requests_processed_byTousers", fields: [processed_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  wallets                                   Wallet                 @relation(fields: [to_wallet_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id                String                @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  fromUserId        String                @map("from_user_id") @db.Uuid
+  toWalletId        String                @map("to_wallet_id") @db.Uuid
+  amount            Decimal               @db.Decimal(15, 2)
+  currency          String?               @default("HTG") @db.VarChar(3)
+  status            RefillRequestStatus?  @map("status") @default(PENDING)
+  note              String?
+  processedBy       String?               @map("processed_by") @db.Uuid
+  processedAt       DateTime?             @map("processed_at") @db.Timestamptz(6)
+  expiresAt         DateTime?             @map("expires_at") @default(dbgenerated("(now() + '24:00:00'::interval)")) @db.Timestamptz(6)
+  stripePaymentId   String?               @map("stripe_payment_id") @db.VarChar(255)
+  paymentMethod     PaymentMethod?        @map("payment_method")
+  createdAt         DateTime?             @map("created_at") @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime?             @map("updated_at") @default(now()) @db.Timestamptz(6)
+  fromUser          User                  @relation("refill_requests_from_user_idTousers", fields: [fromUserId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  processedByUser   User?                 @relation("refill_requests_processed_byTousers", fields: [processedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  wallet            Wallet                @relation(fields: [toWalletId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   // 💰 Commission tracking for refill requests
-  commission_records CommissionRecord[]
+  commissionRecords CommissionRecord[]
 
-  @@index([from_user_id], map: "idx_refill_requests_from_user_id")
+  @@index([fromUserId], map: "idx_refill_requests_from_user_id")
   @@index([status], map: "idx_refill_requests_status")
-  @@index([to_wallet_id], map: "idx_refill_requests_to_wallet_id")
+  @@index([toWalletId], map: "idx_refill_requests_to_wallet_id")
   @@map("refill_requests")
 }
 
@@ -366,30 +366,6 @@ model ExchangeRate {
   @@map("exchange_rates")
 }
 
-model Payment {
-  id                    String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  user_id               String          @db.Uuid
-  amount                Decimal         @db.Decimal(15, 2)
-  currency              String          @default("HTG") @db.VarChar(3)
-  method                payment_method
-  status                payment_status  @default(PENDING)
-  description           String?
-  reference             String?         @unique @db.VarChar(100)
-  stripe_payment_intent_id String?      @unique @db.VarChar(255)
-  metadata              Json?
-  completed_at          DateTime?       @db.Timestamptz(6)
-  created_at            DateTime        @default(now()) @db.Timestamptz(6)
-  updated_at            DateTime        @default(now()) @db.Timestamptz(6)
-
-  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@index([user_id], map: "idx_payments_user_id")
-  @@index([status], map: "idx_payments_status")
-  @@index([method], map: "idx_payments_method")
-  @@index([created_at], map: "idx_payments_created_at")
-  @@map("payments")
-}
-
 model Notification {
   id           String               @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   user_id      String?              @db.Uuid
@@ -441,23 +417,23 @@ model KYCVerification {
 
 // 💳 Card Activity & Lifecycle Tracking
 model CardActivity {
-  id            String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  card_id       String             @db.Uuid
-  activity_type card_activity_type
-  old_status    card_status?
-  new_status    card_status?
-  performed_by  String?            @db.Uuid // Admin/Distributor who performed action
-  reason        String? // Reason for status change
-  location      Json? // GPS coordinates if applicable
-  metadata      Json? // Additional activity data
-  created_at    DateTime           @default(now()) @db.Timestamptz(6)
+  id           String            @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  cardId       String            @map("card_id") @db.Uuid
+  activityType CardActivityType  @map("activity_type")
+  oldStatus    CardStatus?       @map("old_status")
+  newStatus    CardStatus?       @map("new_status")
+  performedBy  String?           @map("performed_by") @db.Uuid // Admin/Distributor who performed action
+  reason       String? // Reason for status change
+  location     Json? // GPS coordinates if applicable
+  metadata     Json? // Additional activity data
+  createdAt    DateTime          @map("created_at") @default(now()) @db.Timestamptz(6)
 
-  card              Card  @relation(fields: [card_id], references: [id], onDelete: Cascade)
-  performed_by_user User? @relation(fields: [performed_by], references: [id])
+  card         Card  @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  performedByUser User? @relation(fields: [performedBy], references: [id])
 
-  @@index([card_id], map: "idx_card_activity_card_id")
-  @@index([activity_type], map: "idx_card_activity_type")
-  @@index([created_at], map: "idx_card_activity_created_at")
+  @@index([cardId], map: "idx_card_activity_card_id")
+  @@index([activityType], map: "idx_card_activity_type")
+  @@index([createdAt], map: "idx_card_activity_created_at")
   @@map("card_activities")
 }
 
@@ -561,23 +537,22 @@ model DeviceSession {
 
 // 🎁 Referral Code System for Growth
 model ReferralCode {
-  id            String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  code          String    @unique @db.VarChar(20)
-  created_by    String    @db.Uuid
-  target_role   user_role // Which role this code targets
-  reward_amount Decimal?  @db.Decimal(15, 2) // Bonus for successful referral
-  usage_limit   Int?      @default(1) // How many times it can be used
-  usage_count   Int       @default(0)
-  expires_at    DateTime? @db.Timestamptz(6)
-  is_active     Boolean   @default(true)
-  created_at    DateTime  @default(now()) @db.Timestamptz(6)
+  id           String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  code         String    @unique @db.VarChar(20)
+  createdBy    String    @map("created_by") @db.Uuid
+  targetRole   UserRole  @map("target_role") // Which role this code targets
+  rewardAmount Decimal?  @map("reward_amount") @db.Decimal(15, 2) // Bonus for successful referral
+  usageLimit   Int?      @map("usage_limit") @default(1) // How many times it can be used
+  usageCount   Int       @map("usage_count") @default(0)
+  expiresAt    DateTime? @map("expires_at") @db.Timestamptz(6)
+  isActive     Boolean   @map("is_active") @default(true)
+  createdAt    DateTime  @map("created_at") @default(now()) @db.Timestamptz(6)
 
-  created_by_user User          @relation(fields: [created_by], references: [id])
-  referral_uses   ReferralUse[]
+  createdByUser User          @relation(fields: [createdBy], references: [id])
+  referralUses  ReferralUse[]
 
   @@index([code], map: "idx_referral_code_code")
-  @@index([target_role], map: "idx_referral_code_target_role")
-  @@index([is_active], map: "idx_referral_code_is_active")
+  @@index([isActive], map: "idx_referral_code_is_active")
   @@map("referral_codes")
 }
 
@@ -709,32 +684,32 @@ model POSDevice {
 
 // 💳 Card Inventory & Batch Management
 model CardInventory {
-  id                   String            @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  batch_id             String            @unique @db.VarChar(30) // BATCH-HTG-20241201-001
-  distributor_id       String            @db.Uuid
-  card_type            card_type // NFC | VIRTUAL
-  quantity_ordered     Int // How many were ordered
-  quantity_received    Int? // How many actually arrived
-  quantity_distributed Int               @default(0) // How many given to merchants
-  quantity_remaining   Int // Current stock level
-  unit_cost            Decimal           @db.Decimal(10, 2) // Cost per card
-  total_cost           Decimal           @db.Decimal(15, 2) // Total batch cost
-  supplier             String?           @db.VarChar(200) // Card manufacturer
-  batch_status         card_batch_status @default(ORDERED) // ORDERED | SHIPPED | RECEIVED | DISTRIBUTED
-  ordered_at           DateTime          @default(now()) @db.Timestamptz(6)
-  shipped_at           DateTime?         @db.Timestamptz(6)
-  received_at          DateTime?         @db.Timestamptz(6)
-  expiry_date          DateTime?         @db.Date // When cards expire
-  notes                String? // Additional batch notes
-  created_at           DateTime          @default(now()) @db.Timestamptz(6)
-  updated_at           DateTime          @default(now()) @db.Timestamptz(6)
+  id                  String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  batchId             String           @unique @map("batch_id") @db.VarChar(30) // BATCH-HTG-20241201-001
+  distributorId       String           @map("distributor_id") @db.Uuid
+  cardType            CardType         @map("card_type") // NFC | VIRTUAL
+  quantityOrdered     Int              @map("quantity_ordered") // How many were ordered
+  quantityReceived    Int?             @map("quantity_received") // How many actually arrived
+  quantityDistributed Int              @map("quantity_distributed") @default(0) // How many given to merchants
+  quantityRemaining   Int              @map("quantity_remaining") // Current stock level
+  unitCost            Decimal          @map("unit_cost") @db.Decimal(10, 2) // Cost per card
+  totalCost           Decimal          @map("total_cost") @db.Decimal(15, 2) // Total batch cost
+  supplier            String?          @db.VarChar(200) // Card manufacturer
+  batchStatus         CardBatchStatus  @map("batch_status") @default(ORDERED) // ORDERED | SHIPPED | RECEIVED | DISTRIBUTED
+  orderedAt           DateTime         @map("ordered_at") @default(now()) @db.Timestamptz(6)
+  shippedAt           DateTime?        @map("shipped_at") @db.Timestamptz(6)
+  receivedAt          DateTime?        @map("received_at") @db.Timestamptz(6)
+  expiryDate          DateTime?        @map("expiry_date") @db.Date // When cards expire
+  notes               String? // Additional batch notes
+  createdAt           DateTime         @map("created_at") @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime         @map("updated_at") @default(now()) @db.Timestamptz(6)
 
-  distributor User @relation(fields: [distributor_id], references: [id])
+  distributor User @relation(fields: [distributorId], references: [id])
 
-  @@index([batch_id], map: "idx_card_inventory_batch_id")
-  @@index([distributor_id], map: "idx_card_inventory_distributor_id")
-  @@index([batch_status], map: "idx_card_inventory_status")
-  @@index([ordered_at], map: "idx_card_inventory_ordered_at")
+  @@index([batchId], map: "idx_card_inventory_batch_id")
+  @@index([distributorId], map: "idx_card_inventory_distributor_id")
+  @@index([batchStatus], map: "idx_card_inventory_status")
+  @@index([orderedAt], map: "idx_card_inventory_ordered_at")
   @@map("card_inventories")
 }
 
@@ -823,19 +798,23 @@ enum audit_action {
   ADMIN_ACTION
 }
 
-enum card_status {
+enum CardStatus {
   INACTIVE
   ACTIVE
   BLOCKED
   EXPIRED
   LOST
   STOLEN
+
+  @@map("card_status")
 }
 
-enum card_type {
+enum CardType {
   CLIENT
   MERCHANT
   DISTRIBUTOR
+
+  @@map("card_type")
 }
 
 enum notification_status {
@@ -853,7 +832,7 @@ enum notification_type {
   MARKETING
 }
 
-enum payment_method {
+enum PaymentMethod {
   NFC
   QR_CODE
   CARD
@@ -861,26 +840,32 @@ enum payment_method {
   CASH
   APPLE_PAY
   GOOGLE_PAY
+
+  @@map("payment_method")
 }
 
-enum refill_request_status {
+enum RefillRequestStatus {
   PENDING
   APPROVED
   REJECTED
   COMPLETED
   EXPIRED
+
+  @@map("refill_request_status")
 }
 
-enum transaction_status {
+enum TransactionStatus {
   PENDING
   PROCESSING
   COMPLETED
   FAILED
   CANCELLED
   REVERSED
+
+  @@map("transaction_status")
 }
 
-enum transaction_type {
+enum TransactionType {
   SEND
   RECEIVE
   REFILL
@@ -889,9 +874,11 @@ enum transaction_type {
   COMMISSION
   FEE
   EXCHANGE
+
+  @@map("transaction_type")
 }
 
-enum user_role {
+enum UserRole {
   CLIENT
   MERCHANT
   DISTRIBUTOR
@@ -900,20 +887,26 @@ enum user_role {
   SUPER_ADMIN
   REGIONAL_MANAGER
   SUPPORT_AGENT
+
+  @@map("user_role")
 }
 
-enum user_status {
+enum UserStatus {
   ACTIVE
   INACTIVE
   SUSPENDED
   BANNED
   PENDING_VERIFICATION
+
+  @@map("user_status")
 }
 
-enum wallet_status {
+enum WalletStatus {
   ACTIVE
   FROZEN
   SUSPENDED
+
+  @@map("wallet_status")
 }
 
 // 🔐 KYC Document Types
@@ -936,7 +929,7 @@ enum kyc_status {
 }
 
 // 💳 Card Activity Types
-enum card_activity_type {
+enum CardActivityType {
   ISSUED
   ACTIVATED
   BLOCKED
@@ -946,6 +939,8 @@ enum card_activity_type {
   EXPIRED
   DESTROYED
   REISSUED
+
+  @@map("card_activity_type")
 }
 
 // 💰 Commission Actor Roles
@@ -1054,13 +1049,15 @@ enum pos_device_status {
 }
 
 // 💳 Card Inventory Management Enums
-enum card_batch_status {
+enum CardBatchStatus {
   ORDERED
   SHIPPED
   IN_TRANSIT
   RECEIVED
   DISTRIBUTED
   CANCELLED
+
+  @@map("card_batch_status")
 }
 
 // ⚙️ App Configuration Enums
@@ -1121,12 +1118,31 @@ enum delivery_status {
   CLICKED
 }
 
-// 💳 Payment Status
+// Payment status enum for Payment model
 enum payment_status {
   PENDING
-  PROCESSING
-  COMPLETED
+  SUCCEEDED
   FAILED
-  CANCELLED
   REFUNDED
+  CANCELLED
+}
+
+model Payment {
+  id              String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId          String          @db.Uuid
+  method          PaymentMethod
+  status          payment_status  @default(PENDING)
+  amount          Decimal         @db.Decimal(15, 2)
+  currency        String          @default("HTG") @db.VarChar(3)
+  reference       String          @unique @db.VarChar(100)
+  stripePaymentId String?         @db.VarChar(255)
+  description     String?
+  createdAt       DateTime        @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime        @default(now()) @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "idx_payments_user_id")
+  @@index([status], map: "idx_payments_status")
+  @@map("payments")
 }
