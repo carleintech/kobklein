@@ -101,10 +101,11 @@ export default function DevModeToggle({
     <>
       {/* Floating Dev Button */}
       <motion.div
-        className="fixed bottom-6 right-6 z-50"
+        className="fixed bottom-6 right-6 z-[9999]"
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.3, delay: 1 }}
+        style={{ pointerEvents: 'auto' }}
       >
         <motion.div
           className="relative"
@@ -115,10 +116,16 @@ export default function DevModeToggle({
         >
           {/* Main Button */}
           <motion.button
-            onClick={() => setIsModalOpen(true)}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              console.log("🚀 Dev Mode Button Clicked!");
+              setIsModalOpen(true);
+            }}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
+                console.log("🚀 Dev Mode Button Activated via keyboard!");
                 setIsModalOpen(true);
               }
             }}
@@ -130,8 +137,9 @@ export default function DevModeToggle({
               rounded-2xl shadow-2xl flex items-center justify-center
               text-white hover:shadow-purple-500/25 transition-all duration-300
               border-2 border-purple-400/30 focus:outline-none focus:ring-4
-              focus:ring-purple-500/50 focus:border-purple-300
+              focus:ring-purple-500/50 focus:border-purple-300 cursor-pointer
             "
+            style={{ pointerEvents: 'auto', zIndex: 9999 }}
             whileHover={{ scale: 1.1, rotate: 5 }}
             whileTap={{ scale: 0.9 }}
             whileFocus={{ scale: 1.05 }}
@@ -151,8 +159,9 @@ export default function DevModeToggle({
                   absolute right-16 top-1/2 -translate-y-1/2
                   bg-slate-900/95 backdrop-blur-xl border border-slate-600
                   rounded-xl px-4 py-2 text-white text-sm font-medium
-                  shadow-xl whitespace-nowrap
+                  shadow-xl whitespace-nowrap z-[9999]
                 "
+                style={{ pointerEvents: 'none' }}
               >
                 <div className="flex items-center space-x-2">
                   <Zap className="h-4 w-4 text-purple-400" />
@@ -179,11 +188,26 @@ export default function DevModeToggle({
             className="
               absolute -top-2 -left-2 w-6 h-6 bg-red-500 rounded-full
               flex items-center justify-center text-white text-xs font-bold
-              border-2 border-white shadow-lg
+              border-2 border-white shadow-lg z-[9999]
             "
+            style={{ pointerEvents: 'none' }}
           >
             DEV
           </motion.div>
+
+          {/* Debug Indicator - Visible if component loads */}
+          {isDevelopment && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="
+                absolute -bottom-8 left-0 right-0 text-center
+                text-xs text-green-400 font-mono bg-black/50 rounded px-2 py-1
+              "
+            >
+              DEV MODE ACTIVE
+            </motion.div>
+          )}
 
           {/* Pulsing Ring */}
           <motion.div
