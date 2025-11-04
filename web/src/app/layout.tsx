@@ -1,5 +1,3 @@
-import DevModeToggle from "@/components/dev/DevModeToggle";
-import DevUserIndicator from "@/components/dev/DevUserIndicator";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 import PWAStatusBar from "@/components/PWAStatusBar";
 import { ClientOnly } from "@/components/ui/client-only";
@@ -100,12 +98,7 @@ export default function RootLayout({
                         showNetworkStatus={true}
                       />
                     </ClientOnly>
-                    <ClientOnly>
-                      <DevModeToggle />
-                    </ClientOnly>
-                    <ClientOnly>
-                      <DevUserIndicator />
-                    </ClientOnly>
+
                     <ClientOnly>
                       <PWAInstallPrompt />
                     </ClientOnly>
