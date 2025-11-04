@@ -79,7 +79,7 @@ function AuthProviderInner({ children }: { children: React.ReactNode }) {
   // Update authentication state based on token changes
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "kobklein_auth_tokens") {
+      if (e.key === "kobklein_auth_tokens" || e.key === "auth_token") {
         const hasToken = !!e.newValue;
         setIsAuthenticated(hasToken);
 
@@ -97,8 +97,8 @@ function AuthProviderInner({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string) => {
     try {
       const result = await loginMutation.mutateAsync({ email, password });
-      if (result.success && result.data?.tokens) {
-        apiClient.setToken(result.data.tokens.accessToken);
+      if (result.success && result.data?.token) {
+        apiClient.setToken(result.data.token);
         setIsAuthenticated(true);
       } else {
         const errorMessage =
@@ -136,8 +136,8 @@ function AuthProviderInner({ children }: { children: React.ReactNode }) {
   }) => {
     try {
       const result = await registerMutation.mutateAsync(userData);
-      if (result.success && result.data?.tokens) {
-        apiClient.setToken(result.data.tokens.accessToken);
+      if (result.success && result.data?.token) {
+        apiClient.setToken(result.data.token);
         setIsAuthenticated(true);
       } else {
         const errorMessage =

@@ -27,7 +27,7 @@ export const authApi = {
   async login(
     email: string,
     password: string
-  ): Promise<ApiResponse<{ user: User; tokens: any }>> {
+  ): Promise<ApiResponse<{ user: User; token: string }>> {
     return apiClient.post(
       "/auth/login",
       { email, password },
@@ -42,7 +42,7 @@ export const authApi = {
     firstName: string;
     lastName: string;
     role: string;
-  }): Promise<ApiResponse<{ user: User; tokens: any }>> {
+  }): Promise<ApiResponse<{ user: User; token: string }>> {
     return apiClient.post("/auth/register", userData, { requireAuth: false });
   },
 
