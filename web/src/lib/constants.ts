@@ -175,9 +175,9 @@ export const ROUTES = {
     home: "/",
     about: "/about",
     contact: "/contact",
-    login: "/auth/login",
-    register: "/auth/register",
-    forgotPassword: "/auth/forgot-password",
+    login: "/auth/signin",
+    register: "/auth/signup",
+    forgotPassword: "/auth/reset",
   },
   client: {
     dashboard: "/client/dashboard",
