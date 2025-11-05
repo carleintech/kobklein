@@ -137,7 +137,10 @@ export default function ModernSignUpForm() {
 
   // Detect user location on component mount
   useEffect(() => {
-    detectLocation();
+    detectLocation().catch((err) => {
+      // Silently fail location detection
+      console.error("Location detection failed:", err);
+    });
   }, []);
 
   const detectLocation = async () => {
@@ -149,37 +152,57 @@ export default function ModernSignUpForm() {
         navigator.geolocation.getCurrentPosition(
           async (position) => {
             const { latitude, longitude } = position.coords;
-            await reverseGeocode(latitude, longitude);
+            await reverseGeocode(latitude, longitude).catch(() => {
+              // If reverse geocoding fails, try IP fallback
+              detectLocationByIP().catch(() => {
+                // If IP detection also fails, use defaults
+                setDefaultLocation();
+              });
+            });
           },
           async () => {
             // Geolocation failed or denied, fallback to IP-based detection
-            await detectLocationByIP();
+            await detectLocationByIP().catch(() => {
+              setDefaultLocation();
+            });
           },
           { timeout: 5000 }
         );
       } else {
         // Geolocation not supported, fallback to IP-based detection
-        await detectLocationByIP();
+        await detectLocationByIP().catch(() => {
+          setDefaultLocation();
+        });
       }
     } catch (error) {
       console.error("Location detection error:", error);
-      // Default to Haiti if all else fails
-      setLocationData({
-        country: "HT",
-        countryCode: "+509",
-        region: "Ouest",
-        timezone: "America/Port-au-Prince",
-      });
-      setLocationLoading(false);
+      setDefaultLocation();
     }
+  };
+
+  const setDefaultLocation = () => {
+    // Default to Haiti if all else fails
+    setLocationData({
+      country: "HT",
+      countryCode: "+509",
+      region: "Ouest",
+      timezone: "America/Port-au-Prince",
+    });
+    setLocationLoading(false);
   };
 
   const reverseGeocode = async (latitude: number, longitude: number) => {
     try {
       // Use a free reverse geocoding service
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+        `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
+        { signal: AbortSignal.timeout(5000) }
       );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
 
       const countryCode = data.address?.country_code?.toUpperCase() || "HT";
@@ -192,18 +215,24 @@ export default function ModernSignUpForm() {
         region: data.address?.state || data.address?.region || "",
         timezone,
       });
+      setLocationLoading(false);
     } catch (error) {
       console.error("Reverse geocoding error:", error);
-      await detectLocationByIP();
-    } finally {
-      setLocationLoading(false);
+      throw error; // Let the caller handle the error
     }
   };
 
   const detectLocationByIP = async () => {
     try {
       // Use ipapi.co for IP-based geolocation (free tier: 1000 requests/day)
-      const response = await fetch("https://ipapi.co/json/");
+      const response = await fetch("https://ipapi.co/json/", {
+        signal: AbortSignal.timeout(5000),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
 
       setLocationData({
@@ -214,17 +243,10 @@ export default function ModernSignUpForm() {
           data.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
         ipAddress: data.ip,
       });
+      setLocationLoading(false);
     } catch (error) {
       console.error("IP geolocation error:", error);
-      // Default to Haiti
-      setLocationData({
-        country: "HT",
-        countryCode: "+509",
-        region: "Ouest",
-        timezone: "America/Port-au-Prince",
-      });
-    } finally {
-      setLocationLoading(false);
+      throw error; // Let the caller handle the error
     }
   };
 

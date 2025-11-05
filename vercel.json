@@ -1,8 +1,12 @@
 {
   "version": 2,
   "framework": "nextjs",
-  "rootDirectory": "web",
-  "regions": ["iad1"],
+  "buildCommand": "cd web && pnpm build",
+  "outputDirectory": "web/.next",
+  "installCommand": "pnpm install",
+  "regions": [
+    "iad1"
+  ],
   "headers": [
     {
       "source": "/videos/(.*)",
@@ -12,7 +16,7 @@
           "value": "public, max-age=31536000, immutable"
         },
         {
-          "key": "Content-Type", 
+          "key": "Content-Type",
           "value": "video/mp4"
         }
       ]
