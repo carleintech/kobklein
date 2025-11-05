@@ -15,6 +15,7 @@ import {
 import { NfcPaymentsService } from './nfc-payments.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
+import { extractError } from '../../utils/error.utils';
 
 interface NFCPaymentData {
   amount: number;
@@ -81,10 +82,11 @@ export class NfcPaymentsController {
         message: 'NFC payment session initiated'
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error initiating NFC payment', error);
       throw new HttpException(
-        error.message || 'Failed to initiate NFC payment',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to initiate NFC payment',
+        err.status || HttpStatus.BAD_REQUEST
       );
     }
   }
@@ -117,10 +119,11 @@ export class NfcPaymentsController {
         message: result.requiresConfirmation ? 'Payment requires confirmation' : 'NFC payment processed successfully'
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error processing NFC payment', error);
       throw new HttpException(
-        error.message || 'Failed to process NFC payment',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to process NFC payment',
+        err.status || HttpStatus.BAD_REQUEST
       );
     }
   }
@@ -160,10 +163,11 @@ export class NfcPaymentsController {
         message: 'NFC payment confirmed successfully'
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error confirming NFC payment', error);
       throw new HttpException(
-        error.message || 'Failed to confirm NFC payment',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to confirm NFC payment',
+        err.status || HttpStatus.BAD_REQUEST
       );
     }
   }
@@ -193,10 +197,11 @@ export class NfcPaymentsController {
         }
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting NFC sessions', error);
       throw new HttpException(
-        error.message || 'Failed to get NFC sessions',
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR
+        err.message || 'Failed to get NFC sessions',
+        err.status || HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }
@@ -221,10 +226,11 @@ export class NfcPaymentsController {
         data: session
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting NFC session', error);
       throw new HttpException(
-        error.message || 'Failed to get NFC session',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to get NFC session',
+        err.status || HttpStatus.BAD_REQUEST
       );
     }
   }
@@ -246,10 +252,11 @@ export class NfcPaymentsController {
         message: 'NFC session cancelled successfully'
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error cancelling NFC session', error);
       throw new HttpException(
-        error.message || 'Failed to cancel NFC session',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to cancel NFC session',
+        err.status || HttpStatus.BAD_REQUEST
       );
     }
   }
@@ -272,10 +279,11 @@ export class NfcPaymentsController {
         data: analytics
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting NFC analytics', error);
       throw new HttpException(
-        error.message || 'Failed to get NFC analytics',
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR
+        err.message || 'Failed to get NFC analytics',
+        err.status || HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }
@@ -297,10 +305,11 @@ export class NfcPaymentsController {
         data: capabilities
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error checking NFC capabilities', error);
       throw new HttpException(
-        error.message || 'Failed to check NFC capabilities',
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR
+        err.message || 'Failed to check NFC capabilities',
+        err.status || HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }
@@ -327,10 +336,11 @@ export class NfcPaymentsController {
         data: merchants
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting nearby merchants', error);
       throw new HttpException(
-        error.message || 'Failed to get nearby merchants',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to get nearby merchants',
+        err.status || HttpStatus.BAD_REQUEST
       );
     }
   }

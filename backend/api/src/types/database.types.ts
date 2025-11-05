@@ -11,8 +11,10 @@ export enum UserRole {
   SUPPORT = 'SUPPORT',
   COMPLIANCE = 'COMPLIANCE',
   MERCHANT = 'MERCHANT',
+  DISTRIBUTOR = 'DISTRIBUTOR',
   AGENT = 'AGENT',
-  CLIENT = 'CLIENT',
+  INDIVIDUAL = 'INDIVIDUAL',
+  DIASPORA = 'DIASPORA',
 }
 
 export enum UserStatus {
@@ -379,7 +381,10 @@ export interface WalletAnalytics {
   totalBalance: Record<CurrencyCode, number>;
   totalTransactions: number;
   transactionVolume: Record<CurrencyCode, number>;
-  byTransactionType: Record<WalletTransactionType, { count: number; amount: number }>;
+  byTransactionType: Record<
+    WalletTransactionType,
+    { count: number; amount: number }
+  >;
   byMonth: {
     month: string;
     transactions: number;

@@ -10,14 +10,24 @@ async function bootstrap() {
   app.setGlobalPrefix('api/v1');
 
   // Enable CORS for frontend communication
+  const corsOrigins = [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://localhost:3002',
+    'http://localhost:3003',
+    'https://kobklein.com',
+    'https://www.kobklein.com',
+    'https://kobklein.vercel.app',
+  ];
+
+  // Add CORS_ORIGIN from env (can be comma-separated)
+  if (process.env.CORS_ORIGIN) {
+    const envOrigins = process.env.CORS_ORIGIN.split(',').map(o => o.trim());
+    corsOrigins.push(...envOrigins);
+  }
+
   app.enableCors({
-    origin: [
-      'http://localhost:3000',
-      'https://kobklein.com',
-      'https://www.kobklein.com',
-      'https://kobklein.vercel.app',
-      process.env.CORS_ORIGIN || 'http://localhost:3000',
-    ].filter(Boolean),
+    origin: [...new Set(corsOrigins)].filter(Boolean),
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],

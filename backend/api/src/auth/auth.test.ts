@@ -8,6 +8,7 @@
 import { AuthService } from './auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { extractError } from '../utils/error.utils';
 
 // Mock implementations for testing
 class MockJwtService extends JwtService {
@@ -73,7 +74,8 @@ async function testAuthService() {
     console.log('🎉 Auth Service basic functionality test passed!');
     
   } catch (error) {
-    console.error('❌ Auth Service test failed:', error.message);
+      const err = extractError(error);
+    console.error('❌ Auth Service test failed:', err.message);
     throw error;
   }
 }

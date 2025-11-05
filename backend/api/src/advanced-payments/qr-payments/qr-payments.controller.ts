@@ -16,6 +16,7 @@ import {
 import { QrPaymentsService } from './qr-payments.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
+import { extractError } from '../../utils/error.utils';
 
 interface QRPaymentData {
   type: 'payment' | 'request' | 'merchant';
@@ -83,10 +84,11 @@ export class QrPaymentsController {
         message: 'QR code generated successfully'
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error generating QR code', error);
       throw new HttpException(
-        error.message || 'Failed to generate QR code',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to generate QR code',
+        err.status || HttpStatus.BAD_REQUEST
       );
     }
   }
@@ -116,10 +118,11 @@ export class QrPaymentsController {
         message: scanResult.valid ? 'QR code scanned successfully' : 'Invalid QR code'
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error scanning QR code', error);
       throw new HttpException(
-        error.message || 'Failed to scan QR code',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to scan QR code',
+        err.status || HttpStatus.BAD_REQUEST
       );
     }
   }
@@ -156,10 +159,11 @@ export class QrPaymentsController {
         message: 'QR payment processed successfully'
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error processing QR payment', error);
       throw new HttpException(
-        error.message || 'Failed to process QR payment',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to process QR payment',
+        err.status || HttpStatus.BAD_REQUEST
       );
     }
   }
@@ -189,10 +193,11 @@ export class QrPaymentsController {
         }
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting QR history', error);
       throw new HttpException(
-        error.message || 'Failed to get QR history',
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR
+        err.message || 'Failed to get QR history',
+        err.status || HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }
@@ -218,10 +223,11 @@ export class QrPaymentsController {
         data: qrCode
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting QR code', error);
       throw new HttpException(
-        error.message || 'Failed to get QR code',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to get QR code',
+        err.status || HttpStatus.BAD_REQUEST
       );
     }
   }
@@ -243,10 +249,11 @@ export class QrPaymentsController {
         message: 'QR code deactivated successfully'
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error deactivating QR code', error);
       throw new HttpException(
-        error.message || 'Failed to deactivate QR code',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to deactivate QR code',
+        err.status || HttpStatus.BAD_REQUEST
       );
     }
   }
@@ -269,10 +276,11 @@ export class QrPaymentsController {
         data: analytics
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting QR analytics', error);
       throw new HttpException(
-        error.message || 'Failed to get QR analytics',
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR
+        err.message || 'Failed to get QR analytics',
+        err.status || HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }

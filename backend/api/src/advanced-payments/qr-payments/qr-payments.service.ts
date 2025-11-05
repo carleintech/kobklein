@@ -5,6 +5,7 @@ import { PaymentMethod, CurrencyCode } from '../../types/database.types';
 import { CreatePaymentDto } from '../../payments/dto/create-enhanced-payment.dto';
 // Note: QRCode package needs to be installed: npm install qrcode @types/qrcode
 import * as crypto from 'crypto';
+import { extractError } from '../../utils/error.utils';
 
 interface QRPaymentData {
   type: 'payment' | 'request' | 'merchant';
@@ -133,9 +134,10 @@ export class QrPaymentsService {
       };
 
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error generating QR code', error);
       throw new HttpException(
-        error.message || 'Failed to generate QR code',
+        err.message || 'Failed to generate QR code',
         HttpStatus.BAD_REQUEST
       );
     }
@@ -219,6 +221,7 @@ export class QrPaymentsService {
       };
 
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error scanning QR code', error);
       throw error;
     }
@@ -291,6 +294,7 @@ export class QrPaymentsService {
       return payment;
 
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error processing QR payment', error);
       throw error;
     }
@@ -328,6 +332,7 @@ export class QrPaymentsService {
       };
 
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting QR history', error);
       throw error;
     }
@@ -353,6 +358,7 @@ export class QrPaymentsService {
       return qrCode;
 
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting QR code', error);
       throw error;
     }
@@ -385,6 +391,7 @@ export class QrPaymentsService {
       return qrCode;
 
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error deactivating QR code', error);
       throw error;
     }
@@ -438,6 +445,7 @@ export class QrPaymentsService {
       return analytics;
 
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting QR analytics', error);
       throw error;
     }

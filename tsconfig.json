@@ -1,4 +1,7 @@
 {
   "compilerOptions": {},
-  "extends": "expo/tsconfig.base"
+  "extends": "./backend/api/tsconfig.json",
+  "include": [
+    "**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"
+  ]
 }

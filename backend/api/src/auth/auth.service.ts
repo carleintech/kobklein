@@ -1,19 +1,26 @@
 import {
-  ConflictException,
-  Injectable,
-  UnauthorizedException,
   BadRequestException,
+  ConflictException,
   ForbiddenException,
+  Injectable,
+  Logger,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
-import { Logger } from '@nestjs/common';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 // Removed Prisma dependency - using Supabase directly
+import {
+  CurrencyCode,
+  KycStatus,
+  KycTier,
+  UserRole,
+  UserStatus,
+} from '../types/database.types';
+import { extractError } from '../utils/error.utils';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
-import { UserRole, KycStatus, KycTier, UserStatus, CurrencyCode } from '../types/database.types';
 
 @Injectable()
 export class AuthService {
@@ -44,10 +51,68 @@ export class AuthService {
       lastName,
       phone,
       country = 'HT',
+      countryCode,
+      region,
+      timezone,
+      ipAddress,
+      role = UserRole.INDIVIDUAL,
+      businessName,
+      legalBusinessName,
+      businessRegistrationNumber,
+      businessAddress,
       preferredCurrency = 'HTG' as CurrencyCode,
     } = registerDto;
 
     this.logger.log(`Registration attempt for email: ${email}`);
+
+    // Validate role-specific required fields
+    if (role === UserRole.MERCHANT && !businessName) {
+      throw new ConflictException('Business name is required for Merchants');
+    }
+
+    if (role === UserRole.DISTRIBUTOR) {
+      if (!legalBusinessName) {
+        throw new ConflictException(
+          'Legal business name is required for Distributors',
+        );
+      }
+      if (!businessRegistrationNumber) {
+        throw new ConflictException(
+          'Business registration number is required for Distributors',
+        );
+      }
+      if (!businessAddress) {
+        throw new ConflictException(
+          'Business address is required for Distributors',
+        );
+      }
+    }
+
+    // Check for existing email
+    const { data: existingEmail } = await this.supabase
+      .from('users')
+      .select('id')
+      .eq('email', email)
+      .single();
+
+    if (existingEmail) {
+      throw new ConflictException(
+        'An account with this email already exists. Please sign in or use a different email.',
+      );
+    }
+
+    // Check for existing phone
+    const { data: existingPhone } = await this.supabase
+      .from('users')
+      .select('id')
+      .eq('phone', phone)
+      .single();
+
+    if (existingPhone) {
+      throw new ConflictException(
+        'An account with this phone number already exists. Please use a different phone number.',
+      );
+    }
 
     try {
       // Create user in Supabase Auth first
@@ -61,24 +126,78 @@ export class AuthService {
             last_name: lastName,
             phone,
             country,
+            country_code: countryCode,
+            region,
+            timezone,
+            ip_address: ipAddress,
+            role,
+            business_name: businessName,
+            legal_business_name: legalBusinessName,
+            business_registration_number: businessRegistrationNumber,
+            business_address: businessAddress,
             preferred_currency: preferredCurrency,
           },
         });
 
       if (authError) {
         this.logger.error(`Supabase auth error: ${authError.message}`);
+
+        // Provide helpful error message for duplicate email
+        if (authError.message.includes('already been registered')) {
+          throw new ConflictException(
+            'An account with this email already exists. Please sign in or use a different email.',
+          );
+        }
+
         throw new ConflictException(authError.message);
       }
 
-      // The user profile will be automatically created via database trigger
+      // The user profile should be automatically created via database trigger
       // Wait a moment for trigger to complete
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Verify user was created in our schema
-      const user = await this.getUserProfile(authData.user.id);
-      
+      let user = await this.getUserProfile(authData.user.id);
+
+      // If trigger didn't fire (common in local dev), create user record manually
       if (!user) {
-        throw new ConflictException('Failed to create user profile');
+        this.logger.warn(
+          `User trigger didn't fire for ${authData.user.id}, creating manually`,
+        );
+
+        // Create minimal user record (only required fields to avoid schema mismatches)
+        const { data: newUser, error: userError } = await this.supabase
+          .from('users')
+          .insert({
+            id: authData.user.id,
+            email,
+            first_name: firstName,
+            last_name: lastName,
+            phone,
+            country,
+            country_code: countryCode,
+            region,
+            timezone,
+            ip_address: ipAddress,
+            status: UserStatus.ACTIVE,
+          })
+          .select()
+          .single();
+
+        if (userError) {
+          this.logger.error(
+            `Failed to create user record: ${userError.message}`,
+          );
+          // Still throw error but don't block - user exists in Auth
+          throw new ConflictException('Failed to create user profile');
+        }
+
+        user = {
+          ...newUser,
+          user_roles: [],
+          user_profiles: null,
+          user_wallets: [],
+        };
       }
 
       this.logger.log(`User registered successfully: ${user.id}`);
@@ -92,7 +211,8 @@ export class AuthService {
         message: 'Registration successful. Please verify your email.',
       };
     } catch (error) {
-      this.logger.error(`Registration failed for ${email}:`, error.message);
+      const err = extractError(error);
+      this.logger.error(`Registration failed for ${email}:`, err.message);
       throw error;
     }
   }
@@ -141,7 +261,8 @@ export class AuthService {
         message: 'Login successful',
       };
     } catch (error) {
-      this.logger.error(`Login error for ${email}:`, error.message);
+      const err = extractError(error);
+      this.logger.error(`Login error for ${email}:`, err.message);
       throw error;
     }
   }
@@ -178,61 +299,50 @@ export class AuthService {
   }
 
   // Helper Methods for Enhanced Authentication
-  
+
   private async getUserProfile(userId: string) {
     try {
+      // First, get the basic user record
       const { data, error } = await this.supabase
         .from('users')
-        .select(`
-          *,
-          user_roles(
-            role,
-            granted_by,
-            granted_at,
-            expires_at
-          ),
-          user_profiles(
-            date_of_birth,
-            nationality,
-            occupation,
-            address,
-            kyc_status,
-            kyc_tier,
-            kyc_verified_at,
-            kyc_documents
-          ),
-          user_wallets(
-            id,
-            currency,
-            balance,
-            status,
-            wallet_type
-          )
-        `)
+        .select('*')
         .eq('id', userId)
         .single();
 
       if (error) {
-        this.logger.error(`Failed to fetch user profile: ${error.message}`);
+        const err = extractError(error);
+        this.logger.error(`Failed to fetch user profile: ${err.message}`);
         return null;
       }
 
-      return data;
+      // TODO: Add related data queries when tables are properly set up
+      // For now, return the basic user with empty arrays for related data
+      return {
+        ...data,
+        user_roles: [],
+        user_profiles: null,
+        user_wallets: [],
+      };
     } catch (error) {
-      this.logger.error(`Database error fetching user: ${error.message}`);
+      const err = extractError(error);
+      this.logger.error(`Database error fetching user: ${err.message}`);
       return null;
     }
   }
 
   private async generateAccessToken(user: any) {
-    const roles = user.user_roles?.map((ur: any) => ur.role) || [UserRole.CLIENT];
-    const primaryWallet = user.user_wallets?.find((w: any) => w.wallet_type === 'PRIMARY');
-    
+    const roles = user.user_roles?.map((ur: any) => ur.role) || [
+      UserRole.INDIVIDUAL,
+    ];
+    const primaryWallet = user.user_wallets?.find(
+      (w: any) => w.wallet_type === 'PRIMARY',
+    );
+
     const payload = {
       sub: user.id,
       email: user.email,
       roles,
-      primaryRole: roles[0] || UserRole.CLIENT,
+      primaryRole: roles[0] || UserRole.INDIVIDUAL,
       status: user.status,
       kycStatus: user.user_profiles?.kyc_status || KycStatus.PENDING,
       kycTier: user.user_profiles?.kyc_tier || KycTier.TIER_0,
@@ -240,7 +350,7 @@ export class AuthService {
       country: user.country,
       preferredCurrency: user.preferred_currency,
       iat: Math.floor(Date.now() / 1000),
-      exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60), // 24 hours
+      exp: Math.floor(Date.now() / 1000) + 24 * 60 * 60, // 24 hours
     };
 
     return this.jwtService.sign(payload);
@@ -261,7 +371,7 @@ export class AuthService {
       preferredCurrency: user.preferred_currency,
       status: user.status,
       roles,
-      primaryRole: roles[0] || UserRole.CLIENT,
+      primaryRole: roles[0] || UserRole.INDIVIDUAL,
       kycStatus: profile.kyc_status || KycStatus.PENDING,
       kycTier: profile.kyc_tier || KycTier.TIER_0,
       wallets: wallets.map((w: any) => ({
@@ -284,31 +394,37 @@ export class AuthService {
         .update({ last_login_at: new Date().toISOString() })
         .eq('id', userId);
     } catch (error) {
-      this.logger.warn(`Failed to update last login for ${userId}:`, error.message);
+      const err = extractError(error);
+      this.logger.warn(
+        `Failed to update last login for ${userId}:`,
+        err.message,
+      );
     }
   }
 
   // Role and Permission Methods
-  
+
   async assignRole(userId: string, role: UserRole, grantedBy: string) {
     try {
-      const { error } = await this.supabase
-        .from('user_roles')
-        .insert({
-          user_id: userId,
-          role,
-          granted_by: grantedBy,
-          granted_at: new Date().toISOString(),
-        });
+      const { error } = await this.supabase.from('user_roles').insert({
+        user_id: userId,
+        role,
+        granted_by: grantedBy,
+        granted_at: new Date().toISOString(),
+      });
 
       if (error) {
-        throw new BadRequestException(`Failed to assign role: ${error.message}`);
+        const err = extractError(error);
+        throw new BadRequestException(`Failed to assign role: ${err.message}`);
       }
 
-      this.logger.log(`Role ${role} assigned to user ${userId} by ${grantedBy}`);
+      this.logger.log(
+        `Role ${role} assigned to user ${userId} by ${grantedBy}`,
+      );
       return { success: true };
     } catch (error) {
-      this.logger.error(`Role assignment error:`, error.message);
+      const err = extractError(error);
+      this.logger.error(`Role assignment error:`, err.message);
       throw error;
     }
   }
@@ -322,13 +438,15 @@ export class AuthService {
         .eq('role', role);
 
       if (error) {
-        throw new BadRequestException(`Failed to revoke role: ${error.message}`);
+        const err = extractError(error);
+        throw new BadRequestException(`Failed to revoke role: ${err.message}`);
       }
 
       this.logger.log(`Role ${role} revoked from user ${userId}`);
       return { success: true };
     } catch (error) {
-      this.logger.error(`Role revocation error:`, error.message);
+      const err = extractError(error);
+      this.logger.error(`Role revocation error:`, err.message);
       throw error;
     }
   }
@@ -343,15 +461,17 @@ export class AuthService {
         .or('expires_at.gt.' + new Date().toISOString());
 
       if (error) {
-        this.logger.error(`Failed to fetch user roles: ${error.message}`);
-        return [UserRole.CLIENT];
+        const err = extractError(error);
+        this.logger.error(`Failed to fetch user roles: ${err.message}`);
+        return [UserRole.INDIVIDUAL];
       }
 
       const roles = data.map((r: any) => r.role);
-      return roles.length > 0 ? roles : [UserRole.CLIENT];
+      return roles.length > 0 ? roles : [UserRole.INDIVIDUAL];
     } catch (error) {
-      this.logger.error(`Role fetch error:`, error.message);
-      return [UserRole.CLIENT];
+      const err = extractError(error);
+      this.logger.error(`Role fetch error:`, err.message);
+      return [UserRole.INDIVIDUAL];
     }
   }
 
@@ -362,11 +482,11 @@ export class AuthService {
 
   async hasAnyRole(userId: string, roles: UserRole[]): Promise<boolean> {
     const userRoles = await this.getUserRoles(userId);
-    return roles.some(role => userRoles.includes(role));
+    return roles.some((role) => userRoles.includes(role));
   }
 
   // Email and Password Management
-  
+
   async sendEmailVerification(userId: string) {
     try {
       const userProfile = await this.getUserProfile(userId);
@@ -381,12 +501,16 @@ export class AuthService {
       });
 
       if (error) {
-        throw new BadRequestException(`Failed to send verification: ${error.message}`);
+        const err = extractError(error);
+        throw new BadRequestException(
+          `Failed to send verification: ${err.message}`,
+        );
       }
 
       return { success: true, message: 'Verification email sent' };
     } catch (error) {
-      this.logger.error(`Email verification error:`, error.message);
+      const err = extractError(error);
+      this.logger.error(`Email verification error:`, err.message);
       throw error;
     }
   }
@@ -398,31 +522,38 @@ export class AuthService {
       });
 
       if (error) {
-        throw new BadRequestException(`Failed to send reset email: ${error.message}`);
+        const err = extractError(error);
+        throw new BadRequestException(
+          `Failed to send reset email: ${err.message}`,
+        );
       }
 
       return { success: true, message: 'Password reset email sent' };
     } catch (error) {
-      this.logger.error(`Password reset error:`, error.message);
+      const err = extractError(error);
+      this.logger.error(`Password reset error:`, err.message);
       throw error;
     }
   }
 
   async updatePassword(userId: string, newPassword: string) {
     try {
-      const { error } = await this.supabase.auth.admin.updateUserById(
-        userId,
-        { password: newPassword }
-      );
+      const { error } = await this.supabase.auth.admin.updateUserById(userId, {
+        password: newPassword,
+      });
 
       if (error) {
-        throw new BadRequestException(`Failed to update password: ${error.message}`);
+        const err = extractError(error);
+        throw new BadRequestException(
+          `Failed to update password: ${err.message}`,
+        );
       }
 
       this.logger.log(`Password updated for user ${userId}`);
       return { success: true, message: 'Password updated successfully' };
     } catch (error) {
-      this.logger.error(`Password update error:`, error.message);
+      const err = extractError(error);
+      this.logger.error(`Password update error:`, err.message);
       throw error;
     }
   }

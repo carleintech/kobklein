@@ -4,6 +4,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { AuthService } from '../auth.service';
 import { JwtPayload } from '../../types/database.types';
+import { extractError } from '../../utils/error.utils';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -56,7 +57,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       this.logger.debug(`JWT validation successful for user: ${user.id}`);
       return userContext;
     } catch (error) {
-      this.logger.error(`JWT validation error:`, error.message);
+      const err = extractError(error);
+      this.logger.error(`JWT validation error:`, err.message);
       throw new UnauthorizedException('Invalid token');
     }
   }

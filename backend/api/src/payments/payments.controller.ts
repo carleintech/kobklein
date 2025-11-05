@@ -1,41 +1,42 @@
 import {
+  Body,
   Controller,
   Get,
-  Post,
-  Patch,
-  Delete,
-  Param,
-  Body,
-  Query,
-  Request,
-  UseGuards,
+  Headers,
   HttpException,
   HttpStatus,
   Logger,
-  Headers,
+  Param,
+  Patch,
+  Post,
+  Query,
   RawBodyRequest,
-  Req
+  Req,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
-import { PaymentsService } from './payments.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
-import { UserRole, PaymentStatus, PaymentMethod, PaymentProcessor } from '../types/database.types';
+import {
+  PaymentMethod,
+  PaymentProcessor,
+  PaymentStatus,
+  UserRole,
+} from '../types/database.types';
+import { extractError } from '../utils/error.utils';
 import {
   CreatePaymentDto,
-  ProcessWebhookDto,
-  PaymentCallbackDto,
-  RefundPaymentDto,
   PaymentAnalyticsDto,
-  FraudCheckDto,
-  PaymentRetryDto,
+  PaymentSearchDto,
+  ProcessWebhookDto,
   UpdatePaymentDto,
-  PaymentSearchDto
 } from './dto/create-enhanced-payment.dto';
+import { PaymentsService } from './payments.service';
 
 @Controller('payments')
 export class PaymentsController {
   private readonly logger = new Logger(PaymentsController.name);
-  
+
   constructor(private readonly paymentsService: PaymentsService) {}
 
   // ==============================
@@ -43,16 +44,27 @@ export class PaymentsController {
   // ==============================
   @Post('create')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  async createPayment(@Request() req: any, @Body() createPaymentDto: CreatePaymentDto) {
+  async createPayment(
+    @Request() req: any,
+    @Body() createPaymentDto: CreatePaymentDto,
+  ) {
     try {
       // Extract user context
       const userId = req.user.id;
       const userRole = req.user.primaryRole || req.user.role;
 
       // Validate user permissions
-      const allowedRoles = [UserRole.CLIENT, UserRole.MERCHANT, UserRole.AGENT, UserRole.ADMIN];
+      const allowedRoles = [
+        UserRole.INDIVIDUAL,
+        UserRole.MERCHANT,
+        UserRole.AGENT,
+        UserRole.ADMIN,
+      ];
       if (!allowedRoles.includes(userRole)) {
-        throw new HttpException('Insufficient permissions to create payments', HttpStatus.FORBIDDEN);
+        throw new HttpException(
+          'Insufficient permissions to create payments',
+          HttpStatus.FORBIDDEN,
+        );
       }
 
       // Add request context to DTO
@@ -62,24 +74,31 @@ export class PaymentsController {
           ...createPaymentDto.metadata,
           userAgent: req.headers['user-agent'],
           ipAddress: req.ip || req.connection.remoteAddress,
-          userRole
-        }
+          userRole,
+        },
       };
 
-      const payment = await this.paymentsService.createPayment(userId, enhancedDto);
-      
-      this.logger.log(`Payment created successfully: ${payment.referenceId}`, { userId, amount: payment.amount });
-      
+      const payment = await this.paymentsService.createPayment(
+        userId,
+        enhancedDto,
+      );
+
+      this.logger.log(`Payment created successfully: ${payment.referenceId}`, {
+        userId,
+        amount: payment.amount,
+      });
+
       return {
         success: true,
         data: payment,
-        message: 'Payment created successfully'
+        message: 'Payment created successfully',
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error creating payment', error);
       throw new HttpException(
-        error.message || 'Failed to create payment',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to create payment',
+        err.status || HttpStatus.BAD_REQUEST,
       );
     }
   }
@@ -92,10 +111,13 @@ export class PaymentsController {
   async searchPayments(@Request() req: any, @Query() query: any) {
     try {
       const userRole = req.user.primaryRole || req.user.role;
-      
+
       // Build search criteria
       const searchDto: PaymentSearchDto = {
-        userId: userRole === UserRole.ADMIN || userRole === UserRole.SUPER_ADMIN ? query.userId : req.user.id,
+        userId:
+          userRole === UserRole.ADMIN || userRole === UserRole.SUPER_ADMIN
+            ? query.userId
+            : req.user.id,
         status: query.status,
         processor: query.processor,
         paymentMethod: query.paymentMethod,
@@ -109,7 +131,7 @@ export class PaymentsController {
         page: parseInt(query.page) || 1,
         limit: Math.min(parseInt(query.limit) || 20, 100), // Max 100 per page
         sortBy: query.sortBy || 'createdAt',
-        sortOrder: query.sortOrder || 'desc'
+        sortOrder: query.sortOrder || 'desc',
       };
 
       const result = await this.paymentsService.searchPayments(searchDto);
@@ -118,13 +140,14 @@ export class PaymentsController {
         success: true,
         data: result.payments,
         pagination: result.pagination,
-        total: result.total
+        total: result.total,
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error searching payments', error);
       throw new HttpException(
-        error.message || 'Failed to search payments',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to search payments',
+        err.status || HttpStatus.BAD_REQUEST,
       );
     }
   }
@@ -137,9 +160,14 @@ export class PaymentsController {
   async getAnalytics(@Request() req: any, @Query() query: any) {
     try {
       const userRole = req.user.primaryRole || req.user.role;
-      
+
       // Admin and managers can see all analytics, others see only their own
-      const allowedRoles = [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MANAGER, UserRole.COMPLIANCE];
+      const allowedRoles = [
+        UserRole.SUPER_ADMIN,
+        UserRole.ADMIN,
+        UserRole.MANAGER,
+        UserRole.COMPLIANCE,
+      ];
       const canViewAll = allowedRoles.includes(userRole);
 
       const analyticsDto: PaymentAnalyticsDto = {
@@ -149,20 +177,22 @@ export class PaymentsController {
         groupBy: query.groupBy || 'day',
         processor: query.processor,
         paymentMethod: query.paymentMethod,
-        currency: query.currency
+        currency: query.currency,
       };
 
-      const analytics = await this.paymentsService.getPaymentAnalytics(analyticsDto);
+      const analytics =
+        await this.paymentsService.getPaymentAnalytics(analyticsDto);
 
       return {
         success: true,
-        data: analytics
+        data: analytics,
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting payment analytics', error);
       throw new HttpException(
-        error.message || 'Failed to get analytics',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to get analytics',
+        err.status || HttpStatus.BAD_REQUEST,
       );
     }
   }
@@ -175,11 +205,13 @@ export class PaymentsController {
     @Param('processor') processor: string,
     @Body() payload: any,
     @Headers() headers: Record<string, string>,
-    @Req() rawReq: RawBodyRequest<Request>
+    @Req() rawReq: RawBodyRequest<Request>,
   ) {
     try {
       // Validate processor
-      if (!Object.values(PaymentProcessor).includes(processor as PaymentProcessor)) {
+      if (
+        !Object.values(PaymentProcessor).includes(processor as PaymentProcessor)
+      ) {
         throw new HttpException('Invalid processor', HttpStatus.BAD_REQUEST);
       }
 
@@ -187,20 +219,27 @@ export class PaymentsController {
         processor: processor as PaymentProcessor,
         eventType: payload.type || payload.event_type || 'unknown',
         payload,
-        signature: headers['stripe-signature'] || headers['paypal-transmission-sig'] || headers['signature'],
-        headers
+        signature:
+          headers['stripe-signature'] ||
+          headers['paypal-transmission-sig'] ||
+          headers['signature'],
+        headers,
       };
 
       const result = await this.paymentsService.processWebhook(webhookDto);
-      
-      this.logger.log(`Webhook processed successfully`, { processor, eventType: webhookDto.eventType });
+
+      this.logger.log(`Webhook processed successfully`, {
+        processor,
+        eventType: webhookDto.eventType,
+      });
 
       return result;
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error processing webhook', error);
       throw new HttpException(
-        error.message || 'Failed to process webhook',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to process webhook',
+        err.status || HttpStatus.BAD_REQUEST,
       );
     }
   }
@@ -213,13 +252,17 @@ export class PaymentsController {
   async getPayment(@Param('id') id: string, @Request() req: any) {
     try {
       const payment = await this.paymentsService.findPaymentById(id);
-      
+
       if (!payment) {
         throw new HttpException('Payment not found', HttpStatus.NOT_FOUND);
       }
 
       const userRole = req.user.primaryRole || req.user.role;
-      const isAdmin = [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MANAGER].includes(userRole);
+      const isAdmin = [
+        UserRole.SUPER_ADMIN,
+        UserRole.ADMIN,
+        UserRole.MANAGER,
+      ].includes(userRole);
 
       // Check access permissions
       if (!isAdmin && payment.userId !== req.user.id) {
@@ -228,13 +271,14 @@ export class PaymentsController {
 
       return {
         success: true,
-        data: payment
+        data: payment,
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting payment', error);
       throw new HttpException(
-        error.message || 'Failed to get payment',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to get payment',
+        err.status || HttpStatus.BAD_REQUEST,
       );
     }
   }
@@ -244,16 +288,24 @@ export class PaymentsController {
   // ==============================
   @Get('reference/:reference')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  async getPaymentByReference(@Param('reference') reference: string, @Request() req: any) {
+  async getPaymentByReference(
+    @Param('reference') reference: string,
+    @Request() req: any,
+  ) {
     try {
-      const payment = await this.paymentsService.findPaymentByReference(reference);
-      
+      const payment =
+        await this.paymentsService.findPaymentByReference(reference);
+
       if (!payment) {
         throw new HttpException('Payment not found', HttpStatus.NOT_FOUND);
       }
 
       const userRole = req.user.primaryRole || req.user.role;
-      const isAdmin = [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MANAGER].includes(userRole);
+      const isAdmin = [
+        UserRole.SUPER_ADMIN,
+        UserRole.ADMIN,
+        UserRole.MANAGER,
+      ].includes(userRole);
 
       // Check access permissions
       if (!isAdmin && payment.userId !== req.user.id) {
@@ -262,13 +314,14 @@ export class PaymentsController {
 
       return {
         success: true,
-        data: payment
+        data: payment,
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting payment by reference', error);
       throw new HttpException(
-        error.message || 'Failed to get payment',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to get payment',
+        err.status || HttpStatus.BAD_REQUEST,
       );
     }
   }
@@ -281,37 +334,45 @@ export class PaymentsController {
   async updatePaymentStatus(
     @Param('id') id: string,
     @Body() body: { status: PaymentStatus; reason?: string },
-    @Request() req: any
+    @Request() req: any,
   ) {
     try {
       const userRole = req.user.primaryRole || req.user.role;
-      const allowedRoles = [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MANAGER];
+      const allowedRoles = [
+        UserRole.SUPER_ADMIN,
+        UserRole.ADMIN,
+        UserRole.MANAGER,
+      ];
 
       if (!allowedRoles.includes(userRole)) {
-        throw new HttpException('Insufficient permissions', HttpStatus.FORBIDDEN);
+        throw new HttpException(
+          'Insufficient permissions',
+          HttpStatus.FORBIDDEN,
+        );
       }
 
       const payment = await this.paymentsService.updatePaymentStatus(
         id,
         body.status,
-        body.reason
+        body.reason,
       );
 
-      this.logger.log(`Payment status updated: ${id} -> ${body.status}`, { 
-        userId: req.user.id, 
-        reason: body.reason 
+      this.logger.log(`Payment status updated: ${id} -> ${body.status}`, {
+        userId: req.user.id,
+        reason: body.reason,
       });
 
       return {
         success: true,
         data: payment,
-        message: 'Payment status updated successfully'
+        message: 'Payment status updated successfully',
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error updating payment status', error);
       throw new HttpException(
-        error.message || 'Failed to update payment status',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to update payment status',
+        err.status || HttpStatus.BAD_REQUEST,
       );
     }
   }
@@ -324,17 +385,21 @@ export class PaymentsController {
   async updatePayment(
     @Param('id') id: string,
     @Body() updatePaymentDto: UpdatePaymentDto,
-    @Request() req: any
+    @Request() req: any,
   ) {
     try {
       const payment = await this.paymentsService.findPaymentById(id);
-      
+
       if (!payment) {
         throw new HttpException('Payment not found', HttpStatus.NOT_FOUND);
       }
 
       const userRole = req.user.primaryRole || req.user.role;
-      const isAdmin = [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MANAGER].includes(userRole);
+      const isAdmin = [
+        UserRole.SUPER_ADMIN,
+        UserRole.ADMIN,
+        UserRole.MANAGER,
+      ].includes(userRole);
 
       // Check access permissions
       if (!isAdmin && payment.userId !== req.user.id) {
@@ -342,11 +407,11 @@ export class PaymentsController {
       }
 
       // Users can only update certain fields, admins can update more
-      const allowedUpdates = isAdmin 
-        ? updatePaymentDto 
+      const allowedUpdates = isAdmin
+        ? updatePaymentDto
         : {
             description: updatePaymentDto.description,
-            metadata: updatePaymentDto.metadata
+            metadata: updatePaymentDto.metadata,
           };
 
       // TODO: Implement update functionality in service
@@ -355,13 +420,14 @@ export class PaymentsController {
       return {
         success: true,
         data: payment, // Temporary until update is implemented
-        message: 'Payment updated successfully'
+        message: 'Payment updated successfully',
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error updating payment', error);
       throw new HttpException(
-        error.message || 'Failed to update payment',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to update payment',
+        err.status || HttpStatus.BAD_REQUEST,
       );
     }
   }
@@ -383,7 +449,7 @@ export class PaymentsController {
         page: parseInt(query.page) || 1,
         limit: Math.min(parseInt(query.limit) || 10, 50),
         sortBy: 'createdAt',
-        sortOrder: 'desc'
+        sortOrder: 'desc',
       };
 
       const result = await this.paymentsService.searchPayments(searchDto);
@@ -391,13 +457,14 @@ export class PaymentsController {
       return {
         success: true,
         data: result.payments,
-        pagination: result.pagination
+        pagination: result.pagination,
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting user payment history', error);
       throw new HttpException(
-        error.message || 'Failed to get payment history',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to get payment history',
+        err.status || HttpStatus.BAD_REQUEST,
       );
     }
   }
@@ -413,30 +480,33 @@ export class PaymentsController {
       const userCountry = req.user.country || 'HT'; // Default to Haiti
 
       const methods = {
-        HT: [ // Haiti
+        HT: [
+          // Haiti
           PaymentMethod.DIGICEL_MONEY,
           PaymentMethod.NATCOM_MONEY,
           PaymentMethod.MONCASH,
           PaymentMethod.BANK_TRANSFER,
           PaymentMethod.CREDIT_CARD,
           PaymentMethod.DEBIT_CARD,
-          PaymentMethod.CASH
+          PaymentMethod.CASH,
         ],
-        US: [ // United States
+        US: [
+          // United States
           PaymentMethod.CREDIT_CARD,
           PaymentMethod.DEBIT_CARD,
           PaymentMethod.BANK_TRANSFER,
           PaymentMethod.ACH_TRANSFER,
           PaymentMethod.PAYPAL,
           PaymentMethod.APPLE_PAY,
-          PaymentMethod.GOOGLE_PAY
+          PaymentMethod.GOOGLE_PAY,
         ],
-        CA: [ // Canada
+        CA: [
+          // Canada
           PaymentMethod.CREDIT_CARD,
           PaymentMethod.DEBIT_CARD,
           PaymentMethod.BANK_TRANSFER,
-          PaymentMethod.PAYPAL
-        ]
+          PaymentMethod.PAYPAL,
+        ],
       };
 
       const availableMethods = methods[userCountry] || methods.HT;
@@ -446,14 +516,15 @@ export class PaymentsController {
         data: {
           country: userCountry,
           methods: availableMethods,
-          processors: Object.values(PaymentProcessor)
-        }
+          processors: Object.values(PaymentProcessor),
+        },
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting available payment methods', error);
       throw new HttpException(
         'Failed to get available payment methods',
-        HttpStatus.INTERNAL_SERVER_ERROR
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }

@@ -57,7 +57,8 @@ export default function SupabaseSignInForm() {
       }
 
       // Redirect to dashboard on successful sign in
-      router.push(`/${locale}/dashboard`);
+      // Redirect to client dashboard since backend assigns CLIENT role by default
+      router.push(`/${locale}/dashboard/client`);
     } catch (error: any) {
       setError(
         getErrorMessage(error.message || "An unexpected error occurred")

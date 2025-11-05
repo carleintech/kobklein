@@ -16,6 +16,7 @@ import {
 import { MerchantQrService } from './merchant-qr.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
+import { extractError } from '../../utils/error.utils';
 
 interface CreateMerchantQRDto {
   merchantName: string;
@@ -57,7 +58,7 @@ export class MerchantQrController {
         throw new HttpException('Insufficient permissions to create merchant QR', HttpStatus.FORBIDDEN);
       }
 
-      this.logger.log(`Creating merchant QR for user ${userId}`, { 
+      this.logger.log(`Creating merchant QR for user ${userId}`, {
         merchantName: createDto.merchantName,
         businessType: createDto.businessType
       });
@@ -70,10 +71,11 @@ export class MerchantQrController {
         message: 'Merchant QR code created successfully'
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error creating merchant QR', error);
       throw new HttpException(
-        error.message || 'Failed to create merchant QR',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to create merchant QR',
+        err.status || HttpStatus.BAD_REQUEST
       );
     }
   }
@@ -103,10 +105,11 @@ export class MerchantQrController {
         }
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting merchant QRs', error);
       throw new HttpException(
-        error.message || 'Failed to get merchant QRs',
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR
+        err.message || 'Failed to get merchant QRs',
+        err.status || HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }
@@ -131,10 +134,11 @@ export class MerchantQrController {
         data: merchantQR
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting merchant QR', error);
       throw new HttpException(
-        error.message || 'Failed to get merchant QR',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to get merchant QR',
+        err.status || HttpStatus.BAD_REQUEST
       );
     }
   }
@@ -156,10 +160,11 @@ export class MerchantQrController {
         message: 'Merchant QR updated successfully'
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error updating merchant QR', error);
       throw new HttpException(
-        error.message || 'Failed to update merchant QR',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to update merchant QR',
+        err.status || HttpStatus.BAD_REQUEST
       );
     }
   }
@@ -181,10 +186,11 @@ export class MerchantQrController {
         message: 'Merchant QR deactivated successfully'
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error deactivating merchant QR', error);
       throw new HttpException(
-        error.message || 'Failed to deactivate merchant QR',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to deactivate merchant QR',
+        err.status || HttpStatus.BAD_REQUEST
       );
     }
   }
@@ -207,10 +213,11 @@ export class MerchantQrController {
         data: analytics
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting merchant QR analytics', error);
       throw new HttpException(
-        error.message || 'Failed to get merchant QR analytics',
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR
+        err.message || 'Failed to get merchant QR analytics',
+        err.status || HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }
@@ -239,10 +246,11 @@ export class MerchantQrController {
         }
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting merchant QR transactions', error);
       throw new HttpException(
-        error.message || 'Failed to get merchant QR transactions',
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR
+        err.message || 'Failed to get merchant QR transactions',
+        err.status || HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }
@@ -275,10 +283,11 @@ export class MerchantQrController {
         message: 'Merchant QR payment processed successfully'
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error processing merchant QR payment', error);
       throw new HttpException(
-        error.message || 'Failed to process merchant QR payment',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to process merchant QR payment',
+        err.status || HttpStatus.BAD_REQUEST
       );
     }
   }
@@ -300,10 +309,11 @@ export class MerchantQrController {
         data: merchantInfo
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting public merchant info', error);
       throw new HttpException(
-        error.message || 'Failed to get merchant info',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to get merchant info',
+        err.status || HttpStatus.BAD_REQUEST
       );
     }
   }
@@ -335,10 +345,11 @@ export class MerchantQrController {
         data: merchants
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error searching nearby merchants', error);
       throw new HttpException(
-        error.message || 'Failed to search nearby merchants',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to search nearby merchants',
+        err.status || HttpStatus.BAD_REQUEST
       );
     }
   }
@@ -366,10 +377,11 @@ export class MerchantQrController {
         data: dashboard
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting merchant dashboard', error);
       throw new HttpException(
-        error.message || 'Failed to get merchant dashboard',
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR
+        err.message || 'Failed to get merchant dashboard',
+        err.status || HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }

@@ -1,9 +1,10 @@
-import { Injectable, HttpException, HttpStatus, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { PaymentsService } from '../../payments/payments.service';
-import { PaymentMethod, CurrencyCode } from '../../types/database.types';
-import { CreatePaymentDto } from '../../payments/dto/create-enhanced-payment.dto';
 import * as crypto from 'crypto';
+import { CreatePaymentDto } from '../../payments/dto/create-enhanced-payment.dto';
+import { PaymentsService } from '../../payments/payments.service';
+import { CurrencyCode, PaymentMethod } from '../../types/database.types';
+import { extractError } from '../../utils/error.utils';
 
 interface CreatePaymentRequestDto {
   recipientId?: string;
@@ -33,30 +34,38 @@ export class PaymentRequestsService {
   private readonly logger = new Logger(PaymentRequestsService.name);
   private supabase: SupabaseClient;
 
-  constructor(
-    private readonly paymentsService: PaymentsService,
-  ) {
+  constructor(private readonly paymentsService: PaymentsService) {
     this.supabase = createClient(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY,
     );
   }
 
   // ==============================
   // CREATE PAYMENT REQUEST
   // ==============================
-  async createPaymentRequest(userId: string, createDto: CreatePaymentRequestDto) {
+  async createPaymentRequest(
+    userId: string,
+    createDto: CreatePaymentRequestDto,
+  ) {
     try {
       // Generate unique request ID
       const requestId = crypto.randomUUID();
-      
+
       // Set default due date if not provided (7 days)
-      const dueDate = createDto.dueDate || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+      const dueDate =
+        createDto.dueDate || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
       // Resolve recipient ID if email or phone provided
       let recipientId = createDto.recipientId;
-      if (!recipientId && (createDto.recipientEmail || createDto.recipientPhone)) {
-        recipientId = await this.resolveRecipientId(createDto.recipientEmail, createDto.recipientPhone);
+      if (
+        !recipientId &&
+        (createDto.recipientEmail || createDto.recipientPhone)
+      ) {
+        recipientId = await this.resolveRecipientId(
+          createDto.recipientEmail,
+          createDto.recipientPhone,
+        );
       }
 
       // Create payment request record
@@ -78,14 +87,17 @@ export class PaymentRequestsService {
           metadata: createDto.metadata || {},
           created_at: new Date().toISOString(),
           attempts: 0,
-          max_attempts: 3
+          max_attempts: 3,
         })
         .select()
         .single();
 
       if (error) {
         this.logger.error('Database error creating payment request', error);
-        throw new HttpException('Failed to create payment request', HttpStatus.INTERNAL_SERVER_ERROR);
+        throw new HttpException(
+          'Failed to create payment request',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
       }
 
       // Create recurring schedule if needed
@@ -100,12 +112,12 @@ export class PaymentRequestsService {
       await this.logRequestEvent(userId, requestId, 'request_created', {
         amount: createDto.amount,
         currency: createDto.currency,
-        recipientId
+        recipientId,
       });
 
       return this.mapDatabaseRequestToInfo(paymentRequest);
-
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error creating payment request', error);
       throw error;
     }
@@ -114,7 +126,11 @@ export class PaymentRequestsService {
   // ==============================
   // GET PAYMENT REQUESTS
   // ==============================
-  async getPaymentRequests(userId: string, type: 'sent' | 'received', options: { page: number; limit: number; status?: string }) {
+  async getPaymentRequests(
+    userId: string,
+    type: 'sent' | 'received',
+    options: { page: number; limit: number; status?: string },
+  ) {
     try {
       const { page, limit, status } = options;
       const offset = (page - 1) * limit;
@@ -139,15 +155,20 @@ export class PaymentRequestsService {
 
       if (error) {
         this.logger.error('Database error getting payment requests', error);
-        throw new HttpException('Failed to get payment requests', HttpStatus.INTERNAL_SERVER_ERROR);
+        throw new HttpException(
+          'Failed to get payment requests',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
       }
 
       return {
-        items: (requests || []).map(req => this.mapDatabaseRequestToInfo(req)),
-        total: count || 0
+        items: (requests || []).map((req) =>
+          this.mapDatabaseRequestToInfo(req),
+        ),
+        total: count || 0,
       };
-
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting payment requests', error);
       throw error;
     }
@@ -170,9 +191,11 @@ export class PaymentRequestsService {
         return null;
       }
 
-      return paymentRequest ? this.mapDatabaseRequestToInfo(paymentRequest) : null;
-
+      return paymentRequest
+        ? this.mapDatabaseRequestToInfo(paymentRequest)
+        : null;
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting payment request by ID', error);
       throw error;
     }
@@ -181,7 +204,11 @@ export class PaymentRequestsService {
   // ==============================
   // RESPOND TO PAYMENT REQUEST
   // ==============================
-  async respondToPaymentRequest(userId: string, requestId: string, respondDto: RespondToRequestDto) {
+  async respondToPaymentRequest(
+    userId: string,
+    requestId: string,
+    respondDto: RespondToRequestDto,
+  ) {
     try {
       const { action, amount, message, scheduleDate } = respondDto;
 
@@ -194,16 +221,28 @@ export class PaymentRequestsService {
         .single();
 
       if (getError || !request) {
-        throw new HttpException('Payment request not found', HttpStatus.NOT_FOUND);
+        throw new HttpException(
+          'Payment request not found',
+          HttpStatus.NOT_FOUND,
+        );
       }
 
       if (request.status !== 'pending') {
-        throw new HttpException('Payment request is not pending', HttpStatus.BAD_REQUEST);
+        throw new HttpException(
+          'Payment request is not pending',
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       // Update request status
-      let newStatus = action === 'approve' ? 'approved' : action === 'decline' ? 'declined' : 'partially_approved';
-      let actualAmount = action === 'partial' && amount ? amount : parseFloat(request.amount);
+      const newStatus =
+        action === 'approve'
+          ? 'approved'
+          : action === 'decline'
+            ? 'declined'
+            : 'partially_approved';
+      const actualAmount =
+        action === 'partial' && amount ? amount : parseFloat(request.amount);
 
       const { data: updatedRequest, error: updateError } = await this.supabase
         .from('payment_requests')
@@ -212,25 +251,40 @@ export class PaymentRequestsService {
           response_message: message,
           responded_at: new Date().toISOString(),
           actual_amount: actualAmount.toString(),
-          scheduled_date: scheduleDate?.toISOString()
+          scheduled_date: scheduleDate?.toISOString(),
         })
         .eq('id', requestId)
         .select()
         .single();
 
       if (updateError) {
-        this.logger.error('Database error updating payment request', updateError);
-        throw new HttpException('Failed to update payment request', HttpStatus.INTERNAL_SERVER_ERROR);
+        this.logger.error(
+          'Database error updating payment request',
+          updateError,
+        );
+        throw new HttpException(
+          'Failed to update payment request',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
       }
 
       // If approved, process the payment
       if (action === 'approve' || action === 'partial') {
         if (scheduleDate && scheduleDate > new Date()) {
           // Schedule payment for later
-          await this.schedulePayment(requestId, userId, actualAmount, scheduleDate);
+          await this.schedulePayment(
+            requestId,
+            userId,
+            actualAmount,
+            scheduleDate,
+          );
         } else {
           // Process payment immediately
-          await this.processRequestPayment(userId, updatedRequest, actualAmount);
+          await this.processRequestPayment(
+            userId,
+            updatedRequest,
+            actualAmount,
+          );
         }
       }
 
@@ -238,15 +292,15 @@ export class PaymentRequestsService {
       await this.logRequestEvent(userId, requestId, `request_${action}ed`, {
         originalAmount: parseFloat(request.amount),
         actualAmount,
-        message
+        message,
       });
 
       // Send notification to requester
       await this.sendResponseNotification(updatedRequest, action);
 
       return this.mapDatabaseRequestToInfo(updatedRequest);
-
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error responding to payment request', error);
       throw error;
     }
@@ -261,7 +315,7 @@ export class PaymentRequestsService {
         .from('payment_requests')
         .update({
           status: 'cancelled',
-          cancelled_at: new Date().toISOString()
+          cancelled_at: new Date().toISOString(),
         })
         .eq('id', requestId)
         .eq('requester_id', userId)
@@ -270,15 +324,18 @@ export class PaymentRequestsService {
 
       if (error) {
         this.logger.error('Database error cancelling payment request', error);
-        throw new HttpException('Failed to cancel payment request', HttpStatus.INTERNAL_SERVER_ERROR);
+        throw new HttpException(
+          'Failed to cancel payment request',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
       }
 
       // Log cancellation event
       await this.logRequestEvent(userId, requestId, 'request_cancelled', {});
 
       return this.mapDatabaseRequestToInfo(paymentRequest);
-
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error cancelling payment request', error);
       throw error;
     }
@@ -298,24 +355,33 @@ export class PaymentRequestsService {
         .single();
 
       if (error || !request) {
-        throw new HttpException('Payment request not found', HttpStatus.NOT_FOUND);
+        throw new HttpException(
+          'Payment request not found',
+          HttpStatus.NOT_FOUND,
+        );
       }
 
       if (request.status !== 'pending') {
-        throw new HttpException('Can only resend pending requests', HttpStatus.BAD_REQUEST);
+        throw new HttpException(
+          'Can only resend pending requests',
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       // Update attempts count
       const newAttempts = request.attempts + 1;
       if (newAttempts > request.max_attempts) {
-        throw new HttpException('Maximum resend attempts reached', HttpStatus.BAD_REQUEST);
+        throw new HttpException(
+          'Maximum resend attempts reached',
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       await this.supabase
         .from('payment_requests')
         .update({
           attempts: newAttempts,
-          last_sent_at: new Date().toISOString()
+          last_sent_at: new Date().toISOString(),
         })
         .eq('id', requestId);
 
@@ -323,11 +389,13 @@ export class PaymentRequestsService {
       await this.sendRequestNotification(request);
 
       // Log resend event
-      await this.logRequestEvent(userId, requestId, 'request_resent', { attempts: newAttempts });
+      await this.logRequestEvent(userId, requestId, 'request_resent', {
+        attempts: newAttempts,
+      });
 
       return { attempts: newAttempts, maxAttempts: request.max_attempts };
-
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error resending payment request', error);
       throw error;
     }
@@ -355,12 +423,15 @@ export class PaymentRequestsService {
       const { data: requests, error } = await query;
 
       if (error) {
-        throw new HttpException('Failed to get recurring requests', HttpStatus.INTERNAL_SERVER_ERROR);
+        throw new HttpException(
+          'Failed to get recurring requests',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
       }
 
-      return (requests || []).map(req => this.mapDatabaseRequestToInfo(req));
-
+      return (requests || []).map((req) => this.mapDatabaseRequestToInfo(req));
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting recurring requests', error);
       throw error;
     }
@@ -369,7 +440,11 @@ export class PaymentRequestsService {
   // ==============================
   // UPDATE RECURRING REQUEST
   // ==============================
-  async updateRecurringRequest(requestId: string, userId: string, updateDto: any) {
+  async updateRecurringRequest(
+    requestId: string,
+    userId: string,
+    updateDto: any,
+  ) {
     try {
       const { data: recurringRequest, error } = await this.supabase
         .from('payment_requests')
@@ -377,10 +452,10 @@ export class PaymentRequestsService {
           recurring_config: {
             frequency: updateDto.frequency,
             endDate: updateDto.endDate,
-            maxOccurrences: updateDto.maxOccurrences
+            maxOccurrences: updateDto.maxOccurrences,
           },
           status: updateDto.active === false ? 'inactive' : 'active',
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .eq('id', requestId)
         .eq('requester_id', userId)
@@ -389,12 +464,15 @@ export class PaymentRequestsService {
         .single();
 
       if (error) {
-        throw new HttpException('Failed to update recurring request', HttpStatus.INTERNAL_SERVER_ERROR);
+        throw new HttpException(
+          'Failed to update recurring request',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
       }
 
       return this.mapDatabaseRequestToInfo(recurringRequest);
-
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error updating recurring request', error);
       throw error;
     }
@@ -403,7 +481,10 @@ export class PaymentRequestsService {
   // ==============================
   // GET REQUEST ANALYTICS
   // ==============================
-  async getRequestAnalytics(userId: string, options: { startDate: Date; endDate: Date }) {
+  async getRequestAnalytics(
+    userId: string,
+    options: { startDate: Date; endDate: Date },
+  ) {
     try {
       const { startDate, endDate } = options;
 
@@ -415,15 +496,19 @@ export class PaymentRequestsService {
         .gte('created_at', startDate.toISOString())
         .lte('created_at', endDate.toISOString());
 
-      const { data: receivedRequests, error: receivedError } = await this.supabase
-        .from('payment_requests')
-        .select('status, amount, currency, created_at')
-        .eq('recipient_id', userId)
-        .gte('created_at', startDate.toISOString())
-        .lte('created_at', endDate.toISOString());
+      const { data: receivedRequests, error: receivedError } =
+        await this.supabase
+          .from('payment_requests')
+          .select('status, amount, currency, created_at')
+          .eq('recipient_id', userId)
+          .gte('created_at', startDate.toISOString())
+          .lte('created_at', endDate.toISOString());
 
       if (sentError || receivedError) {
-        throw new HttpException('Failed to get analytics', HttpStatus.INTERNAL_SERVER_ERROR);
+        throw new HttpException(
+          'Failed to get analytics',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
       }
 
       // Process analytics
@@ -433,15 +518,25 @@ export class PaymentRequestsService {
         summary: {
           totalSent: sentRequests?.length || 0,
           totalReceived: receivedRequests?.length || 0,
-          totalAmount: this.calculateTotalAmount([...(sentRequests || []), ...(receivedRequests || [])]),
-          successRate: this.calculateSuccessRate([...(sentRequests || []), ...(receivedRequests || [])])
+          totalAmount: this.calculateTotalAmount([
+            ...(sentRequests || []),
+            ...(receivedRequests || []),
+          ]),
+          successRate: this.calculateSuccessRate([
+            ...(sentRequests || []),
+            ...(receivedRequests || []),
+          ]),
         },
-        timeline: this.createRequestTimeline([...(sentRequests || []), ...(receivedRequests || [])], startDate, endDate)
+        timeline: this.createRequestTimeline(
+          [...(sentRequests || []), ...(receivedRequests || [])],
+          startDate,
+          endDate,
+        ),
       };
 
       return analytics;
-
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting request analytics', error);
       throw error;
     }
@@ -450,28 +545,35 @@ export class PaymentRequestsService {
   // ==============================
   // CREATE BULK REQUESTS
   // ==============================
-  async createBulkRequests(userId: string, requests: CreatePaymentRequestDto[]) {
+  async createBulkRequests(
+    userId: string,
+    requests: CreatePaymentRequestDto[],
+  ) {
     try {
       const results = {
         successful: [] as any[],
-        failed: [] as any[]
+        failed: [] as any[],
       };
 
       for (const requestDto of requests) {
         try {
-          const paymentRequest = await this.createPaymentRequest(userId, requestDto);
+          const paymentRequest = await this.createPaymentRequest(
+            userId,
+            requestDto,
+          );
           results.successful.push(paymentRequest);
         } catch (error) {
+          const err = extractError(error);
           results.failed.push({
             request: requestDto,
-            error: error.message
+            error: err.message,
           });
         }
       }
 
       return results;
-
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error creating bulk requests', error);
       throw error;
     }
@@ -480,11 +582,14 @@ export class PaymentRequestsService {
   // ==============================
   // HELPER METHODS
   // ==============================
-  private async resolveRecipientId(email?: string, phone?: string): Promise<string | null> {
+  private async resolveRecipientId(
+    email?: string,
+    phone?: string,
+  ): Promise<string | null> {
     if (!email && !phone) return null;
 
     let query = this.supabase.from('profiles').select('id');
-    
+
     if (email) {
       query = query.eq('email', email);
     } else if (phone) {
@@ -492,7 +597,7 @@ export class PaymentRequestsService {
     }
 
     const { data, error } = await query.single();
-    
+
     if (error || !data) return null;
     return data.id;
   }
@@ -501,19 +606,24 @@ export class PaymentRequestsService {
     // Create recurring schedule entries
     const scheduleEntries = [];
     const startDate = new Date();
-    const endDate = recurring.endDate ? new Date(recurring.endDate) : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
-    
-    let currentDate = new Date(startDate);
+    const endDate = recurring.endDate
+      ? new Date(recurring.endDate)
+      : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+
+    const currentDate = new Date(startDate);
     let occurrences = 0;
-    
-    while (currentDate <= endDate && (!recurring.maxOccurrences || occurrences < recurring.maxOccurrences)) {
+
+    while (
+      currentDate <= endDate &&
+      (!recurring.maxOccurrences || occurrences < recurring.maxOccurrences)
+    ) {
       scheduleEntries.push({
         request_id: requestId,
         scheduled_date: currentDate.toISOString(),
         status: 'pending',
-        occurrence_number: occurrences + 1
+        occurrence_number: occurrences + 1,
       });
-      
+
       // Calculate next occurrence based on frequency
       switch (recurring.frequency) {
         case 'daily':
@@ -529,18 +639,20 @@ export class PaymentRequestsService {
           currentDate.setFullYear(currentDate.getFullYear() + 1);
           break;
       }
-      
+
       occurrences++;
     }
 
     if (scheduleEntries.length > 0) {
-      await this.supabase
-        .from('recurring_schedules')
-        .insert(scheduleEntries);
+      await this.supabase.from('recurring_schedules').insert(scheduleEntries);
     }
   }
 
-  private async processRequestPayment(userId: string, request: any, amount: number) {
+  private async processRequestPayment(
+    userId: string,
+    request: any,
+    amount: number,
+  ) {
     try {
       const paymentData: CreatePaymentDto = {
         amount,
@@ -549,40 +661,46 @@ export class PaymentRequestsService {
         description: request.description || 'Payment Request',
         metadata: {
           requestId: request.id,
-          requesterId: request.requester_id
-        }
+          requesterId: request.requester_id,
+        },
       };
 
-      const payment = await this.paymentsService.createPayment(userId, paymentData);
+      const payment = await this.paymentsService.createPayment(
+        userId,
+        paymentData,
+      );
 
       // Update request with payment ID
       await this.supabase
         .from('payment_requests')
         .update({
           payment_id: payment.id,
-          processed_at: new Date().toISOString()
+          processed_at: new Date().toISOString(),
         })
         .eq('id', request.id);
 
       return payment;
-
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error processing request payment', error);
       throw error;
     }
   }
 
-  private async schedulePayment(requestId: string, userId: string, amount: number, scheduleDate: Date) {
+  private async schedulePayment(
+    requestId: string,
+    userId: string,
+    amount: number,
+    scheduleDate: Date,
+  ) {
     // Create scheduled payment entry
-    await this.supabase
-      .from('scheduled_payments')
-      .insert({
-        request_id: requestId,
-        payer_id: userId,
-        amount: amount.toString(),
-        scheduled_date: scheduleDate.toISOString(),
-        status: 'scheduled'
-      });
+    await this.supabase.from('scheduled_payments').insert({
+      request_id: requestId,
+      payer_id: userId,
+      amount: amount.toString(),
+      scheduled_date: scheduleDate.toISOString(),
+      status: 'scheduled',
+    });
   }
 
   private async sendRequestNotification(request: any) {
@@ -596,17 +714,20 @@ export class PaymentRequestsService {
     this.logger.log(`Sending ${action} notification for request ${request.id}`);
   }
 
-  private async logRequestEvent(userId: string, requestId: string, eventType: string, metadata: any) {
+  private async logRequestEvent(
+    userId: string,
+    requestId: string,
+    eventType: string,
+    metadata: any,
+  ) {
     try {
-      await this.supabase
-        .from('request_events')
-        .insert({
-          user_id: userId,
-          request_id: requestId,
-          event_type: eventType,
-          metadata,
-          created_at: new Date().toISOString()
-        });
+      await this.supabase.from('request_events').insert({
+        user_id: userId,
+        request_id: requestId,
+        event_type: eventType,
+        metadata,
+        created_at: new Date().toISOString(),
+      });
     } catch (error) {
       this.logger.warn('Failed to log request event', error);
     }
@@ -627,14 +748,16 @@ export class PaymentRequestsService {
       isRecurring: request.is_recurring,
       recurringConfig: request.recurring_config,
       responseMessage: request.response_message,
-      actualAmount: request.actual_amount ? parseFloat(request.actual_amount) : null,
+      actualAmount: request.actual_amount
+        ? parseFloat(request.actual_amount)
+        : null,
       paymentId: request.payment_id,
       attempts: request.attempts,
       maxAttempts: request.max_attempts,
       createdAt: request.created_at,
       respondedAt: request.responded_at,
       processedAt: request.processed_at,
-      metadata: request.metadata
+      metadata: request.metadata,
     };
   }
 
@@ -644,9 +767,12 @@ export class PaymentRequestsService {
       acc[req.status] = (acc[req.status] || 0) + 1;
       return acc;
     }, {});
-    
-    const totalAmount = requests.reduce((sum, req) => sum + parseFloat(req.amount), 0);
-    
+
+    const totalAmount = requests.reduce(
+      (sum, req) => sum + parseFloat(req.amount),
+      0,
+    );
+
     return { total, byStatus, totalAmount };
   }
 
@@ -656,30 +782,37 @@ export class PaymentRequestsService {
 
   private calculateSuccessRate(requests: any[]) {
     if (requests.length === 0) return 0;
-    const successful = requests.filter(req => req.status === 'approved' || req.status === 'partially_approved').length;
+    const successful = requests.filter(
+      (req) => req.status === 'approved' || req.status === 'partially_approved',
+    ).length;
     return (successful / requests.length) * 100;
   }
 
-  private createRequestTimeline(requests: any[], startDate: Date, endDate: Date) {
+  private createRequestTimeline(
+    requests: any[],
+    startDate: Date,
+    endDate: Date,
+  ) {
     const timeline = [];
     const current = new Date(startDate);
-    
+
     while (current <= endDate) {
-      const dayRequests = requests.filter(req => 
-        new Date(req.created_at).toDateString() === current.toDateString()
+      const dayRequests = requests.filter(
+        (req) =>
+          new Date(req.created_at).toDateString() === current.toDateString(),
       );
-      
+
       timeline.push({
         date: current.toISOString().split('T')[0],
         total: dayRequests.length,
-        approved: dayRequests.filter(r => r.status === 'approved').length,
-        declined: dayRequests.filter(r => r.status === 'declined').length,
-        pending: dayRequests.filter(r => r.status === 'pending').length
+        approved: dayRequests.filter((r) => r.status === 'approved').length,
+        declined: dayRequests.filter((r) => r.status === 'declined').length,
+        pending: dayRequests.filter((r) => r.status === 'pending').length,
       });
-      
+
       current.setDate(current.getDate() + 1);
     }
-    
+
     return timeline;
   }
 }

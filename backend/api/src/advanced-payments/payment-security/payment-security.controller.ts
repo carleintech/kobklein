@@ -16,6 +16,7 @@ import {
 import { PaymentSecurityService } from './payment-security.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
+import { extractError } from '../../utils/error.utils';
 
 interface SecuritySetupDto {
   biometricEnabled?: boolean;
@@ -72,10 +73,11 @@ export class PaymentSecurityController {
         data: settings
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting security settings', error);
       throw new HttpException(
-        error.message || 'Failed to get security settings',
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR
+        err.message || 'Failed to get security settings',
+        err.status || HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }
@@ -99,10 +101,11 @@ export class PaymentSecurityController {
         message: 'Security settings updated successfully'
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error updating security settings', error);
       throw new HttpException(
-        error.message || 'Failed to update security settings',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to update security settings',
+        err.status || HttpStatus.BAD_REQUEST
       );
     }
   }
@@ -129,10 +132,11 @@ export class PaymentSecurityController {
         message: result.verified ? 'Transaction verified successfully' : 'Transaction verification failed'
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error verifying transaction', error);
       throw new HttpException(
-        error.message || 'Failed to verify transaction',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to verify transaction',
+        err.status || HttpStatus.BAD_REQUEST
       );
     }
   }
@@ -162,10 +166,11 @@ export class PaymentSecurityController {
         }
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting fraud alerts', error);
       throw new HttpException(
-        error.message || 'Failed to get fraud alerts',
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR
+        err.message || 'Failed to get fraud alerts',
+        err.status || HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }
@@ -187,10 +192,11 @@ export class PaymentSecurityController {
         message: 'Fraud alert acknowledged'
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error acknowledging fraud alert', error);
       throw new HttpException(
-        error.message || 'Failed to acknowledge fraud alert',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to acknowledge fraud alert',
+        err.status || HttpStatus.BAD_REQUEST
       );
     }
   }
@@ -211,10 +217,11 @@ export class PaymentSecurityController {
         data: devices
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting trusted devices', error);
       throw new HttpException(
-        error.message || 'Failed to get trusted devices',
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR
+        err.message || 'Failed to get trusted devices',
+        err.status || HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }
@@ -237,10 +244,11 @@ export class PaymentSecurityController {
         message: 'Device added to trusted list'
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error adding trusted device', error);
       throw new HttpException(
-        error.message || 'Failed to add trusted device',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to add trusted device',
+        err.status || HttpStatus.BAD_REQUEST
       );
     }
   }
@@ -261,10 +269,11 @@ export class PaymentSecurityController {
         message: 'Device removed from trusted list'
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error removing trusted device', error);
       throw new HttpException(
-        error.message || 'Failed to remove trusted device',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to remove trusted device',
+        err.status || HttpStatus.BAD_REQUEST
       );
     }
   }
@@ -285,10 +294,11 @@ export class PaymentSecurityController {
         data: securityScore
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting security score', error);
       throw new HttpException(
-        error.message || 'Failed to get security score',
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR
+        err.message || 'Failed to get security score',
+        err.status || HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }
@@ -318,10 +328,11 @@ export class PaymentSecurityController {
         }
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting security audit log', error);
       throw new HttpException(
-        error.message || 'Failed to get security audit log',
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR
+        err.message || 'Failed to get security audit log',
+        err.status || HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }
@@ -344,10 +355,11 @@ export class PaymentSecurityController {
         message: 'Two-factor authentication enabled'
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error enabling two-factor authentication', error);
       throw new HttpException(
-        error.message || 'Failed to enable two-factor authentication',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to enable two-factor authentication',
+        err.status || HttpStatus.BAD_REQUEST
       );
     }
   }
@@ -369,10 +381,11 @@ export class PaymentSecurityController {
         message: 'Two-factor authentication disabled'
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error disabling two-factor authentication', error);
       throw new HttpException(
-        error.message || 'Failed to disable two-factor authentication',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to disable two-factor authentication',
+        err.status || HttpStatus.BAD_REQUEST
       );
     }
   }
@@ -393,10 +406,11 @@ export class PaymentSecurityController {
         data: recommendations
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting security recommendations', error);
       throw new HttpException(
-        error.message || 'Failed to get security recommendations',
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR
+        err.message || 'Failed to get security recommendations',
+        err.status || HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }

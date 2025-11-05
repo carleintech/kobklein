@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -47,6 +47,9 @@ const signUpSchema = z
     confirmPassword: z.string(),
     role: z.nativeEnum(UserRole),
     businessName: z.string().optional(),
+    legalBusinessName: z.string().optional(),
+    businessRegistrationNumber: z.string().optional(),
+    businessAddress: z.string().optional(),
     language: z.enum(["en", "fr", "ht", "es"]).default("ht"),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -55,14 +58,34 @@ const signUpSchema = z
   })
   .refine(
     (data) => {
-      if ([UserRole.MERCHANT, UserRole.DISTRIBUTOR].includes(data.role)) {
+      if (data.role === UserRole.MERCHANT) {
         return data.businessName && data.businessName.length >= 2;
       }
       return true;
     },
     {
-      message: "Business name is required for merchants and distributors",
+      message: "Business name is required for merchants",
       path: ["businessName"],
+    }
+  )
+  .refine(
+    (data) => {
+      if (data.role === UserRole.DISTRIBUTOR) {
+        return (
+          data.legalBusinessName &&
+          data.legalBusinessName.length >= 2 &&
+          data.businessRegistrationNumber &&
+          data.businessRegistrationNumber.length >= 2 &&
+          data.businessAddress &&
+          data.businessAddress.length >= 5
+        );
+      }
+      return true;
+    },
+    {
+      message:
+        "Legal business name, registration number, and address are required for distributors",
+      path: ["legalBusinessName"],
     }
   );
 
@@ -80,6 +103,14 @@ export default function ModernSignUpForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [locationData, setLocationData] = useState<{
+    country?: string;
+    countryCode?: string;
+    region?: string;
+    timezone?: string;
+    ipAddress?: string;
+  }>({});
+  const [locationLoading, setLocationLoading] = useState(true);
 
   const { register: registerUser } = useAuth();
   const router = useRouter();
@@ -97,12 +128,122 @@ export default function ModernSignUpForm() {
     resolver: zodResolver(signUpSchema),
     defaultValues: {
       language: "ht",
-      role: UserRole.CLIENT,
+      role: UserRole.INDIVIDUAL,
     },
   });
 
   const selectedRole = watch("role");
   const watchedFields = watch();
+
+  // Detect user location on component mount
+  useEffect(() => {
+    detectLocation();
+  }, []);
+
+  const detectLocation = async () => {
+    try {
+      setLocationLoading(true);
+
+      // Try browser geolocation first (requires HTTPS and user permission)
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const { latitude, longitude } = position.coords;
+            await reverseGeocode(latitude, longitude);
+          },
+          async () => {
+            // Geolocation failed or denied, fallback to IP-based detection
+            await detectLocationByIP();
+          },
+          { timeout: 5000 }
+        );
+      } else {
+        // Geolocation not supported, fallback to IP-based detection
+        await detectLocationByIP();
+      }
+    } catch (error) {
+      console.error("Location detection error:", error);
+      // Default to Haiti if all else fails
+      setLocationData({
+        country: "HT",
+        countryCode: "+509",
+        region: "Ouest",
+        timezone: "America/Port-au-Prince",
+      });
+      setLocationLoading(false);
+    }
+  };
+
+  const reverseGeocode = async (latitude: number, longitude: number) => {
+    try {
+      // Use a free reverse geocoding service
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+      );
+      const data = await response.json();
+
+      const countryCode = data.address?.country_code?.toUpperCase() || "HT";
+      const country = getCountryCallingCode(countryCode);
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      setLocationData({
+        country: countryCode,
+        countryCode: country,
+        region: data.address?.state || data.address?.region || "",
+        timezone,
+      });
+    } catch (error) {
+      console.error("Reverse geocoding error:", error);
+      await detectLocationByIP();
+    } finally {
+      setLocationLoading(false);
+    }
+  };
+
+  const detectLocationByIP = async () => {
+    try {
+      // Use ipapi.co for IP-based geolocation (free tier: 1000 requests/day)
+      const response = await fetch("https://ipapi.co/json/");
+      const data = await response.json();
+
+      setLocationData({
+        country: data.country_code || "HT",
+        countryCode: data.country_calling_code || "+509",
+        region: data.region || "",
+        timezone:
+          data.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
+        ipAddress: data.ip,
+      });
+    } catch (error) {
+      console.error("IP geolocation error:", error);
+      // Default to Haiti
+      setLocationData({
+        country: "HT",
+        countryCode: "+509",
+        region: "Ouest",
+        timezone: "America/Port-au-Prince",
+      });
+    } finally {
+      setLocationLoading(false);
+    }
+  };
+
+  const getCountryCallingCode = (countryCode: string): string => {
+    const codes: Record<string, string> = {
+      HT: "+509",
+      US: "+1",
+      CA: "+1",
+      FR: "+33",
+      GB: "+44",
+      DE: "+49",
+      IT: "+39",
+      ES: "+34",
+      BR: "+55",
+      MX: "+52",
+      // Add more as needed
+    };
+    return codes[countryCode] || "+509";
+  };
 
   const formatPhoneNumber = (value: string) => {
     let cleaned = value.replace(/\D/g, "");
@@ -128,10 +269,43 @@ export default function ModernSignUpForm() {
         lastName: data.lastName,
         phone: data.phoneNumber,
         role: data.role,
+        businessName: data.businessName,
+        legalBusinessName: data.legalBusinessName,
+        businessRegistrationNumber: data.businessRegistrationNumber,
+        businessAddress: data.businessAddress,
+        // Include location data
+        country: locationData.country,
+        countryCode: locationData.countryCode,
+        region: locationData.region,
+        timezone: locationData.timezone,
+        ipAddress: locationData.ipAddress,
       });
-      router.push(`/${locale}/dashboard`);
+
+      // Redirect to login after successful registration
+      router.push(`/${locale}/auth/signin?registered=true`);
     } catch (error: any) {
-      setError(error.message || "Registration failed. Please try again.");
+      // Enhanced error messages for 409 conflicts
+      let errorMessage = "Registration failed. Please try again.";
+
+      if (error.message?.includes("email already exists")) {
+        errorMessage =
+          "An account with this email already exists. Please sign in or use a different email.";
+      } else if (
+        error.message?.includes("phone already exists") ||
+        error.message?.includes("phone number already exists")
+      ) {
+        errorMessage =
+          "An account with this phone number already exists. Please use a different phone number.";
+      } else if (error.message?.includes("Business name is required")) {
+        errorMessage = "Business name is required for Merchants.";
+      } else if (error.message?.includes("Legal business name is required")) {
+        errorMessage =
+          "Legal business name, registration number, and address are required for Distributors.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -164,11 +338,13 @@ export default function ModernSignUpForm() {
 
   const getRoleIcon = (role: UserRole) => {
     switch (role) {
-      case UserRole.CLIENT:
+      case UserRole.INDIVIDUAL:
         return <User className="h-5 w-5" />;
       case UserRole.MERCHANT:
         return <Building className="h-5 w-5" />;
       case UserRole.DISTRIBUTOR:
+        return <Globe className="h-5 w-5" />;
+      case UserRole.DIASPORA:
         return <Globe className="h-5 w-5" />;
       default:
         return <User className="h-5 w-5" />;
@@ -177,12 +353,14 @@ export default function ModernSignUpForm() {
 
   const getRoleColor = (role: UserRole) => {
     switch (role) {
-      case UserRole.CLIENT:
+      case UserRole.INDIVIDUAL:
         return "from-blue-500 to-cyan-500";
       case UserRole.MERCHANT:
         return "from-green-500 to-emerald-500";
       case UserRole.DISTRIBUTOR:
         return "from-purple-500 to-indigo-500";
+      case UserRole.DIASPORA:
+        return "from-orange-500 to-red-500";
       default:
         return "from-blue-500 to-cyan-500";
     }
@@ -199,6 +377,36 @@ export default function ModernSignUpForm() {
       >
         <h2 className="text-3xl font-bold text-white">Join KobKlein</h2>
         <p className="text-blue-200">Create your account in 3 simple steps</p>
+
+        {/* Location Detection Indicator */}
+        {locationLoading && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center justify-center space-x-2 text-sm text-blue-300"
+          >
+            <motion.div
+              className="w-4 h-4 border-2 border-blue-300 border-t-transparent rounded-full"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            />
+            <span>Detecting your location...</span>
+          </motion.div>
+        )}
+
+        {!locationLoading && locationData.country && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center justify-center space-x-2 text-sm text-green-400"
+          >
+            <Globe className="h-4 w-4" />
+            <span>
+              Location detected: {locationData.country}{" "}
+              {locationData.countryCode}
+            </span>
+          </motion.div>
+        )}
 
         {/* Progress Steps */}
         <div className="flex items-center justify-center space-x-4 pt-4">
@@ -515,10 +723,12 @@ export default function ModernSignUpForm() {
 
               {/* Role Selection */}
               <div className="space-y-4">
-                {Object.values(UserRole).map((role) => (
-                  <motion.div
-                    key={role}
-                    className={`
+                {Object.values(UserRole)
+                  .filter((role) => role !== UserRole.ADMIN)
+                  .map((role) => (
+                    <motion.div
+                      key={role}
+                      className={`
                       p-6 rounded-xl border-2 cursor-pointer transition-all duration-300
                       ${
                         selectedRole === role
@@ -526,36 +736,38 @@ export default function ModernSignUpForm() {
                           : "border-white/20 bg-white/5 hover:border-white/30 hover:bg-white/8"
                       }
                     `}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => setValue("role", role)}
-                  >
-                    <div className="flex items-center space-x-4">
-                      <div
-                        className={`
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => setValue("role", role)}
+                    >
+                      <div className="flex items-center space-x-4">
+                        <div
+                          className={`
                         w-12 h-12 rounded-xl bg-gradient-to-r ${getRoleColor(
                           role
                         )}
                         flex items-center justify-center text-white
                       `}
-                      >
-                        {getRoleIcon(role)}
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="text-white font-semibold capitalize">
-                          {role}
-                        </h4>
-                        <p className="text-blue-200 text-sm">
-                          {role === UserRole.CLIENT &&
-                            "Send and receive payments"}
-                          {role === UserRole.MERCHANT &&
-                            "Accept payments for your business"}
-                          {role === UserRole.DISTRIBUTOR &&
-                            "Manage network operations"}
-                        </p>
-                      </div>
-                      <div
-                        className={`
+                        >
+                          {getRoleIcon(role)}
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="text-white font-semibold capitalize">
+                            {role}
+                          </h4>
+                          <p className="text-blue-200 text-sm">
+                            {role === UserRole.INDIVIDUAL &&
+                              "Send and receive payments"}
+                            {role === UserRole.MERCHANT &&
+                              "Accept payments for your business"}
+                            {role === UserRole.DISTRIBUTOR &&
+                              "Manage network operations"}
+                            {role === UserRole.DIASPORA &&
+                              "International remittance services"}
+                          </p>
+                        </div>
+                        <div
+                          className={`
                         w-6 h-6 rounded-full border-2 flex items-center justify-center
                         ${
                           selectedRole === role
@@ -563,49 +775,141 @@ export default function ModernSignUpForm() {
                             : "border-white/30"
                         }
                       `}
-                      >
-                        {selectedRole === role && (
-                          <Check className="h-3 w-3 text-white" />
-                        )}
+                        >
+                          {selectedRole === role && (
+                            <Check className="h-3 w-3 text-white" />
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  </motion.div>
-                ))}
+                    </motion.div>
+                  ))}
               </div>
 
-              {/* Business Name (for Merchant/Distributor) */}
-              {[UserRole.MERCHANT, UserRole.DISTRIBUTOR].includes(
-                selectedRole
-              ) && (
+              {/* Business Name (for Merchant) */}
+              {selectedRole === UserRole.MERCHANT && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="relative"
+                  className="space-y-4"
                 >
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-300">
-                    <Building className="h-5 w-5" />
+                  <div className="relative">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-300">
+                      <Building className="h-5 w-5" />
+                    </div>
+                    <Input
+                      placeholder="Business Name"
+                      {...register("businessName")}
+                      className={`
+                        pl-12 h-14 bg-white/5 border-white/20 text-white placeholder:text-blue-300
+                        rounded-xl backdrop-blur-sm focus:bg-white/10 focus:border-cyan-400/50
+                        transition-all duration-300 focus:ring-0 focus:ring-offset-0
+                        ${errors.businessName ? "border-red-400/50" : ""}
+                      `}
+                    />
+                    {errors.businessName && (
+                      <motion.p
+                        className="text-red-400 text-sm mt-2 flex items-center space-x-1"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                      >
+                        <AlertCircle className="h-3 w-3" />
+                        <span>{errors.businessName.message}</span>
+                      </motion.p>
+                    )}
                   </div>
-                  <Input
-                    placeholder="Business Name"
-                    {...register("businessName")}
-                    className={`
-                      pl-12 h-14 bg-white/5 border-white/20 text-white placeholder:text-blue-300
-                      rounded-xl backdrop-blur-sm focus:bg-white/10 focus:border-cyan-400/50
-                      transition-all duration-300 focus:ring-0 focus:ring-offset-0
-                      ${errors.businessName ? "border-red-400/50" : ""}
-                    `}
-                  />
-                  {errors.businessName && (
-                    <motion.p
-                      className="text-red-400 text-sm mt-2 flex items-center space-x-1"
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                    >
-                      <AlertCircle className="h-3 w-3" />
-                      <span>{errors.businessName.message}</span>
-                    </motion.p>
-                  )}
+                </motion.div>
+              )}
+
+              {/* Distributor Business Fields */}
+              {selectedRole === UserRole.DISTRIBUTOR && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="space-y-4"
+                >
+                  {/* Legal Business Name */}
+                  <div className="relative">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-300">
+                      <Building className="h-5 w-5" />
+                    </div>
+                    <Input
+                      placeholder="Legal Business Name"
+                      {...register("legalBusinessName")}
+                      className={`
+                        pl-12 h-14 bg-white/5 border-white/20 text-white placeholder:text-blue-300
+                        rounded-xl backdrop-blur-sm focus:bg-white/10 focus:border-cyan-400/50
+                        transition-all duration-300 focus:ring-0 focus:ring-offset-0
+                        ${errors.legalBusinessName ? "border-red-400/50" : ""}
+                      `}
+                    />
+                    {errors.legalBusinessName && (
+                      <motion.p
+                        className="text-red-400 text-sm mt-2 flex items-center space-x-1"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                      >
+                        <AlertCircle className="h-3 w-3" />
+                        <span>{errors.legalBusinessName.message}</span>
+                      </motion.p>
+                    )}
+                  </div>
+
+                  {/* Business Registration Number */}
+                  <div className="relative">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-300">
+                      <Building className="h-5 w-5" />
+                    </div>
+                    <Input
+                      placeholder="Business Registration Number"
+                      {...register("businessRegistrationNumber")}
+                      className={`
+                        pl-12 h-14 bg-white/5 border-white/20 text-white placeholder:text-blue-300
+                        rounded-xl backdrop-blur-sm focus:bg-white/10 focus:border-cyan-400/50
+                        transition-all duration-300 focus:ring-0 focus:ring-offset-0
+                        ${errors.businessRegistrationNumber ? "border-red-400/50" : ""}
+                      `}
+                    />
+                    {errors.businessRegistrationNumber && (
+                      <motion.p
+                        className="text-red-400 text-sm mt-2 flex items-center space-x-1"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                      >
+                        <AlertCircle className="h-3 w-3" />
+                        <span>{errors.businessRegistrationNumber.message}</span>
+                      </motion.p>
+                    )}
+                  </div>
+
+                  {/* Business Address */}
+                  <div className="relative">
+                    <div className="absolute left-4 top-6 text-blue-300">
+                      <Building className="h-5 w-5" />
+                    </div>
+                    <textarea
+                      placeholder="Business Address"
+                      {...register("businessAddress")}
+                      rows={3}
+                      className={`
+                        w-full pl-12 pr-4 py-4 bg-white/5 border-white/20 text-white placeholder:text-blue-300
+                        rounded-xl backdrop-blur-sm focus:bg-white/10 focus:border-cyan-400/50
+                        transition-all duration-300 focus:ring-0 focus:ring-offset-0 border-2
+                        ${errors.businessAddress ? "border-red-400/50" : ""}
+                      `}
+                    />
+                    {errors.businessAddress && (
+                      <motion.p
+                        className="text-red-400 text-sm mt-2 flex items-center space-x-1"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                      >
+                        <AlertCircle className="h-3 w-3" />
+                        <span>{errors.businessAddress.message}</span>
+                      </motion.p>
+                    )}
+                  </div>
                 </motion.div>
               )}
             </motion.div>

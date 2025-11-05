@@ -1,32 +1,32 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   HttpStatus,
-  Post,
+  Param,
   Patch,
-  Delete,
-  Request,
+  Post,
   UseGuards,
   ValidationPipe,
-  Param,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
+  ApiBody,
   ApiOperation,
   ApiResponse,
   ApiTags,
-  ApiBody,
 } from '@nestjs/swagger';
+import { UserProfile, UserRole } from '../types/database.types';
+import { extractError } from '../utils/error.utils';
 import { AuthService } from './auth.service';
+import { AdminOnly, Public } from './decorators/roles.decorator';
+import { User, UserId } from './decorators/user.decorator';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
-import { User, UserId } from './decorators/user.decorator';
-import { Roles, AdminOnly, Public } from './decorators/roles.decorator';
 import { RolesGuard } from './guards/roles.guard';
-import { UserProfile, UserRole } from '../types/database.types';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -35,9 +35,9 @@ export class AuthController {
 
   @Post('register')
   @Public()
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Register a new user',
-    description: 'Create a new user account with email verification'
+    description: 'Create a new user account with email verification',
   })
   @ApiResponse({
     status: 201,
@@ -62,7 +62,10 @@ export class AuthController {
       },
     },
   })
-  @ApiResponse({ status: 400, description: 'Registration failed - Invalid data' })
+  @ApiResponse({
+    status: 400,
+    description: 'Registration failed - Invalid data',
+  })
   @ApiResponse({ status: 409, description: 'User already exists' })
   async register(@Body(ValidationPipe) registerDto: RegisterDto) {
     try {
@@ -77,22 +80,23 @@ export class AuthController {
         timestamp: new Date().toISOString(),
       };
     } catch (error) {
+      const err = extractError(error);
       throw new HttpException(
         {
           success: false,
-          error: error.message,
+          error: err.message,
           timestamp: new Date().toISOString(),
         },
-        error.status || HttpStatus.BAD_REQUEST,
+        err.status || HttpStatus.BAD_REQUEST,
       );
     }
   }
 
   @Post('login')
   @Public()
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Authenticate user',
-    description: 'Login with email and password to receive access token'
+    description: 'Login with email and password to receive access token',
   })
   @ApiResponse({
     status: 200,
@@ -132,23 +136,24 @@ export class AuthController {
         timestamp: new Date().toISOString(),
       };
     } catch (error) {
+      const err = extractError(error);
       throw new HttpException(
         {
           success: false,
-          error: error.message,
+          error: err.message,
           timestamp: new Date().toISOString(),
         },
-        error.status || HttpStatus.UNAUTHORIZED,
+        err.status || HttpStatus.UNAUTHORIZED,
       );
     }
   }
 
-  @Get('profile')
+  @UseGuards(AuthGuard('jwt'))
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @ApiBearerAuth()
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get current user profile',
-    description: 'Retrieve complete profile information for authenticated user'
+    description: 'Retrieve complete profile information for authenticated user',
   })
   @ApiResponse({
     status: 200,
@@ -182,10 +187,11 @@ export class AuthController {
         timestamp: new Date().toISOString(),
       };
     } catch (error) {
+      const err = extractError(error);
       throw new HttpException(
         {
           success: false,
-          error: error.message,
+          error: err.message,
           timestamp: new Date().toISOString(),
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -194,11 +200,14 @@ export class AuthController {
   }
 
   @Post('refresh')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @Post('refresh')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @ApiBearerAuth()
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Refresh access token',
-    description: 'Generate new access token for authenticated user'
+    description: 'Generate new access token for authenticated user',
   })
   @ApiResponse({
     status: 200,
@@ -215,10 +224,11 @@ export class AuthController {
         timestamp: new Date().toISOString(),
       };
     } catch (error) {
+      const err = extractError(error);
       throw new HttpException(
         {
           success: false,
-          error: error.message,
+          error: err.message,
           timestamp: new Date().toISOString(),
         },
         HttpStatus.UNAUTHORIZED,
@@ -229,9 +239,9 @@ export class AuthController {
   @Post('logout')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @ApiBearerAuth()
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Logout user',
-    description: 'Invalidate user session and logout'
+    description: 'Invalidate user session and logout',
   })
   @ApiResponse({
     status: 200,
@@ -246,10 +256,11 @@ export class AuthController {
         timestamp: new Date().toISOString(),
       };
     } catch (error) {
+      const err = extractError(error);
       throw new HttpException(
         {
           success: false,
-          error: error.message,
+          error: err.message,
           timestamp: new Date().toISOString(),
         },
         HttpStatus.BAD_REQUEST,
@@ -260,9 +271,9 @@ export class AuthController {
   @Get('validate')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @ApiBearerAuth()
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Validate JWT token',
-    description: 'Verify token validity and return user context'
+    description: 'Verify token validity and return user context',
   })
   @ApiResponse({
     status: 200,
@@ -288,14 +299,14 @@ export class AuthController {
   @Public()
   @ApiOperation({
     summary: 'Request password reset',
-    description: 'Send password reset email to user'
+    description: 'Send password reset email to user',
   })
   @ApiBody({
     schema: {
       properties: {
-        email: { type: 'string', format: 'email' }
-      }
-    }
+        email: { type: 'string', format: 'email' },
+      },
+    },
   })
   @ApiResponse({ status: 200, description: 'Reset email sent successfully' })
   @ApiResponse({ status: 400, description: 'Invalid email address' })
@@ -308,13 +319,14 @@ export class AuthController {
         timestamp: new Date().toISOString(),
       };
     } catch (error) {
+      const err = extractError(error);
       throw new HttpException(
         {
           success: false,
-          error: error.message,
+          error: err.message,
           timestamp: new Date().toISOString(),
         },
-        error.status || HttpStatus.BAD_REQUEST,
+        err.status || HttpStatus.BAD_REQUEST,
       );
     }
   }
@@ -324,36 +336,40 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Update password',
-    description: 'Change user password'
+    description: 'Change user password',
   })
   @ApiBody({
     schema: {
       properties: {
-        newPassword: { type: 'string', minLength: 8 }
-      }
-    }
+        newPassword: { type: 'string', minLength: 8 },
+      },
+    },
   })
   @ApiResponse({ status: 200, description: 'Password updated successfully' })
   @ApiResponse({ status: 400, description: 'Invalid password format' })
   async updatePassword(
     @UserId() userId: string,
-    @Body() body: { newPassword: string }
+    @Body() body: { newPassword: string },
   ) {
     try {
-      const result = await this.authService.updatePassword(userId, body.newPassword);
+      const result = await this.authService.updatePassword(
+        userId,
+        body.newPassword,
+      );
       return {
         success: true,
         message: result.message,
         timestamp: new Date().toISOString(),
       };
     } catch (error) {
+      const err = extractError(error);
       throw new HttpException(
         {
           success: false,
-          error: error.message,
+          error: err.message,
           timestamp: new Date().toISOString(),
         },
-        error.status || HttpStatus.BAD_REQUEST,
+        err.status || HttpStatus.BAD_REQUEST,
       );
     }
   }
@@ -363,7 +379,7 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Send email verification',
-    description: 'Send verification email to user'
+    description: 'Send verification email to user',
   })
   @ApiResponse({ status: 200, description: 'Verification email sent' })
   async sendEmailVerification(@UserId() userId: string) {
@@ -375,13 +391,14 @@ export class AuthController {
         timestamp: new Date().toISOString(),
       };
     } catch (error) {
+      const err = extractError(error);
       throw new HttpException(
         {
           success: false,
-          error: error.message,
+          error: err.message,
           timestamp: new Date().toISOString(),
         },
-        error.status || HttpStatus.BAD_REQUEST,
+        err.status || HttpStatus.BAD_REQUEST,
       );
     }
   }
@@ -394,27 +411,27 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Assign role to user',
-    description: 'Assign a role to a user (Admin only)'
+    description: 'Assign a role to a user (Admin only)',
   })
   @ApiBody({
     schema: {
       properties: {
-        role: { type: 'string', enum: Object.values(UserRole) }
-      }
-    }
+        role: { type: 'string', enum: Object.values(UserRole) },
+      },
+    },
   })
   @ApiResponse({ status: 200, description: 'Role assigned successfully' })
   @ApiResponse({ status: 403, description: 'Insufficient permissions' })
   async assignRole(
     @Param('userId') targetUserId: string,
     @UserId() adminUserId: string,
-    @Body() body: { role: UserRole }
+    @Body() body: { role: UserRole },
   ) {
     try {
       const result = await this.authService.assignRole(
         targetUserId,
         body.role,
-        adminUserId
+        adminUserId,
       );
       return {
         success: true,
@@ -423,13 +440,14 @@ export class AuthController {
         timestamp: new Date().toISOString(),
       };
     } catch (error) {
+      const err = extractError(error);
       throw new HttpException(
         {
           success: false,
-          error: error.message,
+          error: err.message,
           timestamp: new Date().toISOString(),
         },
-        error.status || HttpStatus.BAD_REQUEST,
+        err.status || HttpStatus.BAD_REQUEST,
       );
     }
   }
@@ -440,13 +458,13 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Revoke role from user',
-    description: 'Remove a role from a user (Admin only)'
+    description: 'Remove a role from a user (Admin only)',
   })
   @ApiResponse({ status: 200, description: 'Role revoked successfully' })
   @ApiResponse({ status: 403, description: 'Insufficient permissions' })
   async revokeRole(
     @Param('userId') targetUserId: string,
-    @Param('role') role: UserRole
+    @Param('role') role: UserRole,
   ) {
     try {
       const result = await this.authService.revokeRole(targetUserId, role);
@@ -457,13 +475,14 @@ export class AuthController {
         timestamp: new Date().toISOString(),
       };
     } catch (error) {
+      const err = extractError(error);
       throw new HttpException(
         {
           success: false,
-          error: error.message,
+          error: err.message,
           timestamp: new Date().toISOString(),
         },
-        error.status || HttpStatus.BAD_REQUEST,
+        err.status || HttpStatus.BAD_REQUEST,
       );
     }
   }
@@ -474,16 +493,16 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Get user roles',
-    description: 'Retrieve all roles assigned to a user (Admin only)'
+    description: 'Retrieve all roles assigned to a user (Admin only)',
   })
   @ApiResponse({
     status: 200,
     description: 'User roles retrieved successfully',
     schema: {
       properties: {
-        roles: { type: 'array', items: { type: 'string' } }
-      }
-    }
+        roles: { type: 'array', items: { type: 'string' } },
+      },
+    },
   })
   async getUserRoles(@Param('userId') userId: string) {
     try {
@@ -494,13 +513,14 @@ export class AuthController {
         timestamp: new Date().toISOString(),
       };
     } catch (error) {
+      const err = extractError(error);
       throw new HttpException(
         {
           success: false,
-          error: error.message,
+          error: err.message,
           timestamp: new Date().toISOString(),
         },
-        error.status || HttpStatus.BAD_REQUEST,
+        err.status || HttpStatus.BAD_REQUEST,
       );
     }
   }

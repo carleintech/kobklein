@@ -1,10 +1,10 @@
 // KobKlein User Role System
 export enum UserRole {
-  CLIENT = "client", // Individual users with cards
+  INDIVIDUAL = "individual", // Individual users (previously CLIENT)
   MERCHANT = "merchant", // Businesses accepting payments
   DISTRIBUTOR = "distributor", // Card distribution partners
   DIASPORA = "diaspora", // International remittance users
-  ADMIN = "admin", // Platform administrators
+  ADMIN = "admin", // Platform administrators (not available for public signup)
 }
 
 export interface UserProfile {
@@ -17,10 +17,20 @@ export interface UserProfile {
   createdAt: Date;
   updatedAt: Date;
 
+  // Location data
+  country?: string;
+  countryCode?: string;
+  region?: string;
+  timezone?: string;
+  ipAddress?: string;
+
   // Role-specific fields
   businessName?: string; // For merchants and distributors
+  legalBusinessName?: string; // For distributors
+  businessRegistrationNumber?: string; // For distributors
+  businessAddress?: string; // For distributors
   businessId?: string; // For merchants and distributors
-  cardNumber?: string; // For clients
+  cardNumber?: string; // For individuals
   distributorTerritory?: string; // For distributors
   remittanceCountry?: string; // For diaspora users
 
@@ -45,9 +55,9 @@ export interface AuthContextType {
 
 // Route permissions for role-based access
 export const RolePermissions = {
-  [UserRole.CLIENT]: {
-    routes: ["/dashboard/client", "/cards", "/payments", "/history"],
-    label: "Client Dashboard",
+  [UserRole.INDIVIDUAL]: {
+    routes: ["/dashboard/individual", "/cards", "/payments", "/history"],
+    label: "Individual Dashboard",
   },
   [UserRole.MERCHANT]: {
     routes: ["/dashboard/merchant", "/pos", "/sales", "/analytics"],
@@ -67,7 +77,28 @@ export const RolePermissions = {
   },
 };
 
-// Haiti-specific validation - More flexible for different user types
-export const HAITI_PHONE_REGEX =
-  /^(\+?509\s?[1-9]\d{3}\s?\d{4}|[1-9]\d{7}|\+?509[1-9]\d{7})$/;
+// Phone validation patterns for different countries
+export const PHONE_PATTERNS = {
+  HT: {
+    regex: /^\+?509\s?[1-9]\d{7}$/,
+    prefix: "+509",
+    placeholder: "+509 1234 5678",
+    example: "+509 3456 7890",
+  },
+  US: {
+    regex: /^\+?1\s?\d{10}$/,
+    prefix: "+1",
+    placeholder: "+1 5551234567",
+    example: "+1 5551234567",
+  },
+  INTERNATIONAL: {
+    regex: /^\+[1-9]\d{1,14}$/,
+    prefix: "+",
+    placeholder: "+XX XXXXXXXXXX",
+    example: "+33 612345678",
+  },
+};
+
+// Haiti-specific validation - More flexible for different user types (kept for backward compatibility)
+export const HAITI_PHONE_REGEX = /^\+?509\s?[1-9]\d{7}$/;
 export const HAITI_PHONE_PREFIX = "+509";

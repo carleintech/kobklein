@@ -138,7 +138,8 @@ export default function SignUpForm() {
       await registerUser(userData);
 
       console.log("Registration successful, redirecting..."); // Debug logging
-      router.push(`/${locale}/dashboard`);
+      // Redirect to client dashboard since backend assigns CLIENT role by default
+      router.push(`/${locale}/dashboard/client`);
     } catch (error: any) {
       console.error("Registration error:", error); // Debug logging
 

@@ -16,6 +16,7 @@ import {
 import { PaymentRequestsService } from './payment-requests.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
+import { extractError } from '../../utils/error.utils';
 
 interface CreatePaymentRequestDto {
   recipientId?: string;
@@ -68,10 +69,11 @@ export class PaymentRequestsController {
         message: 'Payment request created successfully'
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error creating payment request', error);
       throw new HttpException(
-        error.message || 'Failed to create payment request',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to create payment request',
+        err.status || HttpStatus.BAD_REQUEST
       );
     }
   }
@@ -101,10 +103,11 @@ export class PaymentRequestsController {
         }
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting sent requests', error);
       throw new HttpException(
-        error.message || 'Failed to get sent requests',
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR
+        err.message || 'Failed to get sent requests',
+        err.status || HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }
@@ -134,10 +137,11 @@ export class PaymentRequestsController {
         }
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting received requests', error);
       throw new HttpException(
-        error.message || 'Failed to get received requests',
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR
+        err.message || 'Failed to get received requests',
+        err.status || HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }
@@ -162,10 +166,11 @@ export class PaymentRequestsController {
         data: paymentRequest
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting payment request', error);
       throw new HttpException(
-        error.message || 'Failed to get payment request',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to get payment request',
+        err.status || HttpStatus.BAD_REQUEST
       );
     }
   }
@@ -196,10 +201,11 @@ export class PaymentRequestsController {
         message: `Payment request ${respondDto.action}ed successfully`
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error responding to payment request', error);
       throw new HttpException(
-        error.message || 'Failed to respond to payment request',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to respond to payment request',
+        err.status || HttpStatus.BAD_REQUEST
       );
     }
   }
@@ -221,10 +227,11 @@ export class PaymentRequestsController {
         message: 'Payment request cancelled successfully'
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error cancelling payment request', error);
       throw new HttpException(
-        error.message || 'Failed to cancel payment request',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to cancel payment request',
+        err.status || HttpStatus.BAD_REQUEST
       );
     }
   }
@@ -246,10 +253,11 @@ export class PaymentRequestsController {
         message: 'Payment request resent successfully'
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error resending payment request', error);
       throw new HttpException(
-        error.message || 'Failed to resend payment request',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to resend payment request',
+        err.status || HttpStatus.BAD_REQUEST
       );
     }
   }
@@ -271,10 +279,11 @@ export class PaymentRequestsController {
         data: recurringRequests
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting recurring requests', error);
       throw new HttpException(
-        error.message || 'Failed to get recurring requests',
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR
+        err.message || 'Failed to get recurring requests',
+        err.status || HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }
@@ -300,10 +309,11 @@ export class PaymentRequestsController {
         message: 'Recurring request updated successfully'
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error updating recurring request', error);
       throw new HttpException(
-        error.message || 'Failed to update recurring request',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to update recurring request',
+        err.status || HttpStatus.BAD_REQUEST
       );
     }
   }
@@ -326,10 +336,11 @@ export class PaymentRequestsController {
         data: analytics
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error getting request analytics', error);
       throw new HttpException(
-        error.message || 'Failed to get request analytics',
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR
+        err.message || 'Failed to get request analytics',
+        err.status || HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }
@@ -360,10 +371,11 @@ export class PaymentRequestsController {
         message: `Created ${results.successful.length} of ${requests.length} payment requests`
       };
     } catch (error) {
+      const err = extractError(error);
       this.logger.error('Error creating bulk requests', error);
       throw new HttpException(
-        error.message || 'Failed to create bulk requests',
-        error.status || HttpStatus.BAD_REQUEST
+        err.message || 'Failed to create bulk requests',
+        err.status || HttpStatus.BAD_REQUEST
       );
     }
   }
