@@ -42,9 +42,13 @@ export default function SignInForm() {
     setLoading(true);
 
     try {
-      await login(data.email, data.password);
-      // Redirect to client dashboard since backend assigns CLIENT role by default
-      router.push(`/${locale}/dashboard/client`);
+      const { user } = await login(data.email, data.password);
+
+      // Redirect based on user's primary role
+      const role = user.primaryRole || user.role || 'INDIVIDUAL';
+      const redirectPath = getDashboardPathForRole(role, String(locale));
+
+      router.push(redirectPath);
     } catch (error: any) {
       setError(
         error.message || "An unexpected error occurred. Please try again."

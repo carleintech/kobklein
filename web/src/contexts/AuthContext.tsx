@@ -16,7 +16,7 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<{ user: User }>;
   logout: () => Promise<void>;
   register: (userData: {
     email: string;
@@ -100,6 +100,8 @@ function AuthProviderInner({ children }: { children: React.ReactNode }) {
       if (result.success && result.data?.token) {
         apiClient.setToken(result.data.token);
         setIsAuthenticated(true);
+        // Return user data for redirect logic
+        return { user: result.data.user };
       } else {
         const errorMessage =
           typeof result.error === "string"
@@ -202,4 +204,3 @@ export function useAuth() {
 
 // Export query client for use in other parts of the app
 export { queryClient };
-

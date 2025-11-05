@@ -11,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/SupabaseAuthContext";
+import { getDashboardPathForRole } from "@/lib/postLoginRedirect";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertCircle, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
@@ -31,7 +32,7 @@ export default function SupabaseSignInForm() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { signIn } = useAuth();
+  const { signIn, user: authUser } = useAuth();
   const router = useRouter();
   const params = useParams();
   const locale = params.locale || "en";
@@ -56,9 +57,10 @@ export default function SupabaseSignInForm() {
         return;
       }
 
-      // Redirect to dashboard on successful sign in
-      // Redirect to client dashboard since backend assigns CLIENT role by default
-      router.push(`/${locale}/dashboard/client`);
+      // Use role from auth user or default to INDIVIDUAL
+      const role = authUser?.role || "INDIVIDUAL";
+      const redirectPath = getDashboardPathForRole(role, String(locale));
+      router.push(redirectPath);
     } catch (error: any) {
       setError(
         getErrorMessage(error.message || "An unexpected error occurred")
@@ -191,4 +193,3 @@ export default function SupabaseSignInForm() {
     </Card>
   );
 }
-

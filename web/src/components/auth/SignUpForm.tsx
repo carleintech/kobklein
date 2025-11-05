@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAuth } from "@/contexts/AuthContext";
+import { getDashboardPathForRole } from "@/lib/postLoginRedirect";
 import { HAITI_PHONE_PREFIX, HAITI_PHONE_REGEX, UserRole } from "@/types/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertCircle, Eye, EyeOff } from "lucide-react";
@@ -138,8 +139,10 @@ export default function SignUpForm() {
       await registerUser(userData);
 
       console.log("Registration successful, redirecting..."); // Debug logging
-      // Redirect to client dashboard since backend assigns CLIENT role by default
-      router.push(`/${locale}/dashboard/client`);
+
+      // Redirect based on user's selected role
+      const redirectPath = getDashboardPathForRole(data.role, String(locale));
+      router.push(redirectPath);
     } catch (error: any) {
       console.error("Registration error:", error); // Debug logging
 
@@ -414,4 +417,3 @@ export default function SignUpForm() {
     </Card>
   );
 }
-
