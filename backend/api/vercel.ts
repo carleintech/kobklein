@@ -3,7 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import * as express from 'express';
+import express from 'express';
 import 'reflect-metadata';
 import { AppModule } from './src/app.module';
 
