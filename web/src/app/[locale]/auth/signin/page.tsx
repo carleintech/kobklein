@@ -1,5 +1,5 @@
 import AuthLayout from "@/components/auth/AuthLayout";
-import ModernSignInForm from "@/components/auth/ModernSignInForm";
+import SupabaseSignInForm from "@/components/auth/SupabaseSignInForm";
 import { unstable_setRequestLocale } from "next-intl/server";
 
 type PageProps = {
@@ -14,7 +14,7 @@ export default function SignInPage({ params: { locale } }: PageProps) {
       subtitle="Sign in to your KobKlein account and continue your journey with secure, bank-free payments."
       backgroundImage="/images/auth/signbg.png"
     >
-      <ModernSignInForm />
+      <SupabaseSignInForm />
     </AuthLayout>
   );
 }

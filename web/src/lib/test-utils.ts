@@ -2,7 +2,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { renderHook, act } from '@testing-library/react-hooks';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AuthProvider } from '@/contexts/AuthContext';
+import { AuthProvider } from '@/contexts/SupabaseAuthContext';
 import { ErrorProvider } from '@/contexts/ErrorContext';
 import { ReactNode } from 'react';
 import React from 'react';
@@ -18,13 +18,13 @@ export const testConfig = {
   },
   mockData: {
     users: {
-      client: {
-        id: 'test-client-123',
-        email: 'client@test.com',
-        type: 'CLIENT',
+      individual: {
+        id: 'test-individual-123',
+        email: 'individual@test.com',
+        type: 'INDIVIDUAL',
         profile: {
           firstName: 'Test',
-          lastName: 'Client',
+          lastName: 'Individual',
           phone: '+509-1234-5678',
         },
       },
@@ -235,7 +235,7 @@ export class PerformanceTester {
 export const performanceTester = new PerformanceTester();
 
 // Test data generators
-export const generateTestUser = (type: 'CLIENT' | 'MERCHANT' | 'DIASPORA' = 'CLIENT') => {
+export const generateTestUser = (type: 'INDIVIDUAL' | 'MERCHANT' | 'DIASPORA' = 'INDIVIDUAL') => {
   const baseUser = {
     id: `test-${type.toLowerCase()}-${Date.now()}`,
     email: `test-${type.toLowerCase()}@example.com`,
@@ -247,12 +247,12 @@ export const generateTestUser = (type: 'CLIENT' | 'MERCHANT' | 'DIASPORA' = 'CLI
   };
 
   switch (type) {
-    case 'CLIENT':
+    case 'INDIVIDUAL':
       return {
         ...baseUser,
         profile: {
           firstName: 'Test',
-          lastName: 'Client',
+          lastName: 'Individual',
           phone: '+509-1234-5678',
           dateOfBirth: '1990-01-01',
           address: {

@@ -1,4 +1,4 @@
-import { api } from '@/lib/api-client';
+import { api } from "@/lib/api-client";
 
 // Types
 export interface LoginCredentials {
@@ -12,7 +12,7 @@ export interface RegisterData {
   firstName: string;
   lastName: string;
   phone?: string;
-  role: 'CLIENT' | 'MERCHANT' | 'DISTRIBUTOR' | 'DIASPORA';
+  role: "INDIVIDUAL" | "MERCHANT" | "DISTRIBUTOR" | "DIASPORA";
 }
 
 export interface AuthResponse {
@@ -44,7 +44,7 @@ export interface User {
 export const authService = {
   // Login
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    const response = await api.post<AuthResponse>('/auth/login', credentials);
+    const response = await api.post<AuthResponse>("/auth/login", credentials);
 
     // Store token
     if (response.accessToken) {
@@ -56,7 +56,7 @@ export const authService = {
 
   // Register
   async register(data: RegisterData): Promise<AuthResponse> {
-    const response = await api.post<AuthResponse>('/auth/register', data);
+    const response = await api.post<AuthResponse>("/auth/register", data);
 
     // Store token
     if (response.accessToken) {
@@ -69,7 +69,7 @@ export const authService = {
   // Logout
   async logout(): Promise<void> {
     try {
-      await api.post('/auth/logout');
+      await api.post("/auth/logout");
     } finally {
       // Clear token regardless of API response
       api.clearAuthToken();
@@ -78,12 +78,14 @@ export const authService = {
 
   // Get current user profile
   async getProfile(): Promise<User> {
-    return api.get<User>('/auth/profile');
+    return api.get<User>("/auth/profile");
   },
 
   // Refresh token
   async refreshToken(refreshToken: string): Promise<AuthResponse> {
-    const response = await api.post<AuthResponse>('/auth/refresh', { refreshToken });
+    const response = await api.post<AuthResponse>("/auth/refresh", {
+      refreshToken,
+    });
 
     if (response.accessToken) {
       api.setAuthToken(response.accessToken);
@@ -94,17 +96,20 @@ export const authService = {
 
   // Request password reset
   async requestPasswordReset(email: string): Promise<{ message: string }> {
-    return api.post('/auth/password-reset/request', { email });
+    return api.post("/auth/password-reset/request", { email });
   },
 
   // Reset password
-  async resetPassword(token: string, newPassword: string): Promise<{ message: string }> {
-    return api.post('/auth/password-reset/confirm', { token, newPassword });
+  async resetPassword(
+    token: string,
+    newPassword: string
+  ): Promise<{ message: string }> {
+    return api.post("/auth/password-reset/confirm", { token, newPassword });
   },
 
   // Verify email
   async verifyEmail(token: string): Promise<{ message: string }> {
-    return api.post('/auth/verify-email', { token });
+    return api.post("/auth/verify-email", { token });
   },
 
   // Check if user is authenticated

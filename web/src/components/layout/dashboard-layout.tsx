@@ -1,8 +1,8 @@
 "use client";
 
 import { ErrorBoundary } from "@/components/ui/error-boundary";
-import { useAuth } from "@/contexts/AuthContext";
 import { usePWA } from "@/contexts/PWAContext";
+import { useAuth } from "@/contexts/SupabaseAuthContext";
 import { cn } from "@/lib/utils";
 import React from "react";
 import { MobileErrorFallback, MobileNavigation } from "./mobile-navigation";
@@ -104,4 +104,3 @@ export function DashboardGrid({
     </div>
   );
 }
-

@@ -57,7 +57,7 @@ export const registerSchema = z
     phone: phoneSchema,
     password: passwordSchema,
     confirmPassword: z.string().min(1, "Please confirm your password"),
-    role: z.enum(["client", "merchant", "distributor", "diaspora"]),
+    role: z.enum(["individual", "merchant", "distributor", "diaspora"]),
     country: z.string().min(2, "Please select your country"),
     language: z.enum(["en", "fr", "ht", "es"]),
     agreeToTerms: z
@@ -199,7 +199,7 @@ export const autoRefillSchema = z.object({
 export const adminUserUpdateSchema = z.object({
   userId: z.string().min(1, "User ID is required"),
   isActive: z.boolean(),
-  role: z.enum(["client", "merchant", "distributor", "diaspora", "admin"]),
+  role: z.enum(["individual", "merchant", "distributor", "diaspora", "admin"]),
   isVerified: z.boolean(),
 });
 

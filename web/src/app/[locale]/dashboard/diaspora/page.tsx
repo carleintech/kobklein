@@ -1,4 +1,3 @@
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { DashboardLayout } from "@/components/dashboards/shared/dashboard-layout";
 import {
   Card,
@@ -39,7 +38,7 @@ export default function DiasporaDashboard() {
   ];
 
   return (
-    <ProtectedRoute allowedRoles={[UserRole.DIASPORA]}>
+    <SupabaseProtectedRoute allowedRoles={[UserRole.DIASPORA]}>
       <DashboardLayout
         title="Diaspora Connect"
         userRole={UserRole.DIASPORA}
@@ -302,6 +301,6 @@ export default function DiasporaDashboard() {
           </Card>
         </div>
       </DashboardLayout>
-    </ProtectedRoute>
+    </SupabaseProtectedRoute>
   );
 }

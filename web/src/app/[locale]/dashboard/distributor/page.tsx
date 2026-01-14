@@ -1,24 +1,23 @@
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { DashboardLayout } from "@/components/dashboards/shared/dashboard-layout";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
 } from "@/components/ui/card";
 import { UserRole } from "@/types/auth";
 import {
-  AlertTriangle,
-  BarChart3,
-  CheckCircle,
-  Clock,
-  CreditCard,
-  MapPin,
-  Package,
-  TrendingUp,
-  Truck,
-  Users,
+    AlertTriangle,
+    BarChart3,
+    CheckCircle,
+    Clock,
+    CreditCard,
+    MapPin,
+    Package,
+    TrendingUp,
+    Truck,
+    Users,
 } from "lucide-react";
 
 export default function DistributorDashboard() {
@@ -158,17 +157,17 @@ export default function DistributorDashboard() {
       icon: "Settings" as const,
     },
   ];
+  ];
 
   return (
-    <ProtectedRoute allowedRoles={[UserRole.DISTRIBUTOR]}>
+    <SupabaseProtectedRoute allowedRoles={[UserRole.DISTRIBUTOR]}>
       <DashboardLayout
         title="Distributor Hub"
         userRole={UserRole.DISTRIBUTOR}
         navigation={distributorNavigation}
         walletBalance={{ htg: 85000, usd: 630 }}
         notifications={3}
-      >
-        {/* Key Metrics */}
+      > {/* Key Metrics */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -419,6 +418,6 @@ export default function DistributorDashboard() {
           </Card>
         </div>
       </DashboardLayout>
-    </ProtectedRoute>
+    </SupabaseProtectedRoute>
   );
 }

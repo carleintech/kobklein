@@ -3,12 +3,13 @@
 import { supabase } from "@/lib/supabase";
 import type { UserProfile, UserRole } from "@/types/auth";
 import { AuthError, Session, User } from "@supabase/supabase-js";
-import { createContext, useContext, useEffect, useState } from "react";
+import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 
 interface AuthContextType {
   user: UserProfile | null;
   session: Session | null;
   loading: boolean;
+  hydrated: boolean;
   signUp: (
     email: string,
     password: string,
@@ -30,6 +31,9 @@ interface AuthContextType {
   ) => Promise<{ error: Error | null }>;
 }
 
+// Profile cache to prevent redundant API calls during Fast Refresh and remounts
+const profileCache = new Map<string, UserProfile>();
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
@@ -41,22 +45,34 @@ export const useAuth = () => {
 };
 
 interface AuthProviderProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [hydrated, setHydrated] = useState(false);
 
   // Fetch user profile from database
   const fetchUserProfile = async (
     userId: string
   ): Promise<UserProfile | null> => {
+    // Check cache first
+    if (profileCache.has(userId)) {
+      console.log('[Auth] Using cached profile for', userId);
+      return profileCache.get(userId)!;
+    }
+
     try {
       const response = await fetch(`/api/auth/profile?userId=${userId}`);
       if (response.ok) {
         const { user } = await response.json();
+        // Cache the profile
+        if (user) {
+          profileCache.set(userId, user);
+          console.log('[Auth] Cached profile for', userId);
+        }
         return user;
       }
 
@@ -81,7 +97,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
               firstName: supabaseUser.user_metadata?.firstName || "",
               lastName: supabaseUser.user_metadata?.lastName || "",
               phoneNumber: supabaseUser.user_metadata?.phoneNumber || "",
-              role: supabaseUser.user_metadata?.role || "CLIENT",
+              role: supabaseUser.user_metadata?.role || "individual",
             }),
           });
 
@@ -93,6 +109,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             );
             if (newProfileResponse.ok) {
               const { user } = await newProfileResponse.json();
+              // Cache the newly created profile
+              if (user) {
+                profileCache.set(userId, user);
+                console.log('[Auth] Cached newly created profile for', userId);
+              }
               return user;
             }
           }
@@ -107,14 +128,22 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const restore = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
+
       if (session?.user) {
-        fetchUserProfile(session.user.id).then(setUser);
+        const profile = await fetchUserProfile(session.user.id);
+        setUser(profile);
+      } else {
+        setUser(null);
       }
+
       setLoading(false);
-    });
+      setHydrated(true);
+    };
+
+    restore();
 
     // Listen for auth changes
     const {
@@ -130,6 +159,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       }
 
       setLoading(false);
+      setHydrated(true);
     });
 
     return () => subscription.unsubscribe();
@@ -147,6 +177,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   ) => {
     try {
       // Sign up with Supabase Auth
+      // The user metadata is stored in Supabase automatically
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -155,7 +186,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             firstName: userData?.firstName || "",
             lastName: userData?.lastName || "",
             phoneNumber: userData?.phoneNumber || "",
-            role: userData?.role || "CLIENT",
+            role: userData?.role || "individual",
           },
         },
       });
@@ -164,29 +195,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         return { user: null, error };
       }
 
-      // Create user profile in database via API
-      if (data.user) {
-        const response = await fetch("/api/auth/register", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            id: data.user.id,
-            email: data.user.email,
-            firstName: userData?.firstName || "",
-            lastName: userData?.lastName || "",
-            phoneNumber: userData?.phoneNumber || "",
-            role: userData?.role || "CLIENT",
-          }),
-        });
-
-        if (!response.ok) {
-          console.error("Failed to create user profile in database");
-        }
-      }
-
-      return { user: data.user, error: null };
+      // Return the user and data - let the calling component handle profile updates
+      return { user: data.user, error: null, data };
     } catch (error) {
       return { user: null, error: error as AuthError };
     }
@@ -229,6 +239,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       if (!error) {
         setUser(null);
         setSession(null);
+        // Clear profile cache on logout
+        profileCache.clear();
+        console.log('[Auth] Profile cache cleared on logout');
       }
 
       return { error };
@@ -283,6 +296,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     user,
     session,
     loading,
+    hydrated,
     signUp,
     signIn,
     signOut,
@@ -292,4 +306,3 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
-

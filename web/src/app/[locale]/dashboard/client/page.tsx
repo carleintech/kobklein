@@ -1,7 +1,7 @@
 import { CreditCard } from "lucide-react";
 import { Metadata } from "next";
 
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import SupabaseProtectedRoute from "@/components/auth/SupabaseProtectedRoute";
 import { QuickActions } from "@/components/dashboards/client/quick-actions";
 // import { RecentTransactions } from "@/components/dashboards/client/recent-transactions";
 import { WalletOverview } from "@/components/dashboards/client/wallet-overview";
@@ -128,10 +128,10 @@ export default function ClientDashboard({ params }: ClientDashboardProps) {
   const clientNavigation = getClientNavigation(params.locale);
 
   return (
-    <ProtectedRoute allowedRoles={[UserRole.CLIENT]}>
+    <SupabaseProtectedRoute allowedRoles={[UserRole.INDIVIDUAL]}>
       <DashboardLayout
         title="Dashboard"
-        userRole={UserRole.CLIENT}
+        userRole={UserRole.INDIVIDUAL}
         navigation={clientNavigation}
         walletBalance={mockWalletData.balance}
         notifications={3}
@@ -211,6 +211,6 @@ export default function ClientDashboard({ params }: ClientDashboardProps) {
           </div>
         </div>
       </DashboardLayout>
-    </ProtectedRoute>
+    </SupabaseProtectedRoute>
   );
 }

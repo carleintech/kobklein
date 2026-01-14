@@ -1,7 +1,6 @@
 import { BarChart3, CreditCard, Users } from "lucide-react";
 import { Metadata } from "next";
 
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { MerchantTransactions } from "@/components/dashboards/merchant/merchant-transactions";
 import { POSInterface } from "@/components/dashboards/merchant/pos-interface";
 import { SalesOverview } from "@/components/dashboards/merchant/sales-overview";
@@ -140,7 +139,7 @@ const merchantNavigation = [
 
 export default function MerchantDashboard() {
   return (
-    <ProtectedRoute allowedRoles={[UserRole.MERCHANT]}>
+    <SupabaseProtectedRoute allowedRoles={[UserRole.MERCHANT]}>
       <DashboardLayout
         title="Merchant Dashboard"
         userRole={UserRole.MERCHANT}
@@ -224,6 +223,6 @@ export default function MerchantDashboard() {
           </div>
         </div>
       </DashboardLayout>
-    </ProtectedRoute>
+    </SupabaseProtectedRoute>
   );
 }

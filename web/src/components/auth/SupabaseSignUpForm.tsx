@@ -37,7 +37,7 @@ const signUpSchema = z
       .min(8, "Phone number must be at least 8 characters"),
     password: z.string().min(8, "Password must be at least 8 characters"),
     confirmPassword: z.string(),
-    role: z.enum(["client", "merchant", "distributor"] as const),
+    role: z.enum(["individual", "merchant", "distributor"] as const),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -66,7 +66,7 @@ export default function SupabaseSignUpForm() {
   } = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
-      role: "client",
+      role: "individual",
     },
   });
 
@@ -219,9 +219,12 @@ export default function SupabaseSignUpForm() {
           <div className="space-y-2">
             <Label htmlFor="role">Account Type</Label>
             <Select
-              defaultValue="client"
+              defaultValue="individual"
               onValueChange={(value) =>
-                setValue("role", value as "client" | "merchant" | "distributor")
+                setValue(
+                  "role",
+                  value as "individual" | "merchant" | "distributor"
+                )
               }
               disabled={loading}
             >
@@ -229,8 +232,8 @@ export default function SupabaseSignUpForm() {
                 <SelectValue placeholder="Select account type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="client">
-                  Client - Personal Account
+                <SelectItem value="individual">
+                  Individual - Personal Account
                 </SelectItem>
                 <SelectItem value="merchant">
                   Merchant - Business Account
@@ -325,4 +328,3 @@ export default function SupabaseSignUpForm() {
     </Card>
   );
 }
-

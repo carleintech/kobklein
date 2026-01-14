@@ -7,9 +7,9 @@ import {
   GlobalErrorHandler,
 } from "@/components/ui/error-notifications";
 import { RouteTransition } from "@/components/ui/route-transition";
-import { AuthProvider } from "@/contexts/AuthContext";
 import { ErrorProvider } from "@/contexts/ErrorContext";
 import { PWAProvider } from "@/contexts/PWAContext";
+import { AuthProvider } from "@/contexts/SupabaseAuthContext";
 import { WebSocketProvider } from "@/contexts/WebSocketContext";
 import { fontClasses } from "@/lib/fonts";
 import { Analytics } from "@vercel/analytics/react";

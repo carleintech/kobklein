@@ -3,7 +3,7 @@
 export interface User {
   id: string;
   email: string;
-  role: "CLIENT" | "MERCHANT" | "DISTRIBUTOR" | "DIASPORA" | "ADMIN";
+  role: "INDIVIDUAL" | "MERCHANT" | "DISTRIBUTOR" | "DIASPORA" | "ADMIN";
   isActive: boolean;
   verificationStatus?: "PENDING" | "VERIFIED" | "REJECTED";
   kycStatus?: "PENDING" | "APPROVED" | "REJECTED";

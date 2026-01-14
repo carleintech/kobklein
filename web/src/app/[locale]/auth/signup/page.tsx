@@ -1,5 +1,5 @@
 import AuthLayout from "@/components/auth/AuthLayout";
-import ModernSignUpForm from "@/components/auth/ModernSignUpForm";
+import SupabaseSignUpForm from "@/components/auth/SupabaseSignUpForm";
 import { unstable_setRequestLocale } from "next-intl/server";
 
 type PageProps = {
@@ -14,7 +14,7 @@ export default function SignUpPage({ params: { locale } }: PageProps) {
       subtitle="Create your account and start your journey with secure, bank-free payments. Connect with Haiti and the diaspora community worldwide."
       backgroundImage="/images/auth/signupbg.png"
     >
-      <ModernSignUpForm />
+      <SupabaseSignUpForm />
     </AuthLayout>
   );
 }

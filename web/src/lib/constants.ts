@@ -224,7 +224,7 @@ export const ROUTES = {
 
 // ===== API CONSTANTS =====
 export const API_CONFIG = {
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001",
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002/api/v1",
   timeout: 30000, // 30 seconds
   retries: 3,
   retryDelay: 1000, // 1 second
