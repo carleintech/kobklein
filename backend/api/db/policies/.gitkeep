@@ -1,0 +1,2 @@
+# Database Policies
+Row-Level Security (RLS) policies for Supabase database tables.

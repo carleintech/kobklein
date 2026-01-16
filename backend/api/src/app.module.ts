@@ -7,14 +7,16 @@ import { ThrottlerGuard } from '@nestjs/throttler';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
-import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
-// import { WalletsModule } from './wallets/wallets.module'; // Temporarily commented out
-// import { TransactionsModule } from './transactions/transactions.module'; // Temporarily commented out
-import { PaymentsModule } from './payments/payments.module';
-import { AdminModule } from './admin/admin.module';
-import { NotificationsModule } from './notifications/notifications.module';
-import { AdvancedPaymentsModule } from './advanced-payments/advanced-payments.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { UsersModule } from './modules/users/users.module';
+import { LedgerModule } from './modules/ledger/ledger.module'; // ✅ NEW: Double-entry ledger system
+import { WalletsModule } from './modules/wallets/wallets.module'; // ✅ NEW: Wallet management on ledger
+// import { TransactionsModule } from './modules/transactions/transactions.module'; // Will be rebuilt on ledger
+import { PaymentsModule } from './modules/payments/payments.module';
+import { AdminModule } from './modules/admin/admin.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
+import { AdvancedPaymentsModule } from './modules/advanced-payments/advanced-payments.module';
+import { EmailModule } from './modules/email/email.module';
 
 @Module({
   imports: [
@@ -47,10 +49,12 @@ import { AdvancedPaymentsModule } from './advanced-payments/advanced-payments.mo
     PrismaModule,
     AuthModule,
     UsersModule,
-    // WalletsModule, // Temporarily commented out due to type conflicts
-    // TransactionsModule, // Temporarily commented out due to compilation errors
+    EmailModule, // ✅ NEW: Transactional email service (Resend)
+    LedgerModule, // ✅ NEW: Financial core (double-entry bookkeeping)
+    WalletsModule, // ✅ NEW: User wallet management
+    // TransactionsModule, // Being rebuilt on ledger foundation
     PaymentsModule,
-    AdvancedPaymentsModule, // This is what we need for testing!
+    AdvancedPaymentsModule,
     AdminModule,
     NotificationsModule,
   ],

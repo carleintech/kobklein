@@ -70,6 +70,10 @@ model User {
 
   payments Payment[]
 
+  // 🏦 Ledger System Relations
+  accounts                Account[]              @relation("AccountOwner")
+  initiatedTransactions   FinancialTransaction[] @relation("TransactionInitiator")
+
   @@index([country], map: "idx_users_country")
   @@index([email], map: "idx_users_email")
   @@index([phone], map: "idx_users_phone")
@@ -160,7 +164,13 @@ model Wallet {
   id                      String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   userId                  String          @map("user_id") @db.Uuid
   currency                String?         @default("HTG") @db.VarChar(3)
+  
+  /// @deprecated ⚠️ NEVER USE - Balance is ALWAYS derived from ledger_entries table
+  /// This column exists for backward compatibility only and will be removed in v2.0.0
+  /// Use LedgerService.getAccountBalance() or WalletsService.getWalletBalance() instead
+  /// Real balance = SUM(ledger_entries.amount WHERE entry_type='CREDIT') - SUM(ledger_entries.amount WHERE entry_type='DEBIT')
   balance                 Decimal?        @default(0) @db.Decimal(15, 2)
+  
   status                  WalletStatus?   @map("status") @default(ACTIVE)
   dailyLimit              Decimal?        @map("daily_limit") @default(50000) @db.Decimal(15, 2)
   monthlyLimit            Decimal?        @map("monthly_limit") @default(500000) @db.Decimal(15, 2)
@@ -879,7 +889,7 @@ enum TransactionType {
 }
 
 enum UserRole {
-  CLIENT
+  INDIVIDUAL
   MERCHANT
   DISTRIBUTOR
   DIASPORA
@@ -1117,6 +1127,248 @@ enum delivery_status {
   OPENED
   CLICKED
 }
+
+// ========================== LEDGER SYSTEM ==========================
+// 🏦 DOUBLE-ENTRY BOOKKEEPING SYSTEM
+// This is the financial core of KobKlein
+// Every financial operation creates TWO entries (debit + credit)
+// Balances are DERIVED, never updated directly
+
+// 💼 Chart of Accounts
+model Account {
+  id             String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  accountNumber  String        @unique @db.VarChar(20) // e.g., "1000-USER-xxxxx"
+  accountName    String        @db.VarChar(255) // Human-readable name
+  accountType    AccountType // ASSET | LIABILITY | EQUITY | REVENUE | EXPENSE
+  subType        String?       @db.VarChar(100) // USER_WALLET | MERCHANT_REVENUE | SYSTEM_FEE
+  
+  // Ownership
+  ownerId        String?       @db.Uuid // User ID if user-owned account
+  ownerType      OwnerType? // USER | MERCHANT | DISTRIBUTOR | SYSTEM
+  
+  // Account properties
+  currency       String        @default("HTG") @db.VarChar(3)
+  status         AccountStatus @default(ACTIVE) // ACTIVE | FROZEN | CLOSED
+  isSystemAccount Boolean      @default(false) // System accounts (fees, float, etc.)
+  
+  // Metadata
+  metadata       Json?         @default("{}")
+  notes          String?
+  
+  // Timestamps
+  createdAt      DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime      @default(now()) @db.Timestamptz(6)
+  closedAt       DateTime?     @db.Timestamptz(6)
+  
+  // Relations
+  owner          User?         @relation("AccountOwner", fields: [ownerId], references: [id])
+  ledgerEntries  LedgerEntry[]
+  
+  @@index([accountNumber], map: "idx_account_number")
+  @@index([ownerId], map: "idx_account_owner_id")
+  @@index([accountType], map: "idx_account_type")
+  @@index([status], map: "idx_account_status")
+  @@index([currency], map: "idx_account_currency")
+  @@map("accounts")
+}
+
+// 📖 Ledger Entries (Double-Entry Records)
+model LedgerEntry {
+  id                String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  
+  // Core double-entry fields
+  accountId         String           @db.Uuid
+  transactionId     String           @db.Uuid
+  entryType         EntryType // DEBIT | CREDIT
+  
+  // Amounts
+  amount            Decimal          @db.Decimal(15, 2) // Always positive
+  currency          String           @db.VarChar(3)
+  
+  // Running balance (for this account after this entry)
+  balanceAfter      Decimal          @db.Decimal(15, 2)
+  
+  // Transaction context
+  description       String
+  referenceNumber   String           @db.VarChar(100) // External reference
+  
+  // Entry metadata
+  entryDate         DateTime         @default(now()) @db.Timestamptz(6) // Business date
+  postedAt          DateTime         @default(now()) @db.Timestamptz(6) // System timestamp
+  
+  // Reconciliation
+  isReconciled      Boolean          @default(false)
+  reconciledAt      DateTime?        @db.Timestamptz(6)
+  reconciledBy      String?          @db.Uuid
+  
+  // Metadata
+  metadata          Json?            @default("{}")
+  
+  // Immutability (ledger entries are NEVER updated, only reversed)
+  isReversed        Boolean          @default(false)
+  reversalEntryId   String?          @db.Uuid // Points to reversal entry
+  originalEntryId   String?          @db.Uuid // If this IS a reversal
+  
+  createdAt         DateTime         @default(now()) @db.Timestamptz(6)
+  
+  // Relations
+  account           Account          @relation(fields: [accountId], references: [id])
+  financialTransaction FinancialTransaction @relation(fields: [transactionId], references: [id])
+  
+  @@index([accountId], map: "idx_ledger_entry_account_id")
+  @@index([transactionId], map: "idx_ledger_entry_transaction_id")
+  @@index([entryDate], map: "idx_ledger_entry_entry_date")
+  @@index([postedAt], map: "idx_ledger_entry_posted_at")
+  @@index([entryType], map: "idx_ledger_entry_type")
+  @@index([isReconciled], map: "idx_ledger_entry_reconciled")
+  @@index([isReversed], map: "idx_ledger_entry_reversed")
+  @@map("ledger_entries")
+}
+
+// 💸 Financial Transactions (Business Events)
+model FinancialTransaction {
+  id                 String                    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  
+  // Transaction identification
+  transactionNumber  String                    @unique @db.VarChar(50) // TXN-20260114-000001
+  transactionType    FinancialTransactionType // TRANSFER | PAYMENT | DEPOSIT | WITHDRAWAL | FEE | REFUND
+  
+  // Parties involved
+  initiatorId        String                    @db.Uuid // Who initiated
+  initiatorType      OwnerType // USER | MERCHANT | DISTRIBUTOR | SYSTEM
+  
+  // Transaction details
+  totalAmount        Decimal                   @db.Decimal(15, 2)
+  currency           String                    @db.VarChar(3)
+  description        String
+  
+  // Status tracking
+  status             FinancialTransactionStatus @default(PENDING)
+  
+  // Processing timestamps
+  initiatedAt        DateTime                  @default(now()) @db.Timestamptz(6)
+  processedAt        DateTime?                 @db.Timestamptz(6)
+  completedAt        DateTime?                 @db.Timestamptz(6)
+  failedAt           DateTime?                 @db.Timestamptz(6)
+  
+  // Error handling
+  failureReason      String?
+  retryCount         Int                       @default(0)
+  
+  // External references
+  externalReference  String?                   @db.VarChar(255) // Stripe ID, etc.
+  relatedTransactionId String?                 @db.Uuid // For reversals, refunds
+  
+  // Metadata
+  metadata           Json?                     @default("{}")
+  ipAddress          String?                   @db.Inet
+  userAgent          String?
+  location           Json?
+  
+  // Audit
+  createdAt          DateTime                  @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime                  @default(now()) @db.Timestamptz(6)
+  
+  // Relations
+  initiator          User                      @relation("TransactionInitiator", fields: [initiatorId], references: [id])
+  ledgerEntries      LedgerEntry[]
+  
+  @@index([transactionNumber], map: "idx_fin_tx_number")
+  @@index([transactionType], map: "idx_fin_tx_type")
+  @@index([initiatorId], map: "idx_fin_tx_initiator_id")
+  @@index([status], map: "idx_fin_tx_status")
+  @@index([initiatedAt], map: "idx_fin_tx_initiated_at")
+  @@index([currency], map: "idx_fin_tx_currency")
+  @@map("financial_transactions")
+}
+
+// 💰 Account Balance Snapshots (for performance)
+// Balances are derived from ledger entries, but we cache them for speed
+model AccountBalanceSnapshot {
+  id              String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  accountId       String   @db.Uuid
+  
+  // Balance information
+  balance         Decimal  @db.Decimal(15, 2)
+  currency        String   @db.VarChar(3)
+  
+  // Snapshot metadata
+  snapshotDate    DateTime @db.Date // Business date
+  lastEntryId     String   @db.Uuid // Last ledger entry included
+  
+  // Audit
+  createdAt       DateTime @default(now()) @db.Timestamptz(6)
+  
+  @@unique([accountId, snapshotDate])
+  @@index([accountId], map: "idx_balance_snapshot_account_id")
+  @@index([snapshotDate], map: "idx_balance_snapshot_date")
+  @@map("account_balance_snapshots")
+}
+
+// ========================== ENUMS FOR LEDGER ==========================
+
+enum AccountType {
+  ASSET      // User wallets, cash, receivables
+  LIABILITY  // Payables, reserves
+  EQUITY     // Owner's equity, retained earnings
+  REVENUE    // Merchant sales, fees collected
+  EXPENSE    // Operating costs, card fees paid
+  
+  @@map("account_type")
+}
+
+enum OwnerType {
+  USER
+  MERCHANT
+  DISTRIBUTOR
+  DIASPORA
+  SYSTEM
+  
+  @@map("owner_type")
+}
+
+enum AccountStatus {
+  ACTIVE
+  FROZEN
+  CLOSED
+  SUSPENDED
+  
+  @@map("account_status")
+}
+
+enum EntryType {
+  DEBIT
+  CREDIT
+  
+  @@map("entry_type")
+}
+
+enum FinancialTransactionType {
+  TRANSFER        // P2P transfer
+  PAYMENT         // Merchant payment
+  DEPOSIT         // External deposit
+  WITHDRAWAL      // Cash out
+  FEE             // Platform fee
+  COMMISSION      // Merchant/distributor commission
+  REFUND          // Transaction reversal
+  ADJUSTMENT      // Manual adjustment
+  EXCHANGE        // Currency exchange
+  
+  @@map("financial_transaction_type")
+}
+
+enum FinancialTransactionStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REVERSED
+  CANCELLED
+  
+  @@map("financial_transaction_status")
+}
+
+// ========================== ORIGINAL PAYMENT MODEL ==========================
 
 // Payment status enum for Payment model
 enum payment_status {

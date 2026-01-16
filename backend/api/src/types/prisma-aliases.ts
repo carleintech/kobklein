@@ -37,7 +37,7 @@ export type KYCDocumentType = $Enums.kyc_document_type;
 
 // Role enum for backwards compatibility
 export enum Role {
-  CLIENT = 'CLIENT',
+  INDIVIDUAL = 'INDIVIDUAL',
   MERCHANT = 'MERCHANT',
   DISTRIBUTOR = 'DISTRIBUTOR',
   DIASPORA = 'DIASPORA',
